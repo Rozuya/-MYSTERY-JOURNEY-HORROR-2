@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+>
+
+<meta
+    name="theme-color"
+    content="#030609"
+>
+
+<meta
+    name="description"
+    content="MYSTERY JOURNEY: HORROR 2 — THE LAST CALL"
+>
+
+<title>
+MYSTERY JOURNEY: HORROR 2 — THE LAST CALL
+</title>
+
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     JEU
+===================================================== -->
+
+<div id="game">
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="game-header">
+
+    <div>
+
+        <small id="chapter">
+            PROLOGUE
+        </small>
+
+        <h1 id="location">
+            THE LAST CALL
+        </h1>
+
+    </div>
+
+
+    <button
+        id="saveBtn"
+        class="small-btn"
+        type="button"
+        aria-label="Sauvegarder"
+        title="Sauvegarder"
+    >
+        💾
+    </button>
+
+</header>
+
+
+<!-- =====================================================
+     CONTENU
+===================================================== -->
+
+<main>
+
+
+<section
+    id="storyBox"
+    class="story-box"
+>
+
+
+    <!-- TEMPS -->
+
+    <div
+        id="time"
+        class="story-time"
+    >
+    </div>
+
+
+    <!-- PERSONNAGE / VOIX -->
+
+    <div
+        id="speaker"
+        class="speaker"
+    >
+    </div>
+
+
+    <!-- TEXTE -->
+
+    <div
+        id="storyText"
+        class="story-text"
+    >
+    </div>
+
+
+    <!-- CHOIX -->
+
+    <div
+        id="choices"
+        class="choices"
+    >
+    </div>
+
+
+</section>
+
+
+<!-- =====================================================
+     STATISTIQUES
+===================================================== -->
+
+<section class="status">
+
+
+    <div>
+
+        <span>
+            Indices
+        </span>
+
+        <b id="clueCount">
+            0
+        </b>
+
+    </div>
+
+
+    <div>
+
+        <span>
+            Objets
+        </span>
+
+        <b id="itemCount">
+            0
+        </b>
+
+    </div>
+
+
+    <div>
+
+        <span>
+            Progression
+        </span>
+
+        <b id="progress">
+            0%
+        </b>
+
+    </div>
+
+
+</section>
+
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+
+    <button
+        id="menuBtn"
+        class="small-btn"
+        type="button"
+    >
+        ☰ Menu
+    </button>
+
+
+    <div class="music">
+
+        <span>
+            🎵
+        </span>
+
+        <span>
+            The Last Call
+        </span>
+
+
+        <input
+            id="volume"
+            type="range"
+            min="0"
+            max="100"
+            value="45"
+            aria-label="Volume de la musique"
+        >
+
+
+        <span id="volumeValue">
+            45%
+        </span>
+
+    </div>
+
+
+</footer>
+
+
+</div>
+
+
+<!-- =====================================================
+     ÉCRAN DE FIN
+===================================================== -->
+
+<div
+    id="ending"
+    class="ending hidden"
+>
+
+
+    <div class="ending-card">
+
+
+        <div id="endingIcon">
+            📞
+        </div>
+
+
+        <h2 id="endingTitle">
+            Fin
+        </h2>
+
+
+        <p id="endingText">
+        </p>
+
+
+        <div class="ending-actions">
+
+
+            <button
+                id="restartBtn"
+                type="button"
+            >
+                Nouvelle partie
+            </button>
+
+
+            <button
+                id="againBtn"
+                type="button"
+            >
+                Rejouer
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     NOTIFICATION
+===================================================== -->
+
+<div id="toast"></div>
+
+
+<!-- =====================================================
+     MUSIQUE
+===================================================== -->
+
+<audio
+    id="music"
+    loop
+    preload="auto"
+>
+
+    <source
+        src="The Last Call.mp3"
+        type="audio/mpeg"
+    >
+
+</audio>
+
+
+<!-- =====================================================
+     HISTOIRE
+===================================================== -->
+
+<script src="save.js"></script>
+
+<script src="prologue.js"></script>
+
+<script src="chapter1.js"></script>
+
+<script src="chapter2.js"></script>
+
+<script src="chapter3.js"></script>
+
+<script src="chapter4.js"></script>
+
+<script src="chapter5.js"></script>
+
+
+<!-- =====================================================
+     MOTEUR
+===================================================== -->
+
+<script src="game.js"></script>
+
+
+</body>
+</html>
