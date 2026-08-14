@@ -3,376 +3,186 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     const $ = id => document.getElementById(id);
-
     const STORY = window.STORY || {};
     const SAVE = window.SaveSystem || null;
 
-    let game = fresh();
+    let game = {
+        scene: "start",
+        chapter: "PROLOGUE",
+        clues: [],
+        items: [],
+        decisions: [],
+        endings: [],
+        started: Date.now(),
+        lastSaved: Date.now()
+    };
+
     let typing = false;
     let timer = null;
 
-    const params = new URLSearchParams(
-        window.location.search
-    );
-
-
-    /* =========================================================
-       NOUVELLE PARTIE
-    ========================================================= */
-
-    function fresh(){
-
-        return {
-
-            scene:"start",
-
-            chapter:"PROLOGUE",
-
-            clues:[],
-
-            items:[],
-
-            decisions:[],
-
-            endings:[],
-
-            started:Date.now(),
-
-            lastSaved:Date.now()
-        };
-    }
-
-
-    /* =========================================================
-       ALIAS DES TRANSITIONS
-    ========================================================= */
-
     const aliases = {
-
-        chapter1_start:"chapter1_begin",
-
-        chapter2_begin:"chapter2_start",
-
-        chapter3_begin:"chapter3_start",
-
-        chapter4_begin:"chapter4_start",
-
-        chapter5_begin:"chapter5_start"
+        chapter1_start: "chapter1_begin",
+        chapter2_begin: "chapter2_start",
+        chapter3_begin: "chapter3_start",
+        chapter4_begin: "chapter4_start",
+        chapter5_begin: "chapter5_start"
     };
 
 
-    function resolve(id){
+    /* =====================================================
+       OUTILS
+    ===================================================== */
 
-        if(STORY[id]){
-
-            return id;
-        }
-
-        if(
-            aliases[id] &&
-            STORY[aliases[id]]
-        ){
-
-            return aliases[id];
-        }
-
-        return id;
+    function resolve(id) {
+        return STORY[id]
+            ? id
+            : (aliases[id] && STORY[aliases[id]]
+                ? aliases[id]
+                : id);
     }
 
 
-    /* =========================================================
-       NOTIFICATION
-    ========================================================= */
+    function toast(text) {
+        const e = $("toast");
+        if (!e) return;
 
-    function toast(text){
+        e.textContent = text;
+        e.classList.add("show");
 
-        const element =
-            $("toast");
+        clearTimeout(e._toast);
 
-        if(!element){
-
-            return;
-        }
-
-        element.textContent =
-            text;
-
-        element.classList.add(
-            "show"
+        e._toast = setTimeout(
+            () => e.classList.remove("show"),
+            2200
         );
-
-        clearTimeout(
-            element._toast
-        );
-
-        element._toast =
-            setTimeout(
-                () => {
-
-                    element.classList.remove(
-                        "show"
-                    );
-
-                },
-                2200
-            );
     }
 
 
-    /* =========================================================
+    function clean(text) {
+        return String(text || "")
+            .replace(/\r\n/g, "\n")
+            .replace(/\n{3,}/g, "\n\n")
+            .trim();
+    }
+
+
+    /* =====================================================
        SAUVEGARDE
-    ========================================================= */
+    ===================================================== */
 
-    function save(show=false){
-
-        if(
-            !SAVE ||
-            typeof SAVE.save !== "function"
-        ){
-
+    function save(show = false) {
+        if (!SAVE || typeof SAVE.save !== "function")
             return false;
-        }
 
-        game.lastSaved =
-            Date.now();
+        game.lastSaved = Date.now();
 
-        const result =
-            SAVE.save(game);
+        const ok = SAVE.save(game);
 
-        if(
-            show &&
-            result
-        ){
+        if (show && ok)
+            toast("💾 Partie sauvegardée");
 
-            toast(
-                "💾 Partie sauvegardée"
-            );
-        }
-
-        return result;
+        return ok;
     }
 
 
-    /* =========================================================
-       CHARGEMENT
-    ========================================================= */
-
-    function load(){
-
-        if(
-            !SAVE ||
-            typeof SAVE.load !== "function"
-        ){
-
+    function load() {
+        if (!SAVE || typeof SAVE.load !== "function")
             return false;
-        }
 
-        const data =
-            SAVE.load();
+        const data = SAVE.load();
 
-        if(
-            !data ||
-            typeof data !== "object"
-        ){
-
+        if (!data || typeof data !== "object")
             return false;
-        }
 
         game = {
-
-            ...fresh(),
-
+            ...game,
             ...data,
-
-            clues:
-                Array.isArray(data.clues)
-                ? data.clues
-                : [],
-
-            items:
-                Array.isArray(data.items)
-                ? data.items
-                : [],
-
-            decisions:
-                Array.isArray(data.decisions)
+            clues: Array.isArray(data.clues) ? data.clues : [],
+            items: Array.isArray(data.items) ? data.items : [],
+            decisions: Array.isArray(data.decisions)
                 ? data.decisions
                 : [],
-
-            endings:
-                Array.isArray(data.endings)
+            endings: Array.isArray(data.endings)
                 ? data.endings
                 : []
         };
 
-        game.scene =
-            resolve(game.scene);
+        game.scene = resolve(game.scene);
 
-        return !!STORY[
-            game.scene
-        ];
+        return !!STORY[game.scene];
     }
 
 
-    /* =========================================================
+    /* =====================================================
        STATISTIQUES
-    ========================================================= */
+    ===================================================== */
 
-    function stats(){
+    function stats() {
+        const clue = $("clueCount");
+        const item = $("itemCount");
+        const progress = $("progress");
 
-        const clue =
-            $("clueCount");
+        if (clue)
+            clue.textContent = game.clues.length;
 
-        const item =
-            $("itemCount");
+        if (item)
+            item.textContent = game.items.length;
 
-        const progress =
-            $("progress");
+        if (progress) {
+            const total = Object.keys(STORY).length || 1;
 
-        if(clue){
-
-            clue.textContent =
-                game.clues.length;
-        }
-
-        if(item){
-
-            item.textContent =
-                game.items.length;
-        }
-
-        if(progress){
-
-            const total =
-                Object.keys(STORY).length || 1;
-
-            const visited =
-                new Set(
-                    game.decisions.map(
-                        decision =>
-                            decision.scene
-                    )
-                ).size;
+            const visited = new Set(
+                game.decisions.map(x => x.scene)
+            ).size;
 
             progress.textContent =
                 Math.min(
                     99,
-                    Math.round(
-                        visited /
-                        total *
-                        100
-                    )
+                    Math.round(visited / total * 100)
                 ) + "%";
         }
     }
 
 
-    /* =========================================================
+    /* =====================================================
        MUSIQUE
-    ========================================================= */
+    ===================================================== */
 
-    function music(){
+    function music() {
+        const audio = $("music");
+        const slider = $("volume");
+        const value = $("volumeValue");
 
-        const audio =
-            $("music");
+        if (!audio) return;
 
-        const slider =
-            $("volume");
+        let volume = 0.45;
 
-        const value =
-            $("volumeValue");
-
-        if(!audio){
-
-            return;
-        }
-
-        audio.loop = true;
-
-        /*
-           Le fichier présent dans ton game.html
-           reste utilisé.
-        */
-
-        let volume =
-            0.45;
-
-        if(
+        if (
             SAVE &&
             typeof SAVE.volume === "function"
-        ){
+        ) {
+            const v = Number(SAVE.volume());
 
-            const savedVolume =
-                Number(
-                    SAVE.volume()
-                );
-
-            if(
-                Number.isFinite(
-                    savedVolume
-                )
-            ){
-
-                volume =
-                    savedVolume;
-            }
+            if (Number.isFinite(v))
+                volume = v;
         }
 
-        volume =
-            Math.max(
-                0,
-                Math.min(
-                    1,
-                    volume
-                )
-            );
+        volume = Math.max(0, Math.min(1, volume));
+        audio.volume = volume;
 
-        audio.volume =
-            volume;
+        if (slider)
+            slider.value = Math.round(volume * 100);
 
-        if(slider){
-
-            slider.value =
-                Math.round(
-                    volume * 100
-                );
-        }
-
-        if(value){
-
+        if (value)
             value.textContent =
-                Math.round(
-                    volume * 100
-                ) + "%";
-        }
+                Math.round(volume * 100) + "%";
 
 
-        /* =====================================================
-           LANCEMENT MUSIQUE
-        ===================================================== */
-
-        function startMusic(){
-
-            if(
-                !audio ||
-                !audio.paused
-            ){
-
+        function startMusic() {
+            if (!audio || !audio.paused)
                 return;
-            }
 
-            const promise =
-                audio.play();
-
-            if(
-                promise &&
-                typeof promise.catch === "function"
-            ){
-
-                promise.catch(
-                    () => {}
-                );
-            }
+            audio.play().catch(() => {});
         }
 
         startMusic();
@@ -381,56 +191,35 @@ document.addEventListener("DOMContentLoaded", () => {
             "pointerdown",
             startMusic,
             {
-                once:true,
-                passive:true
+                once: true,
+                passive: true
             }
         );
 
 
-        /* =====================================================
-           VOLUME
-        ===================================================== */
-
-        if(slider){
-
+        if (slider) {
             slider.addEventListener(
                 "input",
                 () => {
+                    const v = Math.max(
+                        0,
+                        Math.min(
+                            1,
+                            Number(slider.value) / 100
+                        )
+                    );
 
-                    const number =
-                        Math.max(
-                            0,
-                            Math.min(
-                                100,
-                                Number(
-                                    slider.value
-                                ) || 0
-                            )
-                        );
+                    audio.volume = v;
 
-                    const newVolume =
-                        number / 100;
-
-                    audio.volume =
-                        newVolume;
-
-                    if(value){
-
+                    if (value)
                         value.textContent =
-                            Math.round(
-                                newVolume * 100
-                            ) + "%";
-                    }
+                            Math.round(v * 100) + "%";
 
-                    if(
+                    if (
                         SAVE &&
-                        typeof SAVE.setVolume ===
-                        "function"
-                    ){
-
-                        SAVE.setVolume(
-                            newVolume
-                        );
+                        typeof SAVE.setVolume === "function"
+                    ) {
+                        SAVE.setVolume(v);
                     }
 
                     startMusic();
@@ -440,386 +229,174 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =========================================================
-       TEXTE AVEC EFFET MACHINE À ÉCRIRE
-    ========================================================= */
+    /* =====================================================
+       TEXTE
+    ===================================================== */
 
-    function showText(text, done){
+    function showText(text, done) {
+        clearInterval(timer);
 
-        clearInterval(
-            timer
-        );
+        const box = $("storyText");
 
-        const box =
-            $("storyText");
+        if (!box) {
+            if (done) done();
+            return;
+        }
 
-        if(!box){
+        text = clean(text);
 
-            if(done){
+        box.textContent = "";
+        typing = true;
 
-                done();
+        let index = 0;
+
+        timer = setInterval(() => {
+            box.textContent += text.charAt(index++);
+
+            if (index >= text.length) {
+                clearInterval(timer);
+                timer = null;
+                typing = false;
+
+                if (done)
+                    done();
             }
-
-            return;
-        }
-
-        typing =
-            true;
-
-        box.textContent =
-            "";
-
-        text =
-            String(
-                text || ""
-            )
-            .replace(
-                /\r\n/g,
-                "\n"
-            )
-            .replace(
-                /\n{3,}/g,
-                "\n\n"
-            )
-            .trim();
-
-        let index =
-            0;
-
-        timer =
-            setInterval(
-                () => {
-
-                    box.textContent +=
-                        text.charAt(
-                            index
-                        );
-
-                    index++;
-
-                    if(
-                        index >=
-                        text.length
-                    ){
-
-                        clearInterval(
-                            timer
-                        );
-
-                        timer =
-                            null;
-
-                        typing =
-                            false;
-
-                        if(done){
-
-                            done();
-                        }
-                    }
-
-                },
-                18
-            );
+        }, 18);
     }
 
 
-    /* =========================================================
-       TERMINER LE TEXTE IMMÉDIATEMENT
-    ========================================================= */
+    function finish(data) {
+        clearInterval(timer);
 
-    function finish(sceneData){
+        timer = null;
+        typing = false;
 
-        clearInterval(
-            timer
-        );
+        const box = $("storyText");
 
-        timer =
-            null;
+        if (box)
+            box.textContent = clean(data.text);
 
-        typing =
-            false;
-
-        const box =
-            $("storyText");
-
-        if(box){
-
-            box.textContent =
-                String(
-                    sceneData.text || ""
-                )
-                .replace(
-                    /\r\n/g,
-                    "\n"
-                )
-                .replace(
-                    /\n{3,}/g,
-                    "\n\n"
-                )
-                .trim();
-        }
-
-        renderChoices(
-            sceneData
-        );
+        renderChoices(data);
     }
 
 
-    /* =========================================================
+    /* =====================================================
        AFFICHER UNE SCÈNE
-    ========================================================= */
+    ===================================================== */
 
-    function scene(id){
+    function scene(id) {
+        id = resolve(id);
 
-        id =
-            resolve(id);
+        const data = STORY[id];
 
-        const data =
-            STORY[id];
-
-        if(!data){
-
-            console.error(
-                "Scène introuvable :",
-                id
-            );
-
-            toast(
-                "⚠️ Scène introuvable : " +
-                id
-            );
-
+        if (!data) {
+            console.error("Scène introuvable :", id);
+            toast("⚠️ Scène introuvable");
             return;
         }
 
-        game.scene =
-            id;
+        game.scene = id;
 
-        if(data.chapter){
-
-            game.chapter =
-                data.chapter;
-        }
+        if (data.chapter)
+            game.chapter = data.chapter;
 
 
-        /* =====================================================
-           INTERFACE
-        ===================================================== */
+        const chapter = $("chapter");
+        const location = $("location");
+        const time = $("time");
+        const speaker = $("speaker");
+        const choices = $("choices");
 
-        const chapter =
-            $("chapter");
-
-        const location =
-            $("location");
-
-        const time =
-            $("time");
-
-        const speaker =
-            $("speaker");
-
-        const choices =
-            $("choices");
-
-
-        if(chapter){
-
+        if (chapter)
             chapter.textContent =
-                data.chapter ||
-                "MYSTERY JOURNEY";
-        }
+                data.chapter || "MYSTERY JOURNEY";
 
-        if(location){
+        if (location)
+            location.textContent = data.location || "";
 
-            location.textContent =
-                data.location ||
-                "";
-        }
+        if (time)
+            time.textContent = data.time || "";
 
-        if(time){
+        if (speaker)
+            speaker.textContent = data.speaker || "";
 
-            time.textContent =
-                data.time ||
-                "";
-        }
-
-        if(speaker){
-
-            speaker.textContent =
-                data.speaker ||
-                "";
-        }
-
-        if(choices){
-
-            choices.innerHTML =
-                "";
-        }
+        if (choices)
+            choices.innerHTML = "";
 
         stats();
-
         save();
 
-
-        /* =====================================================
-           TEXTE
-        ===================================================== */
-
         showText(
-
             data.text || "",
-
-            () => {
-
-                renderChoices(
-                    data
-                );
-
-            }
+            () => renderChoices(data)
         );
     }
 
 
-    /* =========================================================
-       AFFICHER LES CHOIX
-    ========================================================= */
+    /* =====================================================
+       CHOIX
+    ===================================================== */
 
-    function renderChoices(data){
+    function renderChoices(data) {
+        const box = $("choices");
 
-        const box =
-            $("choices");
+        if (!box) return;
 
-        if(!box){
+        box.innerHTML = "";
 
-            return;
-        }
-
-        box.innerHTML =
-            "";
-
-        const choices =
-            Array.isArray(
-                data.choices
-            )
+        const choices = Array.isArray(data.choices)
             ? data.choices
             : [];
 
+        choices.forEach((choice, index) => {
 
-        choices.forEach(
-            (choice,index) => {
+            if (
+                typeof choice.condition === "function" &&
+                !choice.condition(game)
+            ) {
+                return;
+            }
 
-                /* =============================================
-                   CONDITION
-                ============================================= */
+            const button =
+                document.createElement("button");
 
-                if(
-                    typeof choice.condition ===
-                    "function" &&
-                    !choice.condition(game)
-                ){
+            button.type = "button";
+            button.className = "choice";
+            button.textContent =
+                choice.text || "Continuer";
 
+            button.onclick = () => {
+
+                if (typing) {
+                    finish(data);
                     return;
                 }
 
+                choose(choice, index);
+            };
 
-                const button =
-                    document.createElement(
-                        "button"
-                    );
-
-                button.type =
-                    "button";
-
-                button.className =
-                    "choice";
-
-                button.textContent =
-                    choice.text ||
-                    "Continuer";
-
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        /*
-                           Si le texte est encore
-                           en cours d'écriture,
-                           le clic termine d'abord
-                           le texte.
-                        */
-
-                        if(typing){
-
-                            finish(
-                                data
-                            );
-
-                            return;
-                        }
-
-                        choose(
-                            choice,
-                            index
-                        );
-
-                    }
-                );
-
-
-                box.appendChild(
-                    button
-                );
-
-            }
-        );
+            box.appendChild(button);
+        });
     }
 
 
-    /* =========================================================
+    /* =====================================================
        EFFECTUER UN CHOIX
-    ========================================================= */
+    ===================================================== */
 
-    function choose(choice,index){
-
-        /*
-           On mémorise tous les choix.
-
-           Cela permet aux chapitres suivants
-           d'utiliser game.decisions si besoin.
-        */
+    function choose(choice, index) {
 
         game.decisions.push({
-
-            scene:
-                game.scene,
-
-            choice:
-                index,
-
-            time:
-                Date.now()
+            scene: game.scene,
+            choice: index,
+            time: Date.now()
         });
 
 
-        /* =====================================================
-           EFFET
-        ===================================================== */
-
-        if(
-            typeof choice.effect ===
-            "function"
-        ){
-
-            try{
-
-                choice.effect(
-                    game
-                );
-
-            }catch(error){
-
+        if (typeof choice.effect === "function") {
+            try {
+                choice.effect(game);
+            } catch (error) {
                 console.error(
                     "Erreur effet :",
                     error
@@ -828,215 +405,138 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        /* =====================================================
-           INDICE
-        ===================================================== */
+        /* INDICE */
 
-        if(
+        if (
             choice.clue &&
-            !game.clues.includes(
-                choice.clue
-            )
-        ){
-
-            game.clues.push(
-                choice.clue
-            );
-
-            toast(
-                "🔎 Nouvel indice"
-            );
+            !game.clues.includes(choice.clue)
+        ) {
+            game.clues.push(choice.clue);
+            toast("🔎 Nouvel indice");
         }
 
 
-        /* =====================================================
-           OBJET
-        ===================================================== */
+        /* OBJET */
 
-        if(
+        if (
             choice.item &&
-            !game.items.includes(
-                choice.item
-            )
-        ){
-
-            game.items.push(
-                choice.item
-            );
-
-            toast(
-                "🎒 Objet obtenu"
-            );
+            !game.items.includes(choice.item)
+        ) {
+            game.items.push(choice.item);
+            toast("🎒 Objet obtenu");
         }
 
 
         stats();
-
         save();
 
 
-        /* =====================================================
-           FIN
-        ===================================================== */
+        /* FIN */
 
-        if(choice.end){
+        if (choice.end) {
+            unlockEnding(choice.end);
 
-            /*
-               On sauvegarde l'ID de la fin.
-
-               C'est ce même ID qui est utilisé
-               par SaveSystem pour l'accueil.
-            */
-
-            unlockEnding(
-                choice.end
-            );
-
-
-            /*
-               Si une scène de fin est indiquée,
-               on l'affiche directement.
-            */
-
-            if(choice.next){
-
-                const endingScene =
-                    resolve(
-                        choice.next
-                    );
-
-                if(
-                    STORY[
-                        endingScene
-                    ]
-                ){
-
-                    showEnding(
-                        choice.end,
-                        STORY[
-                            endingScene
-                        ]
-                    );
-
-                    return;
-                }
+            if (choice.next && STORY[resolve(choice.next)]) {
+                scene(choice.next);
+            } else {
+                showEnding(choice.end);
             }
 
-            /*
-               Si aucune scène de fin
-               n'est indiquée, on affiche
-               simplement l'écran de fin.
-            */
-
-            showEnding(
-                choice.end,
-                null
-            );
-
             return;
         }
 
 
-        /* =====================================================
-           SCÈNE SUIVANTE
-        ===================================================== */
+        /* SCÈNE SUIVANTE */
 
-        if(choice.next){
-
-            scene(
-                choice.next
-            );
-
-            return;
+        if (choice.next) {
+            scene(choice.next);
         }
-
-
-        /*
-           Aucun next et aucune end :
-           on reste simplement sur la scène.
-        */
-
-        renderChoices(
-            STORY[
-                game.scene
-            ]
-        );
     }
 
 
-    /* =========================================================
-       DÉBLOQUER UNE FIN
-    ========================================================= */
+    /* =====================================================
+       FINS
+    ===================================================== */
 
-    function unlockEnding(id){
+    function unlockEnding(id) {
+        if (!id) return;
 
-        if(!id){
+        if (!Array.isArray(game.endings))
+            game.endings = [];
 
-            return;
-        }
+        if (!game.endings.includes(id))
+            game.endings.push(id);
 
-
-        if(
-            !Array.isArray(
-                game.endings
-            )
-        ){
-
-            game.endings =
-                [];
-        }
-
-
-        if(
-            !game.endings.includes(
-                id
-            )
-        ){
-
-            game.endings.push(
-                id
-            );
-        }
-
-
-        if(
+        if (
             SAVE &&
-            typeof SAVE.unlockEnding ===
-            "function"
-        ){
-
-            SAVE.unlockEnding(
-                id
-            );
+            typeof SAVE.unlockEnding === "function"
+        ) {
+            SAVE.unlockEnding(id);
         }
-
 
         save();
     }
 
 
-    /* =========================================================
-       AFFICHER UNE FIN
-    ========================================================= */
+    function showEnding(id) {
+        clearInterval(timer);
 
-    function showEnding(id,data){
+        timer = null;
+        typing = false;
 
-        clearInterval(
-            timer
-        );
+        const gameBox = $("game");
+        const ending = $("ending");
 
-        timer =
-            null;
+        if (gameBox)
+            gameBox.classList.add("hidden");
 
-        typing =
-            false;
+        if (!ending) {
+            toast("🏆 Fin débloquée");
+            return;
+        }
+
+        ending.classList.remove("hidden");
+
+        const icon = $("endingIcon");
+        const title = $("endingTitle");
+        const text = $("endingText");
+
+        if (icon)
+            icon.textContent = "🩸";
+
+        if (title)
+            title.textContent = "FIN DÉBLOQUÉE";
+
+        if (text)
+            text.textContent =
+                "Tu as débloqué la fin : " + id;
+
+        const button = $("endingButton");
+
+        if (button) {
+            button.onclick = () => {
+                window.location.href = "index.html";
+            };
+        }
+    }
 
 
-        const gameBox =
-            $("game");
+    /* =====================================================
+       DÉMARRAGE
+    ===================================================== */
 
-        const ending =
-            $("ending");
+    const params =
+        new URLSearchParams(window.location.search);
 
-        const endingIcon =
-            $("endingIcon"
+    if (
+        params.has("continue") &&
+        load()
+    ) {
+        scene(game.scene);
+    } else {
+        scene(resolve("start"));
+    }
+
+    music();
+
+});
