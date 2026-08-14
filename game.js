@@ -1,608 +1,156 @@
-"use strict";
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const $ = id => document.getElementById(id);
-    const STORY = window.STORY || {};
-    const SAVE = window.SaveSystem || null;
-
-    let game = fresh();
-    let typing = false;
-    let timer = null;
-
-    const params = new URLSearchParams(location.search);
-
-    function fresh() {
-        return {
-            scene: "start",
-            chapter: "PROLOGUE",
-            clues: [],
-            items: [],
-            decisions: [],
-            endings: [],
-            started: Date.now(),
-            lastSaved: Date.now()
-        };
-    }
-
-    const aliases = {
-        chapter1_start: "chapter1_begin",
-        chapter2_begin: "chapter2_start",
-        chapter3_begin: "chapter3_start",
-        chapter4_begin: "chapter4_start",
-        chapter5_begin: "chapter5_start"
-    };
-
-    function resolve(id) {
-        if (STORY[id]) return id;
-        return aliases[id] && STORY[aliases[id]]
-            ? aliases[id]
-            : id;
-    }
-
-    function toast(text) {
-        const e = $("toast");
-        if (!e) return;
-
-        e.textContent = text;
-        e.classList.add("show");
-
-        clearTimeout(e._timer);
-
-        e._timer = setTimeout(() => {
-            e.classList.remove("show");
-        }, 2200);
-    }
-
-    function clean(text) {
-        return String(text || "")
-            .replace(/\r\n/g, "\n")
-            .replace(/\n{3,}/g, "\n\n")
-            .trim();
-    }
-
-    function save(show = false) {
-
-        if (!SAVE || typeof SAVE.save !== "function") {
-            return false;
-        }
-
-        game.lastSaved = Date.now();
-
-        const ok = SAVE.save(game);
-
-        if (show && ok) {
-            toast("💾 Partie sauvegardée");
-        }
-
-        return ok;
-    }
-
-    function load() {
-
-        if (!SAVE || typeof SAVE.load !== "function") {
-            return false;
-        }
-
-        const data = SAVE.load();
-
-        if (!data || typeof data !== "object") {
-            return false;
-        }
-
-        game = {
-            ...fresh(),
-            ...data,
-            clues: Array.isArray(data.clues) ? data.clues : [],
-            items: Array.isArray(data.items) ? data.items : [],
-            decisions: Array.isArray(data.decisions)
-                ? data.decisions
-                : [],
-            endings: Array.isArray(data.endings)
-                ? data.endings
-                : []
-        };
+<!DOCTYPE html>
+<html lang="fr">
 
-        game.scene = resolve(game.scene);
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050505">
+<title>Mystery Journey: Horror 2</title>
+<link rel="stylesheet" href="style.css">
+</head>
 
-        return !!STORY[game.scene];
-    }
-
-    function stats() {
-
-        const clue = $("clueCount");
-        const item = $("itemCount");
-        const progress = $("progress");
+<body>
 
-        if (clue) {
-            clue.textContent = game.clues.length;
-        }
+<div id="game">
 
-        if (item) {
-            item.textContent = game.items.length;
-        }
+<header class="game-header">
+<div>
+<small id="chapter">PROLOGUE</small>
+<h1 id="location">THE LAST CALL HOTEL</h1>
+</div>
 
-        if (progress) {
-
-            const total =
-                Object.keys(STORY).length || 1;
+<button id="saveBtn" class="small-btn">
+💾
+</button>
+</header>
 
-            const visited =
-                new Set(
-                    game.decisions.map(x => x.scene)
-                ).size;
+<main>
 
-            progress.textContent =
-                Math.min(
-                    99,
-                    Math.round(
-                        visited / total * 100
-                    )
-                ) + "%";
-        }
-    }
-
-    function setupMusic() {
-
-        const audio = $("music");
-        const slider = $("volume");
-        const value = $("volumeValue");
-
-        if (!audio) return;
+<section id="storyBox" class="story-box">
 
-        const source =
-            audio.querySelector("source");
+<div id="time" class="story-time"></div>
 
-        if (source) {
-            source.src = "The Last Call.mp3";
-            audio.load();
-        } else {
-            audio.src = "The Last Call.mp3";
-        }
+<div id="speaker" class="speaker"></div>
 
-        audio.loop = true;
+<div id="storyText" class="story-text"></div>
 
-        let volume = 0.45;
+<div id="choices" class="choices"></div>
 
-        if (
-            SAVE &&
-            typeof SAVE.volume === "function"
-        ) {
-            const saved = Number(SAVE.volume());
+</section>
 
-            if (Number.isFinite(saved)) {
-                volume = saved;
-            }
-        }
+<section class="status">
 
-        volume = Math.max(
-            0,
-            Math.min(1, volume)
-        );
+<div>
+<span>Indices</span>
+<b id="clueCount">0</b>
+</div>
 
-        audio.volume = volume;
+<div>
+<span>Objets</span>
+<b id="itemCount">0</b>
+</div>
 
-        if (slider) {
-            slider.value =
-                Math.round(volume * 100);
-        }
+<div>
+<span>Progression</span>
+<b id="progress">0%</b>
+</div>
 
-        if (value) {
-            value.textContent =
-                Math.round(volume * 100) + "%";
-        }
+</section>
 
-        function playMusic() {
-            audio.play().catch(() => {});
-        }
+</main>
 
-        playMusic();
+<footer>
 
-        document.addEventListener(
-            "pointerdown",
-            playMusic,
-            { once: true }
-        );
+<button id="menuBtn" class="small-btn">
+☰ Menu
+</button>
 
-        document.addEventListener(
-            "keydown",
-            playMusic,
-            { once: true }
-        );
+<div class="music">
 
-        if (slider) {
+<span>🎵</span>
 
-            slider.addEventListener(
-                "input",
-                () => {
+<input
+id="volume"
+type="range"
+min="0"
+max="100"
+value="45"
+aria-label="Volume">
 
-                    let v =
-                        Number(slider.value) / 100;
+<span id="volumeValue">
+45%
+</span>
 
-                    v = Math.max(
-                        0,
-                        Math.min(1, v)
-                    );
+</div>
 
-                    audio.volume = v;
+</footer>
 
-                    if (value) {
-                        value.textContent =
-                            Math.round(v * 100) + "%";
-                    }
+</div>
 
-                    if (
-                        SAVE &&
-                        typeof SAVE.setVolume ===
-                        "function"
-                    ) {
-                        SAVE.setVolume(v);
-                    }
 
-                    playMusic();
-                }
-            );
-        }
-    }
+<!-- =========================
+     ÉCRAN DE FIN
+========================= -->
 
-    function showText(text, done) {
+<div id="ending" class="ending hidden">
 
-        clearInterval(timer);
+<div class="ending-card">
 
-        const box = $("storyText");
+<div id="endingIcon"></div>
 
-        if (!box) {
-            if (done) done();
-            return;
-        }
+<h2 id="endingTitle"></h2>
 
-        text = clean(text);
+<p id="endingText"></p>
 
-        box.textContent = "";
-        typing = true;
+<div class="ending-actions">
 
-        let i = 0;
+<button id="restartBtn">
+Nouvelle partie
+</button>
 
-        timer = setInterval(() => {
+<button id="againBtn">
+Rejouer
+</button>
 
-            box.textContent += text.charAt(i++);
+<button id="endingMenuBtn">
+Menu
+</button>
 
-            if (i >= text.length) {
+</div>
 
-                clearInterval(timer);
-                timer = null;
-                typing = false;
+</div>
 
-                if (done) done();
-            }
+</div>
 
-        }, 18);
-    }
 
-    function finish(data) {
+<!-- =========================
+     MUSIQUE
+========================= -->
 
-        clearInterval(timer);
+<audio
+id="music"
+loop
+preload="auto">
 
-        timer = null;
-        typing = false;
+<source
+src="The Last Call.mp3"
+type="audio/mpeg">
 
-        const box = $("storyText");
+</audio>
 
-        if (box) {
-            box.textContent =
-                clean(data.text);
-        }
 
-        renderChoices(data);
-    }
+<!-- =========================
+     SYSTÈME DU JEU
+========================= -->
 
-    function scene(id) {
+<script src="save.js"></script>
+<script src="prologue.js"></script>
+<script src="chapter1.js"></script>
+<script src="chapter2.js"></script>
+<script src="chapter3.js"></script>
+<script src="chapter4.js"></script>
+<script src="chapter5.js"></script>
+<script src="game.js"></script>
 
-        id = resolve(id);
-
-        const data = STORY[id];
-
-        if (!data) {
-
-            console.error(
-                "Scène introuvable :",
-                id
-            );
-
-            toast("⚠️ Scène introuvable");
-
-            return;
-        }
-
-        game.scene = id;
-
-        if (data.chapter) {
-            game.chapter = data.chapter;
-        }
-
-        const chapter = $("chapter");
-        const location = $("location");
-        const time = $("time");
-        const speaker = $("speaker");
-        const choices = $("choices");
-
-        if (chapter) {
-            chapter.textContent =
-                data.chapter || "MYSTERY JOURNEY";
-        }
-
-        if (location) {
-            location.textContent =
-                data.location || "";
-        }
-
-        if (time) {
-            time.textContent =
-                data.time || "";
-        }
-
-        if (speaker) {
-            speaker.textContent =
-                data.speaker || "";
-        }
-
-        if (choices) {
-            choices.innerHTML = "";
-        }
-
-        stats();
-        save();
-
-        showText(
-            data.text || "",
-            () => renderChoices(data)
-        );
-    }
-
-    function renderChoices(data) {
-
-        const box = $("choices");
-
-        if (!box) return;
-
-        box.innerHTML = "";
-
-        const choices =
-            Array.isArray(data.choices)
-                ? data.choices
-                : [];
-
-        choices.forEach((choice, index) => {
-
-            if (
-                typeof choice.condition ===
-                "function" &&
-                !choice.condition(game)
-            ) {
-                return;
-            }
-
-            const button =
-                document.createElement("button");
-
-            button.type = "button";
-            button.className = "choice";
-            button.textContent =
-                choice.text || "Continuer";
-
-            button.onclick = () => {
-
-                if (typing) {
-                    finish(data);
-                    return;
-                }
-
-                choose(choice, index);
-            };
-
-            box.appendChild(button);
-        });
-    }
-
-    function choose(choice, index) {
-
-        game.decisions.push({
-            scene: game.scene,
-            choice: index,
-            time: Date.now()
-        });
-
-        if (typeof choice.effect === "function") {
-
-            try {
-                choice.effect(game);
-            } catch (error) {
-                console.error(
-                    "Erreur effet :",
-                    error
-                );
-            }
-        }
-
-        /* INDICE */
-        if (
-            choice.clue &&
-            !game.clues.includes(choice.clue)
-        ) {
-            game.clues.push(choice.clue);
-            // Notification supprimée volontairement
-        }
-
-        /* OBJET */
-        if (
-            choice.item &&
-            !game.items.includes(choice.item)
-        ) {
-            game.items.push(choice.item);
-            // Notification supprimée volontairement
-        }
-
-        stats();
-        save();
-
-        if (choice.end) {
-
-            unlockEnding(choice.end);
-
-            if (
-                choice.next &&
-                STORY[resolve(choice.next)]
-            ) {
-                scene(choice.next);
-            } else {
-                showEnding(choice.end);
-            }
-
-            return;
-        }
-
-        if (choice.next) {
-            scene(choice.next);
-        }
-    }
-
-    function unlockEnding(id) {
-
-        if (!id) return;
-
-        if (!Array.isArray(game.endings)) {
-            game.endings = [];
-        }
-
-        if (!game.endings.includes(id)) {
-            game.endings.push(id);
-        }
-
-        if (
-            SAVE &&
-            typeof SAVE.unlockEnding ===
-            "function"
-        ) {
-            SAVE.unlockEnding(id);
-        }
-
-        save();
-    }
-
-    function showEnding(id) {
-
-        clearInterval(timer);
-
-        timer = null;
-        typing = false;
-
-        const gameBox = $("game");
-        const ending = $("ending");
-
-        if (gameBox) {
-            gameBox.classList.add("hidden");
-        }
-
-        if (!ending) {
-            toast("🏆 Fin débloquée");
-            return;
-        }
-
-        ending.classList.remove("hidden");
-
-        const icon = $("endingIcon");
-        const title = $("endingTitle");
-        const text = $("endingText");
-
-        if (icon) {
-            icon.textContent = "🩸";
-        }
-
-        if (title) {
-            title.textContent =
-                "FIN DÉBLOQUÉE";
-        }
-
-        if (text) {
-            text.textContent =
-                "Tu as débloqué la fin : " + id;
-        }
-    }
-
-    const saveBtn = $("saveBtn");
-
-    if (saveBtn) {
-
-        saveBtn.type = "button";
-
-        saveBtn.onclick = () => {
-            save(true);
-        };
-    }
-
-    const menuBtn = $("menuBtn");
-
-    if (menuBtn) {
-
-        menuBtn.type = "button";
-
-        menuBtn.onclick = () => {
-
-            save();
-
-            window.location.href =
-                "index.html";
-        };
-    }
-
-    const restartBtn = $("restartBtn");
-    const againBtn = $("againBtn");
-    const endingMenuBtn = $("endingMenuBtn");
-
-    if (restartBtn) {
-
-        restartBtn.onclick = () => {
-
-            if (SAVE && SAVE.clear) {
-                SAVE.clear();
-            }
-
-            window.location.href =
-                "game.html?new=1";
-        };
-    }
-
-    if (againBtn) {
-
-        againBtn.onclick = () => {
-
-            if (SAVE && SAVE.clear) {
-                SAVE.clear();
-            }
-
-            window.location.href =
-                "game.html?new=1";
-        };
-    }
-
-    if (endingMenuBtn) {
-
-        endingMenuBtn.onclick = () => {
-
-            window.location.href =
-                "index.html";
-        };
-    }
-
-    if (
-        params.has("continue") &&
-        load()
-    ) {
-        scene(game.scene);
-    } else {
-        scene(resolve("start"));
-    }
-
-    setupMusic();
-
-});
+</body>
+</html>
