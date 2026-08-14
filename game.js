@@ -1,382 +1,616 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
 
-const $=id=>document.getElementById(id);
-const scenes=window.STORY||{};
-const Save=window.SaveSystem;
+const $ = id => document.getElementById(id);
+const STORY = window.STORY || {};
+const SAVE = window.SaveSystem || null;
 
-let game={
- scene:"start",
- chapter:"PROLOGUE",
- clues:[],
- items:[],
- decisions:[],
- endings:[],
- started:Date.now(),
- lastSaved:Date.now()
+let game = fresh();
+let typing = false;
+let timer = null;
+
+const params = new URLSearchParams(location.search);
+
+function fresh(){
+return {
+scene:"start",
+chapter:"PROLOGUE",
+clues:[],
+items:[],
+decisions:[],
+endings:[],
+started:Date.now(),
+lastSaved:Date.now()
+};
+}
+
+/* =========================
+CORRECTION DES TRANSITIONS
+========================= */
+
+const aliases = {
+chapter1_start:"chapter1_begin",
+chapter2_begin:"chapter2_start",
+chapter3_begin:"chapter3_start",
+chapter4_begin:"chapter4_start",
+chapter5_begin:"chapter5_start"
 };
 
-let typing=false;
-let timer=null;
-
-const params=new URLSearchParams(location.search);
-const forceNew=params.get("new")==="1";
-const forceContinue=params.get("continue")==="1";
-
-function freshGame(){
- return{
-  scene:"start",
-  chapter:"PROLOGUE",
-  clues:[],
-  items:[],
-  decisions:[],
-  endings:[],
-  started:Date.now(),
-  lastSaved:Date.now()
- };
+function resolve(id){
+if(STORY[id]) return id;
+if(aliases[id] && STORY[aliases[id]]) return aliases[id];
+return id;
 }
+
+/* =========================
+NOTIFICATION
+========================= */
 
 function toast(text){
- const e=$("toast");
- if(!e)return;
- e.textContent=text;
- e.classList.add("show");
- clearTimeout(e._timer);
- e._timer=setTimeout(()=>e.classList.remove("show"),2200);
+const e = $("toast");
+if(!e) return;
+
+e.textContent = text;
+e.classList.add("show");
+
+clearTimeout(e._toast);
+e._toast = setTimeout(() => {
+    e.classList.remove("show");
+},2200);
+
 }
 
+/* =========================
+SAUVEGARDE
+========================= */
+
 function save(show=false){
- if(!Save)return false;
- game.lastSaved=Date.now();
- const ok=Save.save(game);
- if(show&&ok)toast("💾 Partie sauvegardée");
- return ok;
+if(!SAVE || typeof SAVE.save!=="function") return false;
+
+game.lastSaved = Date.now();
+
+const ok = SAVE.save(game);
+
+if(show && ok) toast("💾 Partie sauvegardée");
+
+return ok;
+
 }
 
 function load(){
- if(!Save)return false;
- const data=Save.load();
- if(!data)return false;
+if(!SAVE || typeof SAVE.load!=="function") return false;
 
- game={
-  ...freshGame(),
-  ...data,
-  clues:Array.isArray(data.clues)?data.clues:[],
-  items:Array.isArray(data.items)?data.items:[],
-  decisions:Array.isArray(data.decisions)?data.decisions:[],
-  endings:Array.isArray(data.endings)?data.endings:[]
- };
+const data = SAVE.load();
 
- return true;
+if(!data || typeof data!=="object") return false;
+
+game = {
+    ...fresh(),
+    ...data,
+    clues:Array.isArray(data.clues)?data.clues:[],
+    items:Array.isArray(data.items)?data.items:[],
+    decisions:Array.isArray(data.decisions)?data.decisions:[],
+    endings:Array.isArray(data.endings)?data.endings:[]
+};
+
+game.scene = resolve(game.scene);
+
+return !!STORY[game.scene];
+
 }
 
-function updateStats(){
- const c=$("clueCount");
- const i=$("itemCount");
- const p=$("progress");
+/* =========================
+STATISTIQUES
+========================= */
 
- if(c)c.textContent=game.clues.length;
- if(i)i.textContent=game.items.length;
+function stats(){
+const c = $("clueCount");
+const i = $("itemCount");
+const p = $("progress");
 
- if(p){
-  const total=Math.max(Object.keys(scenes).length,1);
-  const used=new Set(game.decisions.map(x=>x.scene)).size;
-  const percent=Math.min(99,Math.round(used/total*100));
-  p.textContent=percent+"%";
- }
+if(c) c.textContent = game.clues.length;
+if(i) i.textContent = game.items.length;
+
+if(p){
+    const total = Object.keys(STORY).length || 1;
+    const visited = new Set(
+        game.decisions.map(x => x.scene)
+    ).size;
+
+    p.textContent =
+        Math.min(99,Math.round(visited/total*100)) + "%";
 }
 
-function setupMusic(){
- const audio=$("music");
- const volume=$("volume");
- const value=$("volumeValue");
-
- if(!audio)return;
-
- let v=Save&&Save.volume?Number(Save.volume()):.45;
- if(!Number.isFinite(v))v=.45;
-
- audio.volume=v;
-
- if(volume)volume.value=Math.round(v*100);
- if(value)value.textContent=Math.round(v*100)+"%";
-
- function play(){
-  audio.play().catch(()=>{});
- }
-
- play();
-
- document.addEventListener("click",play,{once:true});
-
- if(volume){
-  volume.addEventListener("input",()=>{
-   const n=Math.max(0,Math.min(100,Number(volume.value)||0))/100;
-   audio.volume=n;
-   if(value)value.textContent=Math.round(n*100)+"%";
-   if(Save&&Save.setVolume)Save.setVolume(n);
-  });
- }
 }
 
-function typeText(text,done){
- clearInterval(timer);
- typing=true;
+/* =========================
+MUSIQUE
+========================= */
 
- const box=$("storyText");
- if(!box){
-  typing=false;
-  if(done)done();
-  return;
- }
+function music(){
+const audio = $("music");
+const slider = $("volume");
+const value = $("volumeValue");
 
- box.textContent="";
- let i=0;
+if(!audio) return;
 
- timer=setInterval(()=>{
-  box.textContent+=text.charAt(i++);
-  if(i>=text.length){
-   clearInterval(timer);
-   typing=false;
-   if(done)done();
-  }
- },18);
+let volume = 0.45;
+
+if(SAVE && typeof SAVE.volume==="function"){
+    volume = Number(SAVE.volume());
+    if(!Number.isFinite(volume)) volume=0.45;
 }
 
-function finishTyping(scene){
- clearInterval(timer);
- typing=false;
+audio.volume = Math.max(0,Math.min(1,volume));
 
- const box=$("storyText");
- if(box)box.textContent=scene.text||"";
+if(slider)
+    slider.value = Math.round(audio.volume*100);
 
- renderChoices(scene);
+if(value)
+    value.textContent =
+        Math.round(audio.volume*100) + "%";
+
+const start = () => {
+    audio.play().catch(()=>{});
+};
+
+start();
+
+document.addEventListener("click",start,{once:true});
+document.addEventListener("touchstart",start,{once:true});
+
+if(slider){
+    slider.addEventListener("input",() => {
+
+        const n =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    Number(slider.value)||0
+                )
+            ) / 100;
+
+        audio.volume = n;
+
+        if(value)
+            value.textContent =
+                Math.round(n*100) + "%";
+
+        if(SAVE && typeof SAVE.setVolume==="function")
+            SAVE.setVolume(n);
+    });
 }
 
-function showScene(id){
- const scene=scenes[id];
-
- if(!scene){
-  console.error("Scène introuvable :",id);
-  endGame("unknown");
-  return;
- }
-
- game.scene=id;
-
- if(scene.chapter)
-  game.chapter=scene.chapter;
-
- const chapter=$("chapter");
- const location=$("location");
- const time=$("time");
- const speaker=$("speaker");
- const choices=$("choices");
-
- if(chapter)chapter.textContent=scene.chapter||"MYSTERY JOURNEY";
- if(location)location.textContent=scene.location||"UNKNOWN";
- if(time)time.textContent=scene.time||"";
- if(speaker)speaker.textContent=scene.speaker||"";
- if(choices)choices.innerHTML="";
-
- updateStats();
- save(false);
-
- typeText(scene.text||"",()=>renderChoices(scene));
 }
 
-function conditionOK(condition){
- if(typeof condition!=="function")return true;
+/* =========================
+TEXTE
+========================= */
 
- try{
-  return !!condition(game);
- }catch(e){
-  console.error("Erreur condition :",e);
-  return false;
- }
-}
+function showText(text,done){
 
-function renderChoices(scene){
- const box=$("choices");
- if(!box)return;
+clearInterval(timer);
 
- box.innerHTML="";
+const box = $("storyText");
 
- (Array.isArray(scene.choices)?scene.choices:[]).forEach((choice,index)=>{
-
-  if(choice.condition&&!conditionOK(choice.condition))
-   return;
-
-  const button=document.createElement("button");
-  button.className="choice";
-  button.type="button";
-  button.textContent=choice.text||"Continuer";
-
-  button.addEventListener("click",()=>{
-   if(typing){
-    finishTyping(scene);
+if(!box){
+    if(done) done();
     return;
-   }
-
-   choose(choice,index);
-  });
-
-  box.appendChild(button);
- });
 }
+
+typing = true;
+box.textContent = "";
+
+let i = 0;
+
+timer = setInterval(() => {
+
+    box.textContent += text.charAt(i++);
+
+    if(i >= text.length){
+
+        clearInterval(timer);
+        timer = null;
+        typing = false;
+
+        if(done) done();
+    }
+
+},18);
+
+}
+
+function finish(scene){
+
+clearInterval(timer);
+timer = null;
+typing = false;
+
+const box = $("storyText");
+
+if(box)
+    box.textContent = scene.text || "";
+
+renderChoices(scene);
+
+}
+
+/* =========================
+AFFICHER UNE SCÈNE
+========================= */
+
+function scene(id){
+
+id = resolve(id);
+
+const data = STORY[id];
+
+if(!data){
+
+    console.error(
+        "Scène introuvable :",
+        id
+    );
+
+    toast("⚠️ Erreur de scène : " + id);
+
+    /*
+     * IMPORTANT :
+     * On ne déclenche PAS une fin.
+     * Cela évite de terminer le jeu
+     * à cause d'une simple transition incorrecte.
+     */
+
+    return;
+}
+
+game.scene = id;
+
+if(data.chapter)
+    game.chapter = data.chapter;
+
+const chapter = $("chapter");
+const location = $("location");
+const time = $("time");
+const speaker = $("speaker");
+const choices = $("choices");
+
+if(chapter)
+    chapter.textContent =
+        data.chapter || "MYSTERY JOURNEY";
+
+if(location)
+    location.textContent =
+        data.location || "";
+
+if(time)
+    time.textContent =
+        data.time || "";
+
+if(speaker)
+    speaker.textContent =
+        data.speaker || "";
+
+if(choices)
+    choices.innerHTML = "";
+
+stats();
+save();
+
+showText(
+    data.text || "",
+    () => renderChoices(data)
+);
+
+}
+
+/* =========================
+CHOIX
+========================= */
+
+function renderChoices(data){
+
+const box = $("choices");
+
+if(!box) return;
+
+box.innerHTML = "";
+
+const choices =
+    Array.isArray(data.choices)
+        ? data.choices
+        : [];
+
+choices.forEach((choice,index) => {
+
+    if(
+        typeof choice.condition === "function" &&
+        !choice.condition(game)
+    )
+        return;
+
+    const button =
+        document.createElement("button");
+
+    button.type = "button";
+    button.className = "choice";
+    button.textContent =
+        choice.text || "Continuer";
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            if(typing){
+                finish(data);
+                return;
+            }
+
+            choose(choice,index);
+        }
+    );
+
+    box.appendChild(button);
+});
+
+}
+
+/* =========================
+EFFECTUER UN CHOIX
+========================= */
 
 function choose(choice,index){
 
- game.decisions.push({
-  scene:game.scene,
-  choice:index,
-  time:Date.now()
- });
-
- if(typeof choice.effect==="function"){
-  try{
-   choice.effect(game);
-  }catch(e){
-   console.error("Erreur effet :",e);
-  }
- }
-
- if(choice.clue&&!game.clues.includes(choice.clue)){
-  game.clues.push(choice.clue);
-  toast("🔎 Nouvel indice");
- }
-
- if(choice.item&&!game.items.includes(choice.item)){
-  game.items.push(choice.item);
-  toast("🎒 Objet obtenu");
- }
-
- updateStats();
- save(false);
-
- if(choice.end){
-  endGame(choice.end);
-  return;
- }
-
- if(choice.next){
-  showScene(choice.next);
-  return;
- }
-
- save(false);
-}
-
-const endings={
- good:["🌅","LA VÉRITÉ","Le cycle est terminé. Blackwood disparaît derrière toi."],
- loop:["🔄","LE CYCLE","La route 47 recommence encore."],
- destroy:["🔥","LE FEU","Blackwood brûle et les voix disparaissent."],
- guardian:["🔒","LE GARDIEN","Tu es devenu le nouveau gardien."],
- escape:["🚗","L'ÉCHAPPÉE","Tu quittes les lieux, mais quelque chose marche toujours derrière toi."],
- watched:["👁️","ILS TE REGARDENT","Quelqu'un se tient derrière toi, même lorsque tu ne vois personne."],
- mirror_end:["🪞","LE REFLET","Ton reflet est désormais libre."],
- memory_end:["🧠","L'OUBLI","Tu as tout oublié, mais l'histoire recommence."],
- house_end:["🚪","LA PORTE","Tu quittes la maison sans jamais regarder derrière toi."],
- chapter1_escape:["🏃","TROP TÔT","Tu as quitté Blackwood avant de découvrir toute la vérité."],
- basement_end:["⬇️","LE SOUS-SOL","Tu es enfermé. Des voix utilisent maintenant ta propre voix."],
- secret_escape:["🔑","LE SECRET","Tu refuses d'ouvrir la dernière porte et pars."],
- upper_end:["👤","LA SILHOUETTE","La silhouette est déjà derrière toi."],
- survivor_end:["🕯️","LE SURVIVANT","Tu marches jusqu'à l'aube, mais ton ombre n'est pas seule."]
-};
-
-function endGame(id){
-
- if(id&&id!=="unknown"){
-
-  if(!game.endings.includes(id))
-   game.endings.push(id);
-
-  if(Save&&Save.unlockEnding)
-   Save.unlockEnding(id);
- }
-
- save(false);
-
- const gameBox=$("game");
- const ending=$("ending");
-
- if(gameBox)gameBox.classList.add("hidden");
- if(ending)ending.classList.remove("hidden");
-
- const data=endings[id]||[
-  "❓",
-  "FIN",
-  "L'histoire se termine ici."
- ];
-
- const icon=$("endingIcon");
- const title=$("endingTitle");
- const text=$("endingText");
-
- if(icon)icon.textContent=data[0];
- if(title)title.textContent=data[1];
- if(text)text.textContent=data[2];
-}
-
-function newGame(){
- if(Save)Save.clear();
-
- game=freshGame();
-
- const ending=$("ending");
- const gameBox=$("game");
-
- if(ending)ending.classList.add("hidden");
- if(gameBox)gameBox.classList.remove("hidden");
-
- showScene("start");
-}
-
-function replay(){
- game=freshGame();
-
- const ending=$("ending");
- const gameBox=$("game");
-
- if(ending)ending.classList.add("hidden");
- if(gameBox)gameBox.classList.remove("hidden");
-
- showScene("start");
-}
-
-const saveBtn=$("saveBtn");
-const restartBtn=$("restartBtn");
-const againBtn=$("againBtn");
-const menuBtn=$("menuBtn");
-
-if(saveBtn)
- saveBtn.addEventListener("click",()=>save(true));
-
-if(restartBtn)
- restartBtn.addEventListener("click",newGame);
-
-if(againBtn)
- againBtn.addEventListener("click",replay);
-
-if(menuBtn)
- menuBtn.addEventListener("click",()=>{
-  save(false);
-  location.href="index.html";
+game.decisions.push({
+    scene:game.scene,
+    choice:index,
+    time:Date.now()
 });
 
-setupMusic();
+if(typeof choice.effect==="function"){
+    try{
+        choice.effect(game);
+    }catch(error){
+        console.error(
+            "Erreur effet :",
+            error
+        );
+    }
+}
 
-if(forceNew){
- newGame();
-}else if(forceContinue){
- if(load())showScene(game.scene);
- else newGame();
-}else if(load()){
- toast("📂 Partie chargée");
- showScene(game.scene);
-}else{
- showScene("start");
+if(
+    choice.clue &&
+    !game.clues.includes(choice.clue)
+){
+    game.clues.push(choice.clue);
+    toast("🔎 Nouvel indice");
+}
+
+if(
+    choice.item &&
+    !game.items.includes(choice.item)
+){
+    game.items.push(choice.item);
+    toast("🎒 Objet obtenu");
+}
+
+stats();
+save();
+
+if(choice.end){
+    end(choice.end);
+    return;
+}
+
+if(choice.next){
+    scene(choice.next);
+    return;
+}
+
+}
+
+/* =========================
+FIN
+========================= */
+
+function end(id){
+
+if(!id) return;
+
+if(!game.endings.includes(id))
+    game.endings.push(id);
+
+if(
+    SAVE &&
+    typeof SAVE.unlockEnding==="function"
+){
+    SAVE.unlockEnding(id);
+}
+
+save();
+
+const gameBox = $("game");
+const ending = $("ending");
+
+if(gameBox)
+    gameBox.classList.add("hidden");
+
+if(ending)
+    ending.classList.remove("hidden");
+
+const titles = {
+    good:["🌅","LA VÉRITÉ"],
+    loop:["🔄","LE CYCLE"],
+    destroy:["🔥","LE FEU"],
+    guardian:["🔒","LE GARDIEN"],
+    escape:["🚗","L'ÉCHAPPÉE"],
+    watched:["👁️","ILS TE REGARDENT"],
+    mirror_end:["🪞","LE REFLET"],
+    memory_end:["🧠","L'OUBLI"],
+    house_end:["🚪","LA PORTE"],
+    chapter1_escape:["🏃","TROP TÔT"],
+    basement_end:["⬇️","LE SOUS-SOL"],
+    secret_escape:["🔑","LE SECRET"],
+    upper_end:["👤","LA SILHOUETTE"],
+    survivor_end:["🕯️","LE SURVIVANT"]
+};
+
+const data =
+    titles[id] ||
+    ["❓","FIN","L'histoire se termine ici."];
+
+const icon = $("endingIcon");
+const title = $("endingTitle");
+const text = $("endingText");
+
+if(icon)
+    icon.textContent = data[0];
+
+if(title)
+    title.textContent = data[1];
+
+if(text){
+
+    const descriptions = {
+        good:"Le cycle est terminé. Pour la première fois, aucun téléphone ne sonne.",
+        loop:"La route 47 recommence. Le cycle n'est pas terminé.",
+        destroy:"Blackwood brûle et les voix disparaissent.",
+        guardian:"Tu es devenu le nouveau gardien.",
+        escape:"Tu quittes les lieux, mais quelque chose marche toujours derrière toi.",
+        watched:"Quelqu'un te regarde, même lorsque tu ne vois personne.",
+        mirror_end:"Ton reflet est maintenant libre.",
+        memory_end:"Tu as tout oublié. Une nouvelle histoire commence.",
+        house_end:"Tu quittes la maison sans jamais regarder derrière toi.",
+        chapter1_escape:"Tu as quitté Blackwood trop tôt.",
+        basement_end:"Tu es enfermé. Des dizaines de voix utilisent maintenant ta voix.",
+        secret_escape:"Tu refuses d'ouvrir la dernière porte.",
+        upper_end:"La silhouette est déjà derrière toi.",
+        survivor_end:"Tu marches jusqu'à l'aube, mais ton ombre n'est pas seule."
+    };
+
+    text.textContent =
+        descriptions[id] ||
+        "L'histoire se termine ici.";
+}
+
+}
+
+/* =========================
+NOUVELLE PARTIE
+========================= */
+
+function newGame(){
+
+if(SAVE && typeof SAVE.clear==="function")
+    SAVE.clear();
+
+game = fresh();
+
+const ending = $("ending");
+const gameBox = $("game");
+
+if(ending)
+    ending.classList.add("hidden");
+
+if(gameBox)
+    gameBox.classList.remove("hidden");
+
+scene("start");
+
+}
+
+/* =========================
+REJOUER
+========================= */
+
+function replay(){
+
+game = fresh();
+
+const ending = $("ending");
+const gameBox = $("game");
+
+if(ending)
+    ending.classList.add("hidden");
+
+if(gameBox)
+    gameBox.classList.remove("hidden");
+
+scene("start");
+
+}
+
+/* =========================
+BOUTONS
+========================= */
+
+const saveBtn = $("saveBtn");
+const restartBtn = $("restartBtn");
+const againBtn = $("againBtn");
+const menuBtn = $("menuBtn");
+
+if(saveBtn){
+saveBtn.addEventListener(
+"click",
+() => save(true)
+);
+}
+
+if(restartBtn){
+restartBtn.addEventListener(
+"click",
+newGame
+);
+}
+
+if(againBtn){
+againBtn.addEventListener(
+"click",
+replay
+);
+}
+
+if(menuBtn){
+menuBtn.addEventListener(
+"click",
+() => {
+save();
+location.href = "index.html";
+}
+);
+}
+
+/* =========================
+DÉMARRAGE
+========================= */
+
+music();
+
+if(params.get("new")==="1"){
+
+newGame();
+
+}
+else if(params.get("continue")==="1"){
+
+if(load())
+    scene(game.scene);
+else
+    newGame();
+
+}
+else if(load()){
+
+toast("📂 Partie chargée");
+scene(game.scene);
+
+}
+else{
+
+scene("start");
+
 }
 
 });
