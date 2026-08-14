@@ -1,177 +1,66 @@
-<!DOCTYPE html>
-<html lang="fr">
-
+<!DOCTYPE html><html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#050505">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MYSTERY JOURNEY: HORROR 2</title>
+  <link rel="stylesheet" href="style.css">
+</head><body><main id="game">  <header class="game-header">
+    <div>
+      <span id="chapter">PROLOGUE</span>
+      <span id="location">UNKNOWN</span>
+    </div><div id="time"></div>
 
-<title>MYSTERY JOURNEY: HORROR 2</title>
+  </header>  <section class="story"><div id="speaker"></div>
 
-<link rel="stylesheet" href="style.css">
-</head>
+<div id="storyText" aria-live="polite"></div>
 
-<body>
+<div id="choices"></div>
 
-<div id="game">
-
-<header class="game-header">
-
-<div>
-<small>MYSTERY JOURNEY</small>
-<h1>HORROR 2</h1>
+  </section>  <footer class="game-footer"><div class="stats">
+  <span>🔎 <b id="clueCount">0</b></span>
+  <span>🎒 <b id="itemCount">0</b></span>
+  <span>📖 <b id="progress">0%</b></span>
 </div>
 
-<div class="header-buttons">
-
-<button id="saveBtn" type="button">
-💾
-</button>
-
-<button id="menuBtn" type="button">
-☰
-</button>
-
+<div class="volume-control">
+  <span>🎵</span>
+  <input
+    id="volume"
+    type="range"
+    min="0"
+    max="100"
+    value="45"
+    aria-label="Volume"
+  >
+  <span id="volumeValue">45%</span>
 </div>
 
-</header>
+<button id="saveBtn" type="button">💾 Sauvegarder</button>
+<button id="menuBtn" type="button">🏠 Menu</button>
 
+  </footer></main><!-- =========================
+     ÉCRAN DE FIN
+========================= --><section id="ending" class="hidden" aria-hidden="true">  <div class="ending-content"><div id="endingIcon"></div>
 
-<main>
+<h1 id="endingTitle"></h1>
 
-<section class="story-box">
-
-<div class="story-meta">
-
-<span id="chapter">PROLOGUE</span>
-
-<span id="location">UNKNOWN</span>
-
-<span id="time">00:00</span>
-
-</div>
-
-
-<div id="speaker" class="speaker">
-NARRATEUR
-</div>
-
-
-<div id="storyText" class="story-text">
-Chargement...
-</div>
-
-
-<div id="choices" class="choices">
-</div>
-
-</section>
-
-
-<section class="stats">
-
-<div>
-<span>🔎</span>
-<strong id="clueCount">0</strong>
-</div>
-
-<div>
-<span>🎒</span>
-<strong id="itemCount">0</strong>
-</div>
-
-<div>
-<span>📖</span>
-<strong id="progress">0%</strong>
-</div>
-
-</section>
-
-</main>
-
-
-<footer>
-
-<div class="music">
-
-<span>🎵</span>
-
-<input
-id="volume"
-type="range"
-min="0"
-max="100"
-value="45"
-aria-label="Volume">
-
-<span id="volumeValue">45%</span>
-
-</div>
-
-</footer>
-
-</div>
-
-
-<div id="toast"></div>
-
-
-<section id="ending" class="hidden">
-
-<div class="ending-box">
-
-<div id="endingIcon" class="ending-icon">
-🩸
-</div>
-
-<h2 id="endingTitle">FIN</h2>
-
-<p id="endingText">
-L'histoire se termine ici.
-</p>
+<p id="endingText"></p>
 
 <div class="ending-buttons">
+  <button id="againBtn" type="button">
+    🔄 Rejouer
+  </button>
 
-<button id="againBtn" type="button">
-🔄 Rejouer
-</button>
+  <button id="restartBtn" type="button">
+    ▶ Nouvelle partie
+  </button>
 
-<button id="restartBtn" type="button">
-▶ Nouvelle partie
-</button>
-
-<button id="endingMenuBtn" type="button">
-🏠 Menu
-</button>
-
+  <button id="endingMenuBtn" type="button">
+    🏠 Menu
+  </button>
 </div>
 
-</div>
-
-</section>
-
-
-<audio id="music" loop preload="auto">
-
-<source
-src="The Last Call.mp3"
-type="audio/mpeg">
-
-</audio>
-
-
-<script src="save.js"></script>
-
-<script src="prologue.js"></script>
-
-<script src="chapter1.js"></script>
-<script src="chapter2.js"></script>
-<script src="chapter3.js"></script>
-<script src="chapter4.js"></script>
-<script src="chapter5.js"></script>
-
-<script src="game.js"></script>
-
-</body>
-
+  </div></section><audio id="music" loop preload="auto">
+  <source src="MYSTERY JOURNEY — THE UNKNOWN.mp3" type="audio/mpeg">
+</audio><div id="toast" aria-live="polite"></div><script src="save.js"></script><!-- Histoire --><script src="prologue.js"></script><script src="chapter1.js"></script><script src="chapter2.js"></script><script src="chapter3.js"></script><script src="chapter4.js"></script><script src="chapter5.js"></script><!-- Moteur du jeu --><script src="game.js"></script></body>
 </html>
