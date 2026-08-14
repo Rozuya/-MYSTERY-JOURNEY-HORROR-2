@@ -1,103 +1,143 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#050507">
-<meta name="description" content="MYSTERY JOURNEY: HORROR 2 — THE LAST CALL">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1">
+
+<meta
+    name="theme-color"
+    content="#050507">
+
+<meta
+    name="description"
+    content="MYSTERY JOURNEY: HORROR 2 — THE LAST CALL">
+
 <title>MYSTERY JOURNEY: HORROR 2</title>
-<link rel="stylesheet" href="style.css">
+
+<link
+    rel="stylesheet"
+    href="style.css">
+
 </head>
 
 <body>
 
 <div id="game">
 
-<header class="game-header">
-    <div>
-        <small>MYSTERY JOURNEY</small>
-        <h1>HORROR 2</h1>
-    </div>
-</header>
+    <header class="game-header">
 
-<main>
+        <div>
 
-<section class="story-box">
+            <small>
+                MYSTERY JOURNEY
+            </small>
 
-    <div class="story-time">
-        THE LAST CALL
-    </div>
+            <h1>
+                HORROR 2
+            </h1>
 
-    <div class="speaker">
-        📞 UN NUMÉRO INCONNU
-    </div>
+        </div>
 
-    <div class="story-text">
-        Certaines histoires auraient dû rester oubliées.
+    </header>
 
-        Certains appels n'auraient jamais dû être décrochés.
 
-        Et certaines réponses auraient dû rester inconnues.
+    <main>
 
-        Cette fois...
+        <section class="story-box">
 
-        le téléphone sonnera une dernière fois.
-    </div>
+            <div class="story-time">
+                THE LAST CALL
+            </div>
 
-    <div class="choices">
+            <div class="speaker">
+                📞 UN NUMÉRO INCONNU
+            </div>
 
-        <button
-            class="choice"
-            id="newGameBtn"
-            type="button">
-            ▶ Nouvelle partie
-        </button>
+            <div class="story-text">
 
-        <button
-            class="choice"
-            id="continueBtn"
-            type="button">
-            💾 Continuer
-        </button>
+                Certaines histoires auraient dû rester oubliées.
 
-        <button
-            class="choice"
-            id="endingsBtn"
-            type="button">
-            🩸 Mes fins
-        </button>
+                Certains appels n'auraient jamais dû être décrochés.
 
-    </div>
+                Et certaines réponses auraient dû rester inconnues.
 
-</section>
+                Cette fois...
 
-</main>
+                le téléphone sonnera une dernière fois.
 
-<footer>
+            </div>
 
-    <div class="music">
 
-        <span>🎵</span>
+            <div class="choices">
 
-        <span>The Last Call</span>
+                <button
+                    class="choice"
+                    id="newGameBtn"
+                    type="button">
 
-        <input
-            id="volume"
-            type="range"
-            min="0"
-            max="100"
-            value="45"
-            aria-label="Volume de la musique">
+                    ▶ Nouvelle partie
 
-        <span id="volumeValue">
-            45%
-        </span>
+                </button>
 
-    </div>
 
-</footer>
+                <button
+                    class="choice"
+                    id="continueBtn"
+                    type="button">
+
+                    💾 Continuer
+
+                </button>
+
+
+                <button
+                    class="choice"
+                    id="endingsBtn"
+                    type="button">
+
+                    🩸 Mes fins
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <div class="music">
+
+            <span>🎵</span>
+
+            <span>
+                The Last Call
+            </span>
+
+            <input
+                id="volume"
+                type="range"
+                min="0"
+                max="100"
+                value="45"
+                aria-label="Volume de la musique">
+
+            <span id="volumeValue">
+                45%
+            </span>
+
+        </div>
+
+    </footer>
 
 </div>
+
 
 
 <!-- =====================================================
@@ -116,8 +156,11 @@
             class="close-btn"
             type="button"
             aria-label="Fermer">
+
             ✕
+
         </button>
+
 
         <div class="endings-header">
 
@@ -135,11 +178,13 @@
 
         </div>
 
+
         <div id="endingsList"></div>
 
     </div>
 
 </div>
+
 
 
 <!-- =====================================================
@@ -158,13 +203,15 @@
 </audio>
 
 
+
 <script>
 
 "use strict";
 
 
 /* =====================================================
-   CONFIGURATION
+   CLÉS DE SAUVEGARDE
+   DOIVENT ÊTRE IDENTIQUES À save.js
 ===================================================== */
 
 const SAVE_KEY =
@@ -174,7 +221,8 @@ const ENDINGS_KEY =
     "mystery_journey_horror_2_endings_v1";
 
 const VOLUME_KEY =
-    "mjh2_volume";
+    "mystery_journey_horror_2_volume";
+
 
 
 /* =====================================================
@@ -212,8 +260,9 @@ const closeEndings =
     document.getElementById("closeEndings");
 
 
+
 /* =====================================================
-   LES 15 FINS
+   LES 15 FINS OFFICIELLES
 ===================================================== */
 
 const ENDINGS = [
@@ -326,8 +375,9 @@ const ENDINGS = [
 ];
 
 
+
 /* =====================================================
-   LECTURE DES FINS
+   RÉCUPÉRER LES FINS DÉBLOQUÉES
 ===================================================== */
 
 function getDiscoveredEndings(){
@@ -340,21 +390,22 @@ function getDiscoveredEndings(){
             );
 
         if(!raw){
+
             return [];
+
         }
+
 
         const data =
             JSON.parse(raw);
 
+
         if(!Array.isArray(data)){
+
             return [];
+
         }
 
-        /*
-         * On garde uniquement les IDs
-         * qui existent réellement parmi
-         * les 15 fins.
-         */
 
         const validIds =
             new Set(
@@ -363,10 +414,12 @@ function getDiscoveredEndings(){
                 )
             );
 
+
         return [
             ...new Set(
                 data.filter(
-                    id => validIds.has(id)
+                    id =>
+                        validIds.has(id)
                 )
             )
         ];
@@ -379,12 +432,15 @@ function getDiscoveredEndings(){
         );
 
         return [];
+
     }
+
 }
 
 
+
 /* =====================================================
-   AFFICHER LES FINS
+   AFFICHER MES FINS
 ===================================================== */
 
 function renderEndings(){
@@ -392,32 +448,30 @@ function renderEndings(){
     const discovered =
         getDiscoveredEndings();
 
-    endingsList.innerHTML = "";
 
+    endingsList.innerHTML =
+        "";
 
-    /* ================================================
-       COMPTEUR
-    ================================================ */
 
     endingProgress.textContent =
         discovered.length +
         "/15";
 
 
-    /* ================================================
-       LISTE
-    ================================================ */
-
     ENDINGS.forEach(
-        (ending,index)=>{
+        (ending,index) => {
 
             const unlocked =
                 discovered.includes(
                     ending.id
                 );
 
+
             const card =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             card.className =
                 "ending-entry " +
@@ -427,10 +481,6 @@ function renderEndings(){
                     : "locked"
                 );
 
-
-            /* ========================================
-               FIN DÉBLOQUÉE
-            ======================================== */
 
             if(unlocked){
 
@@ -458,14 +508,7 @@ function renderEndings(){
 
                 `;
 
-            }
-
-
-            /* ========================================
-               FIN NON DÉBLOQUÉE
-            ======================================== */
-
-            else{
+            }else{
 
                 card.innerHTML = `
 
@@ -494,7 +537,9 @@ function renderEndings(){
             }
 
 
-            endingsList.appendChild(card);
+            endingsList.appendChild(
+                card
+            );
 
         }
     );
@@ -502,19 +547,23 @@ function renderEndings(){
 }
 
 
+
 /* =====================================================
    NOUVELLE PARTIE
    IMPORTANT :
-   LES FINS NE SONT PAS SUPPRIMÉES.
+   SEULE LA PARTIE EN COURS EST SUPPRIMÉE.
+
+   LES 15 FINS RESTENT SAUVEGARDÉES.
 ===================================================== */
 
 newGameBtn.addEventListener(
     "click",
-    ()=>{
+    () => {
 
         localStorage.removeItem(
             SAVE_KEY
         );
+
 
         window.location.href =
             "game.html?new=1";
@@ -523,18 +572,20 @@ newGameBtn.addEventListener(
 );
 
 
+
 /* =====================================================
    CONTINUER
 ===================================================== */
 
 continueBtn.addEventListener(
     "click",
-    ()=>{
+    () => {
 
         const save =
             localStorage.getItem(
                 SAVE_KEY
             );
+
 
         if(save){
 
@@ -552,19 +603,22 @@ continueBtn.addEventListener(
 );
 
 
+
 /* =====================================================
    OUVRIR MES FINS
 ===================================================== */
 
 endingsBtn.addEventListener(
     "click",
-    ()=>{
+    () => {
 
         renderEndings();
+
 
         endingsScreen.classList.remove(
             "hidden"
         );
+
 
         endingsScreen.setAttribute(
             "aria-hidden",
@@ -573,6 +627,7 @@ endingsBtn.addEventListener(
 
     }
 );
+
 
 
 /* =====================================================
@@ -584,6 +639,7 @@ function closeEndingsScreen(){
     endingsScreen.classList.add(
         "hidden"
     );
+
 
     endingsScreen.setAttribute(
         "aria-hidden",
@@ -599,13 +655,14 @@ closeEndings.addEventListener(
 );
 
 
+
 /* =====================================================
    CLIQUER EN DEHORS
 ===================================================== */
 
 endingsScreen.addEventListener(
     "click",
-    event=>{
+    event => {
 
         if(
             event.target ===
@@ -620,13 +677,14 @@ endingsScreen.addEventListener(
 );
 
 
+
 /* =====================================================
-   ÉCHAP
+   TOUCHE ESCAPE
 ===================================================== */
 
 document.addEventListener(
     "keydown",
-    event=>{
+    event => {
 
         if(
             event.key === "Escape" &&
@@ -643,6 +701,7 @@ document.addEventListener(
 );
 
 
+
 /* =====================================================
    VOLUME
 ===================================================== */
@@ -651,6 +710,7 @@ function loadVolume(){
 
     let value;
 
+
     try{
 
         const saved =
@@ -658,20 +718,29 @@ function loadVolume(){
                 VOLUME_KEY
             );
 
+
         value =
             saved === null
             ? 0.45
             : Number(saved);
 
-    }catch{
+    }catch(error){
 
-        value = 0.45;
+        value =
+            0.45;
 
     }
 
-    if(!Number.isFinite(value)){
-        value = 0.45;
+
+    if(
+        !Number.isFinite(value)
+    ){
+
+        value =
+            0.45;
+
     }
+
 
     value =
         Math.max(
@@ -682,29 +751,44 @@ function loadVolume(){
             )
         );
 
-    music.volume = value;
+
+    music.volume =
+        value;
+
 
     volume.value =
         Math.round(
             value * 100
         );
 
+
     volumeValue.textContent =
         Math.round(
             value * 100
-        ) + "%";
+        ) +
+        "%";
 
 }
+
 
 
 function setVolume(){
 
     let value =
-        Number(volume.value) / 100;
+        Number(
+            volume.value
+        ) / 100;
 
-    if(!Number.isFinite(value)){
-        value = 0.45;
+
+    if(
+        !Number.isFinite(value)
+    ){
+
+        value =
+            0.45;
+
     }
+
 
     value =
         Math.max(
@@ -715,19 +799,25 @@ function setVolume(){
             )
         );
 
-    music.volume = value;
+
+    music.volume =
+        value;
+
 
     volumeValue.textContent =
         Math.round(
             value * 100
-        ) + "%";
+        ) +
+        "%";
+
 
     localStorage.setItem(
         VOLUME_KEY,
-        value
+        String(value)
     );
 
 }
+
 
 
 volume.addEventListener(
@@ -735,24 +825,31 @@ volume.addEventListener(
     setVolume
 );
 
+
 loadVolume();
+
 
 
 /* =====================================================
    MUSIQUE
-   Le navigateur bloque parfois
-   l'autoplay : le premier clic
-   lance donc la musique.
+   Le navigateur peut bloquer
+   l'autoplay.
+
+   Le premier clic lance donc
+   automatiquement la musique.
 ===================================================== */
 
 function startMusic(){
 
     if(!music){
+
         return;
+
     }
 
+
     music.play().catch(
-        ()=>{}
+        () => {}
     );
 
 }
@@ -765,6 +862,7 @@ document.addEventListener(
         once:true
     }
 );
+
 
 
 /* =====================================================
