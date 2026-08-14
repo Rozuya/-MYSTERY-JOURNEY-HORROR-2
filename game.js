@@ -3,576 +3,421 @@
 /* =========================================================
    🕵️ MYSTERY JOURNEY: HORROR 2
    THE LAST CALL
-   MOTEUR PRINCIPAL
+   MOTEUR PRINCIPAL FINAL
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    const $ = id => document.getElementById(id);
 
-/* =========================================================
-   OUTILS
-========================================================= */
+    const scenes = window.STORY || {};
 
-const $ = id => document.getElementById(id);
+    let game = null;
+    let typing = false;
+    let timer = null;
 
-const scenes = window.STORY || {};
+    /* =====================================================
+       PARAMÈTRES URL
+    ===================================================== */
 
-let game = null;
-
-let typing = false;
-let timer = null;
-
-
-/* =========================================================
-   PARAMÈTRES URL
-========================================================= */
-
-const params =
-    new URLSearchParams(
+    const params = new URLSearchParams(
         window.location.search
     );
 
-const forceNew =
-    params.get("new") === "1";
+    const forceNew =
+        params.get("new") === "1";
 
-const forceContinue =
-    params.get("continue") === "1";
-
-
-/* =========================================================
-   NOUVELLE PARTIE
-========================================================= */
-
-function freshGame(){
-
-    return {
-
-        scene:"start",
-
-        chapter:"PROLOGUE",
-
-        clues:[],
-
-        items:[],
-
-        decisions:[],
-
-        endings:[],
-
-        started:Date.now(),
-
-        lastSaved:Date.now()
-
-    };
-
-}
+    const forceContinue =
+        params.get("continue") === "1";
 
 
-/* =========================================================
-   NORMALISER UNE SAUVEGARDE
-========================================================= */
+    /* =====================================================
+       NOUVELLE PARTIE
+    ===================================================== */
 
-function normalizeGame(data){
+    function freshGame(){
 
-    if(!data){
-        return freshGame();
-    }
-
-    return {
-
-        scene:
-            data.scene ||
-            "start",
-
-        chapter:
-            data.chapter ||
-            "PROLOGUE",
-
-        clues:
-            Array.isArray(data.clues)
-            ? data.clues
-            : [],
-
-        items:
-            Array.isArray(data.items)
-            ? data.items
-            : [],
-
-        decisions:
-            Array.isArray(data.decisions)
-            ? data.decisions
-            : [],
-
-        endings:
-            Array.isArray(data.endings)
-            ? data.endings
-            : [],
-
-        started:
-            data.started ||
-            Date.now(),
-
-        lastSaved:
-            data.lastSaved ||
-            Date.now()
-
-    };
-
-}
-
-
-/* =========================================================
-   NOTIFICATION
-========================================================= */
-
-function toast(text){
-
-    const element =
-        $("toast");
-
-    if(!element){
-        return;
-    }
-
-    element.textContent =
-        text;
-
-    element.classList.add(
-        "show"
-    );
-
-    clearTimeout(
-        element._timer
-    );
-
-    element._timer =
-        setTimeout(
-            () => {
-
-                element.classList.remove(
-                    "show"
-                );
-
-            },
-            2200
-        );
-
-}
-
-
-/* =========================================================
-   SAUVEGARDER
-========================================================= */
-
-function saveGame(showMessage = true){
-
-    if(!window.SaveSystem){
-        return false;
-    }
-
-    game.lastSaved =
-        Date.now();
-
-    const success =
-        window.SaveSystem.save(
-            game
-        );
-
-    if(
-        success &&
-        showMessage
-    ){
-
-        toast(
-            "💾 Partie sauvegardée"
-        );
+        return {
+            scene: "start",
+            chapter: "PROLOGUE",
+            clues: [],
+            items: [],
+            decisions: [],
+            endings: [],
+            started: Date.now(),
+            lastSaved: Date.now()
+        };
 
     }
 
-    return success;
 
-}
+    /* =====================================================
+       NORMALISER UNE SAUVEGARDE
+    ===================================================== */
 
+    function normalizeGame(data){
 
-/* =========================================================
-   SAUVEGARDE AUTOMATIQUE
-========================================================= */
+        if(!data){
+            return freshGame();
+        }
 
-function autoSave(){
+        return {
+            scene: data.scene || "start",
 
-    if(!game){
-        return;
-    }
+            chapter:
+                data.chapter ||
+                "PROLOGUE",
 
-    saveGame(false);
+            clues:
+                Array.isArray(data.clues)
+                ? data.clues
+                : [],
 
-}
+            items:
+                Array.isArray(data.items)
+                ? data.items
+                : [],
 
+            decisions:
+                Array.isArray(data.decisions)
+                ? data.decisions
+                : [],
 
-/* =========================================================
-   CHARGER UNE PARTIE
-========================================================= */
+            endings:
+                Array.isArray(data.endings)
+                ? data.endings
+                : [],
 
-function loadGame(){
+            started:
+                data.started ||
+                Date.now(),
 
-    if(!window.SaveSystem){
-        return false;
-    }
-
-    const saved =
-        window.SaveSystem.load();
-
-    if(!saved){
-        return false;
-    }
-
-    game =
-        normalizeGame(
-            saved
-        );
-
-    return true;
-
-}
-
-
-/* =========================================================
-   MUSIQUE
-========================================================= */
-
-function setupMusic(){
-
-    const audio =
-        $("music");
-
-    const volume =
-        $("volume");
-
-    const volumeValue =
-        $("volumeValue");
-
-    if(!audio){
-        return;
-    }
-
-
-    let savedVolume =
-        0.45;
-
-    if(window.SaveSystem){
-
-        savedVolume =
-            window.SaveSystem.volume();
-
-    }
-
-    audio.volume =
-        savedVolume;
-
-
-    if(volume){
-
-        volume.value =
-            Math.round(
-                savedVolume * 100
-            );
+            lastSaved:
+                data.lastSaved ||
+                Date.now()
+        };
 
     }
 
 
-    if(volumeValue){
+    /* =====================================================
+       NOTIFICATION
+    ===================================================== */
 
-        volumeValue.textContent =
-            Math.round(
-                savedVolume * 100
-            ) + "%";
+    function toast(text){
+
+        const element = $("toast");
+
+        if(!element){
+            return;
+        }
+
+        element.textContent = text;
+        element.classList.add("show");
+
+        clearTimeout(element._timer);
+
+        element._timer = setTimeout(() => {
+            element.classList.remove("show");
+        }, 2200);
 
     }
 
 
-    if(volume){
+    /* =====================================================
+       SAUVEGARDE
+    ===================================================== */
 
-        volume.addEventListener(
-            "input",
-            () => {
+    function saveGame(showMessage = true){
+
+        if(!game || !window.SaveSystem){
+            return false;
+        }
+
+        game.lastSaved = Date.now();
+
+        const success =
+            window.SaveSystem.save(game);
+
+        if(success && showMessage){
+            toast("💾 Partie sauvegardée");
+        }
+
+        return success;
+
+    }
+
+
+    function autoSave(){
+        saveGame(false);
+    }
+
+
+    /* =====================================================
+       CHARGEMENT
+    ===================================================== */
+
+    function loadGame(){
+
+        if(!window.SaveSystem){
+            return false;
+        }
+
+        const data =
+            window.SaveSystem.load();
+
+        if(!data){
+            return false;
+        }
+
+        game = normalizeGame(data);
+
+        return true;
+
+    }
+
+
+    /* =====================================================
+       MUSIQUE
+    ===================================================== */
+
+    function setupMusic(){
+
+        const audio = $("music");
+        const volume = $("volume");
+        const volumeValue = $("volumeValue");
+
+        if(!audio){
+            return;
+        }
+
+        let savedVolume = 0.45;
+
+        if(window.SaveSystem){
+            savedVolume =
+                window.SaveSystem.volume();
+        }
+
+        audio.volume = savedVolume;
+
+        if(volume){
+            volume.value =
+                Math.round(savedVolume * 100);
+        }
+
+        if(volumeValue){
+            volumeValue.textContent =
+                Math.round(savedVolume * 100) + "%";
+        }
+
+
+        if(volume){
+
+            volume.addEventListener("input", () => {
 
                 const value =
-                    Number(
-                        volume.value
-                    ) / 100;
+                    Number(volume.value) / 100;
 
-                audio.volume =
-                    value;
+                audio.volume = value;
 
                 if(window.SaveSystem){
-
-                    window.SaveSystem.setVolume(
-                        value
-                    );
-
+                    window.SaveSystem.setVolume(value);
                 }
 
                 if(volumeValue){
-
                     volumeValue.textContent =
-                        Math.round(
-                            value * 100
-                        ) + "%";
+                        Math.round(value * 100) + "%";
+                }
 
+            });
+
+        }
+
+
+        function playMusic(){
+
+            audio.play().catch(() => {});
+
+        }
+
+        playMusic();
+
+        document.addEventListener(
+            "click",
+            playMusic
+        );
+
+        document.addEventListener(
+            "touchstart",
+            playMusic,
+            {passive:true}
+        );
+
+    }
+
+
+    /* =====================================================
+       EFFET MACHINE À ÉCRIRE
+    ===================================================== */
+
+    function typeText(text, done){
+
+        clearInterval(timer);
+
+        const storyText = $("storyText");
+
+        if(!storyText){
+
+            typing = false;
+
+            if(done){
+                done();
+            }
+
+            return;
+        }
+
+        typing = true;
+
+        storyText.textContent = "";
+
+        let index = 0;
+
+        timer = setInterval(() => {
+
+            storyText.textContent +=
+                text[index] || "";
+
+            index++;
+
+            if(index >= text.length){
+
+                clearInterval(timer);
+
+                timer = null;
+                typing = false;
+
+                if(done){
+                    done();
                 }
 
             }
-        );
+
+        }, 18);
 
     }
 
 
-    function playMusic(){
+    function finishTyping(scene){
 
-        audio.play().catch(
-            () => {}
-        );
+        clearInterval(timer);
 
-    }
+        timer = null;
+        typing = false;
 
+        const storyText = $("storyText");
 
-    playMusic();
-
-
-    document.addEventListener(
-        "click",
-        playMusic,
-        {
-            once:true
+        if(storyText){
+            storyText.textContent =
+                scene.text || "";
         }
-    );
-
-}
-
-
-/* =========================================================
-   TEXTE AVEC EFFET MACHINE À ÉCRIRE
-========================================================= */
-
-function typeText(text, done){
-
-    clearInterval(
-        timer
-    );
-
-    typing = true;
-
-    const storyText =
-        $("storyText");
-
-    if(!storyText){
-        return;
-    }
-
-    storyText.textContent =
-        "";
-
-    let index = 0;
-
-
-    timer =
-        setInterval(
-            () => {
-
-                storyText.textContent +=
-                    text[index] || "";
-
-                index++;
-
-
-                if(
-                    index >=
-                    text.length
-                ){
-
-                    clearInterval(
-                        timer
-                    );
-
-                    typing = false;
-
-                    if(done){
-                        done();
-                    }
-
-                }
-
-            },
-            18
-        );
-
-}
-
-
-/* =========================================================
-   AFFICHER IMMÉDIATEMENT LE TEXTE
-========================================================= */
-
-function finishTyping(scene){
-
-    clearInterval(
-        timer
-    );
-
-    typing = false;
-
-    const storyText =
-        $("storyText");
-
-    if(storyText){
-
-        storyText.textContent =
-            scene.text || "";
-
-    }
-
-}
-
-
-/* =========================================================
-   AFFICHER UNE SCÈNE
-========================================================= */
-
-function showScene(id){
-
-    const scene =
-        scenes[id];
-
-
-    if(!scene){
-
-        console.error(
-            "Scène introuvable :",
-            id
-        );
-
-        endGame(
-            "unknown",
-            "FIN INCONNUE",
-            "Cette histoire semble avoir perdu sa trace."
-        );
-
-        return;
 
     }
 
 
-    game.scene =
-        id;
+    /* =====================================================
+       AFFICHER UNE SCÈNE
+    ===================================================== */
 
+    function showScene(id){
 
-    if(scene.chapter){
+        const scene = scenes[id];
 
-        game.chapter =
-            scene.chapter;
+        if(!scene){
 
-    }
-
-
-    const chapter =
-        $("chapter");
-
-    const location =
-        $("location");
-
-    const time =
-        $("time");
-
-    const speaker =
-        $("speaker");
-
-    const choices =
-        $("choices");
-
-
-    if(chapter){
-
-        chapter.textContent =
-            scene.chapter ||
-            "MYSTERY JOURNEY";
-
-    }
-
-
-    if(location){
-
-        location.textContent =
-            scene.location ||
-            "UNKNOWN";
-
-    }
-
-
-    if(time){
-
-        time.textContent =
-            scene.time ||
-            "";
-
-    }
-
-
-    if(speaker){
-
-        speaker.textContent =
-            scene.speaker ||
-            "";
-
-    }
-
-
-    if(choices){
-
-        choices.innerHTML =
-            "";
-
-    }
-
-
-    updateStats();
-
-
-    typeText(
-        scene.text || "",
-        () => {
-
-            renderChoices(
-                scene
+            console.error(
+                "❌ Scène introuvable :",
+                id
             );
 
+            endGame(
+                "unknown",
+                "FIN INCONNUE",
+                "Cette histoire semble avoir perdu sa trace.",
+                "❓"
+            );
+
+            return;
         }
-    );
+
+        game.scene = id;
+
+        if(scene.chapter){
+            game.chapter = scene.chapter;
+        }
 
 
-    autoSave();
+        const chapter = $("chapter");
+        const location = $("location");
+        const time = $("time");
+        const speaker = $("speaker");
+        const choices = $("choices");
 
-}
+
+        if(chapter){
+            chapter.textContent =
+                scene.chapter ||
+                "MYSTERY JOURNEY";
+        }
+
+        if(location){
+            location.textContent =
+                scene.location ||
+                "UNKNOWN";
+        }
+
+        if(time){
+            time.textContent =
+                scene.time ||
+                "";
+        }
+
+        if(speaker){
+            speaker.textContent =
+                scene.speaker ||
+                "";
+        }
+
+        if(choices){
+            choices.innerHTML = "";
+        }
+
+        updateStats();
+
+        typeText(
+            scene.text || "",
+            () => {
+                renderChoices(scene);
+            }
+        );
+
+        autoSave();
+
+    }
 
 
-/* =========================================================
-   VÉRIFIER UNE CONDITION
-========================================================= */
+    /* =====================================================
+       CONDITIONS
+    ===================================================== */
 
-function checkCondition(
-    condition
-){
+    function checkCondition(condition){
 
-    if(
-        typeof condition ===
-        "function"
-    ){
+        if(typeof condition !== "function"){
+            return true;
+        }
 
         try{
-
-            return !!condition(
-                game
-            );
-
+            return !!condition(game);
         }catch(error){
 
             console.error(
@@ -581,149 +426,104 @@ function checkCondition(
             );
 
             return false;
-
         }
 
     }
 
 
-    return true;
+    /* =====================================================
+       AFFICHER LES CHOIX
+    ===================================================== */
 
-}
+    function renderChoices(scene){
 
+        const box = $("choices");
 
-/* =========================================================
-   AFFICHER LES CHOIX
-========================================================= */
+        if(!box){
+            return;
+        }
 
-function renderChoices(scene){
+        box.innerHTML = "";
 
-    const box =
-        $("choices");
-
-    if(!box){
-        return;
-    }
-
-    box.innerHTML =
-        "";
+        const choices =
+            Array.isArray(scene.choices)
+            ? scene.choices
+            : [];
 
 
-    const choices =
-        Array.isArray(
-            scene.choices
-        )
-        ? scene.choices
-        : [];
-
-
-    choices.forEach(
-        (choice,index) => {
-
+        choices.forEach((choice,index) => {
 
             if(
                 choice.condition &&
-                !checkCondition(
-                    choice.condition
-                )
+                !checkCondition(choice.condition)
             ){
-
                 return;
-
             }
 
 
             const button =
-                document.createElement(
-                    "button"
-                );
+                document.createElement("button");
 
-
-            button.className =
-                "choice";
-
-
-            button.type =
-                "button";
-
+            button.className = "choice";
+            button.type = "button";
 
             button.textContent =
                 choice.text ||
                 "Continuer";
 
 
-            button.addEventListener(
-                "click",
-                () => {
+            button.addEventListener("click", () => {
 
+                /*
+                   Si le texte est encore en train
+                   de s'afficher, le premier clic
+                   termine l'animation.
+                */
 
-                    /* Si le texte est encore
-                       en train de s'afficher,
-                       le premier clic termine
-                       simplement l'animation. */
+                if(typing){
 
-                    if(typing){
+                    finishTyping(scene);
 
-                        finishTyping(
-                            scene
-                        );
+                    renderChoices(scene);
 
-                        renderChoices(
-                            scene
-                        );
-
-                        return;
-
-                    }
-
-
-                    choose(
-                        scene,
-                        choice,
-                        index
-                    );
-
+                    return;
                 }
-            );
+
+                choose(
+                    scene,
+                    choice,
+                    index
+                );
+
+            });
 
 
-            box.appendChild(
-                button
-            );
+            box.appendChild(button);
 
-        }
-    );
-
-}
-
-
-/* =========================================================
-   EFFECTS D'UN CHOIX
-========================================================= */
-
-function applyEffect(choice){
-
-    if(
-        !choice ||
-        !choice.effect
-    ){
-
-        return;
+        });
 
     }
 
 
-    if(
-        typeof choice.effect ===
-        "function"
-    ){
+    /* =====================================================
+       EFFET D'UN CHOIX
+    ===================================================== */
+
+    function applyEffect(choice){
+
+        if(
+            !choice ||
+            !choice.effect
+        ){
+            return;
+        }
+
+        if(typeof choice.effect !== "function"){
+            return;
+        }
 
         try{
-
-            choice.effect(
-                game
-            );
-
+            choice.effect(game);
         }catch(error){
 
             console.error(
@@ -735,507 +535,471 @@ function applyEffect(choice){
 
     }
 
-}
-
-
-/* =========================================================
-   CHOISIR
-========================================================= */
-
-function choose(
-    scene,
-    choice,
-    index
-){
-
-    game.decisions.push({
-
-        scene:
-            game.scene,
-
-        choice:
-            index,
-
-        time:
-            Date.now()
-
-    });
-
-
-    applyEffect(
-        choice
-    );
-
 
     /* =====================================================
-       INDICE
+       CHOISIR
     ===================================================== */
 
-    if(choice.clue){
+    function choose(scene,choice,index){
 
-        if(
-            !game.clues.includes(
-                choice.clue
-            )
-        ){
+        game.decisions.push({
 
-            game.clues.push(
-                choice.clue
-            );
+            scene: game.scene,
 
-            toast(
-                "🔎 Nouvel indice"
-            );
+            choice: index,
+
+            time: Date.now()
+
+        });
+
+
+        applyEffect(choice);
+
+
+        /* =========================
+           INDICE
+        ========================= */
+
+        if(choice.clue){
+
+            if(
+                !game.clues.includes(
+                    choice.clue
+                )
+            ){
+
+                game.clues.push(
+                    choice.clue
+                );
+
+                toast(
+                    "🔎 Nouvel indice"
+                );
+
+            }
 
         }
 
-    }
 
+        /* =========================
+           OBJET
+        ========================= */
 
-    /* =====================================================
-       OBJET
-    ===================================================== */
+        if(choice.item){
 
-    if(choice.item){
+            if(
+                !game.items.includes(
+                    choice.item
+                )
+            ){
 
-        if(
-            !game.items.includes(
-                choice.item
-            )
-        ){
+                game.items.push(
+                    choice.item
+                );
 
-            game.items.push(
-                choice.item
-            );
+                toast(
+                    "🎒 Objet obtenu"
+                );
 
-            toast(
-                "🎒 Objet obtenu"
-            );
+            }
 
         }
 
-    }
+
+        updateStats();
 
 
-    updateStats();
+        /* =========================
+           FIN
+        ========================= */
+
+        if(choice.end){
+
+            endGame(
+                choice.end,
+                getEndingTitle(choice.end),
+                getEndingText(choice.end),
+                getEndingIcon(choice.end)
+            );
+
+            return;
+        }
 
 
-    /* =====================================================
-       FIN
-    ===================================================== */
+        /* =========================
+           SCÈNE SUIVANTE
+        ========================= */
 
-    if(choice.end){
+        if(choice.next){
 
-        endGame(
-            choice.end,
-            getEndingTitle(
-                choice.end
-            ),
-            getEndingText(
-                choice.end
-            ),
-            getEndingIcon(
-                choice.end
-            )
-        );
+            showScene(
+                choice.next
+            );
 
-        return;
-
-    }
+            return;
+        }
 
 
-    /* =====================================================
-       SCÈNE SUIVANTE
-    ===================================================== */
-
-    if(choice.next){
-
-        showScene(
-            choice.next
-        );
-
-        return;
+        autoSave();
 
     }
 
 
     /* =====================================================
-       PAS DE SUITE
+       15 FINS
     ===================================================== */
 
-    autoSave();
+    const endingData = {
 
-}
+        last_call:{
+            title:"LE DERNIER APPEL",
+            icon:"📞",
+            text:
+            "Tu réponds au dernier téléphone et découvres enfin l'origine du phénomène."
+        },
 
+        answer:{
+            title:"DÉCROCHE",
+            icon:"☎️",
+            text:
+            "Tu fais confiance à la voix au bout du fil. Mais elle ne t'a pas tout dit."
+        },
 
-/* =========================================================
-   DONNÉES DES 15 FINS
-========================================================= */
+        silence:{
+            title:"SILENCE",
+            icon:"🔇",
+            text:
+            "Tu détruis les téléphones et fais taire les appels. Mais ton propre téléphone sonne encore."
+        },
 
-const endingData = {
+        hotel:{
+            title:"L'HÔTEL",
+            icon:"🏨",
+            text:
+            "Tu restes dans le Last Call Hotel. Peu à peu, les portes disparaissent autour de toi."
+        },
 
-    last_call:{
-        title:"LE DERNIER APPEL",
-        icon:"📞",
-        text:"Tu réponds au dernier téléphone et découvres enfin l'origine du phénomène."
-    },
+        new_cycle:{
+            title:"LE NOUVEAU CYCLE",
+            icon:"🔄",
+            text:
+            "Tu crois avoir détruit le phénomène avant de découvrir qu'il recommence déjà."
+        },
 
-    answer:{
-        title:"DÉCROCHE",
-        icon:"☎️",
-        text:"Tu fais confiance à la voix au bout du fil. Mais elle ne t'a pas tout dit."
-    },
+        other:{
+            title:"L'AUTRE",
+            icon:"👁️",
+            text:
+            "Une autre version de toi prend ta place dans le monde réel."
+        },
 
-    silence:{
-        title:"SILENCE",
-        icon:"🔇",
-        text:"Tu détruis les téléphones et fais taire les appels. Mais ton propre téléphone sonne encore."
-    },
+        mirror:{
+            title:"LE REFLET",
+            icon:"🪞",
+            text:
+            "Tu détruis le miroir, mais ton reflet continue de bouger."
+        },
 
-    hotel:{
-        title:"L'HÔTEL",
-        icon:"🏨",
-        text:"Tu restes dans le Last Call Hotel. Peu à peu, les portes disparaissent autour de toi."
-    },
+        offline:{
+            title:"HORS RÉSEAU",
+            icon:"🚗",
+            text:
+            "Tu quittes la ville. Tout semble terminé jusqu'à ce qu'un appel provenant de Blackwood apparaisse."
+        },
 
-    new_cycle:{
-        title:"LE NOUVEAU CYCLE",
-        icon:"🔄",
-        text:"Tu crois avoir détruit le phénomène avant de découvrir qu'il recommence déjà."
-    },
+        cassette:{
+            title:"LA CASSETTE",
+            icon:"📼",
+            text:
+            "Tu découvres la vérité sur Blackwood et comprends que son histoire est beaucoup plus ancienne."
+        },
 
-    other:{
-        title:"L'AUTRE",
-        icon:"👁️",
-        text:"Une autre version de toi prend ta place dans le monde réel."
-    },
+        after_blackwood:{
+            title:"APRÈS BLACKWOOD",
+            icon:"🌑",
+            text:
+            "Tu comprends que Blackwood n'était qu'un des nombreux endroits liés au phénomène."
+        },
 
-    mirror:{
-        title:"LE REFLET",
-        icon:"🪞",
-        text:"Tu détruis le miroir, mais ton reflet continue de bouger."
-    },
+        last_survivor:{
+            title:"LE DERNIER SURVIVANT",
+            icon:"🕯️",
+            text:
+            "Tu retrouves une personne disparue depuis des années, mais elle semble te connaître."
+        },
 
-    offline:{
-        title:"HORS RÉSEAU",
-        icon:"🚗",
-        text:"Tu quittes la ville. Tout semble terminé jusqu'à ce qu'un appel provenant de Blackwood apparaisse."
-    },
+        room17:{
+            title:"LA CHAMBRE 17",
+            icon:"🚪",
+            text:
+            "Tu entres dans la chambre 17 et découvres une photographie qui n'aurait jamais dû exister."
+        },
 
-    cassette:{
-        title:"LA CASSETTE",
-        icon:"📼",
-        text:"Tu découvres la vérité sur Blackwood et comprends que son histoire est beaucoup plus ancienne."
-    },
+        tomorrow:{
+            title:"DEMAIN",
+            icon:"⏳",
+            text:
+            "Tu découvres que certaines vidéos ont été enregistrées par toi-même."
+        },
 
-    after_blackwood:{
-        title:"APRÈS BLACKWOOD",
-        icon:"🌑",
-        text:"Tu comprends que Blackwood n'était qu'un des nombreux endroits liés au phénomène."
-    },
+        nobody:{
+            title:"PERSONNE NE RÉPOND",
+            icon:"🌘",
+            text:
+            "Tu détruis ton téléphone et rentres chez toi. Puis quelqu'un frappe à ta porte."
+        },
 
-    last_survivor:{
-        title:"LE DERNIER SURVIVANT",
-        icon:"🕯️",
-        text:"Tu retrouves une personne disparue depuis des années, mais elle semble te connaître."
-    },
-
-    room17:{
-        title:"LA CHAMBRE 17",
-        icon:"🚪",
-        text:"Tu entres dans la chambre 17 et découvres une photographie qui n'aurait jamais dû exister."
-    },
-
-    tomorrow:{
-        title:"DEMAIN",
-        icon:"⏳",
-        text:"Tu découvres que certaines vidéos ont été enregistrées par toi-même."
-    },
-
-    nobody:{
-        title:"PERSONNE NE RÉPOND",
-        icon:"🌘",
-        text:"Tu détruis ton téléphone et rentres chez toi. Puis quelqu'un frappe à ta porte."
-    },
-
-    truth:{
-        title:"LA VÉRITÉ",
-        icon:"🩸",
-        text:"Tu comprends enfin ce que le phénomène cherche réellement : quelqu'un pour prendre ta place."
-    }
-
-};
-
-
-/* =========================================================
-   RÉCUPÉRER UNE FIN
-========================================================= */
-
-function getEndingData(id){
-
-    return endingData[id] || {
-
-        title:"FIN",
-        icon:"❓",
-        text:"L'histoire se termine ici."
+        truth:{
+            title:"LA VÉRITÉ",
+            icon:"🩸",
+            text:
+            "Tu comprends enfin ce que le phénomène cherche réellement : quelqu'un pour prendre ta place."
+        }
 
     };
 
-}
+
+    function getEndingData(id){
+
+        return endingData[id] || {
+
+            title:"FIN",
+
+            icon:"❓",
+
+            text:
+            "L'histoire se termine ici."
+
+        };
+
+    }
 
 
-function getEndingTitle(id){
-
-    return getEndingData(id).title;
-
-}
+    function getEndingTitle(id){
+        return getEndingData(id).title;
+    }
 
 
-function getEndingIcon(id){
-
-    return getEndingData(id).icon;
-
-}
+    function getEndingIcon(id){
+        return getEndingData(id).icon;
+    }
 
 
-function getEndingText(id){
-
-    return getEndingData(id).text;
-
-}
+    function getEndingText(id){
+        return getEndingData(id).text;
+    }
 
 
-/* =========================================================
-   TERMINER LE JEU
-========================================================= */
+    /* =====================================================
+       TERMINER LE JEU
+    ===================================================== */
 
-function endGame(
-    id,
-    title,
-    text,
-    icon
-){
-
-    /* Enregistrer la fin dans la partie */
-
-    if(
-        id &&
-        id !== "unknown"
+    function endGame(
+        id,
+        title,
+        text,
+        icon
     ){
 
         if(
-            !game.endings.includes(
-                id
-            )
+            id &&
+            id !== "unknown"
         ){
 
-            game.endings.push(
-                id
-            );
+            if(
+                !game.endings.includes(id)
+            ){
+
+                game.endings.push(id);
+
+            }
+
+
+            /*
+               Sauvegarde permanente de la fin.
+               save.js conserve les fins même après
+               une nouvelle partie.
+            */
+
+            if(
+                window.SaveSystem &&
+                typeof window.SaveSystem.unlockEnding ===
+                "function"
+            ){
+
+                window.SaveSystem.unlockEnding(id);
+
+            }
 
         }
 
 
-        /* Enregistrer définitivement
-           la fin dans la collection */
+        autoSave();
 
-        if(
-            window.SaveSystem &&
-            window.SaveSystem.unlockEnding
-        ){
 
-            window.SaveSystem.unlockEnding(
-                id
+        const gameElement = $("game");
+        const ending = $("ending");
+
+
+        if(gameElement){
+            gameElement.classList.add("hidden");
+        }
+
+        if(ending){
+            ending.classList.remove("hidden");
+        }
+
+
+        const data =
+            endingData[id] ||
+            null;
+
+
+        const finalTitle =
+            title ||
+            (data ? data.title : "FIN");
+
+
+        const finalText =
+            text ||
+            (data
+                ? data.text
+                : "L'histoire se termine ici."
             );
 
+
+        const finalIcon =
+            icon ||
+            (data
+                ? data.icon
+                : "❓"
+            );
+
+
+        if($("endingIcon")){
+            $("endingIcon").textContent =
+                finalIcon;
+        }
+
+        if($("endingTitle")){
+            $("endingTitle").textContent =
+                finalTitle;
+        }
+
+        if($("endingText")){
+            $("endingText").textContent =
+                finalText;
         }
 
     }
 
 
-    autoSave();
+    /* =====================================================
+       STATISTIQUES
+    ===================================================== */
+
+    function updateStats(){
+
+        if(!game){
+            return;
+        }
 
 
-    /* Cacher le jeu */
-
-    const gameElement =
-        $("game");
-
-    const ending =
-        $("ending");
+        if($("clueCount")){
+            $("clueCount").textContent =
+                game.clues.length;
+        }
 
 
-    if(gameElement){
-
-        gameElement.classList.add(
-            "hidden"
-        );
-
-    }
+        if($("itemCount")){
+            $("itemCount").textContent =
+                game.items.length;
+        }
 
 
-    if(ending){
-
-        ending.classList.remove(
-            "hidden"
-        );
-
-    }
+        const totalScenes =
+            Math.max(
+                Object.keys(scenes).length,
+                1
+            );
 
 
-    const data =
-        id &&
-        endingData[id]
-        ? endingData[id]
-        : null;
+        const usedScenes =
+            new Set(
+                game.decisions.map(
+                    decision =>
+                        decision.scene
+                )
+            ).size;
 
 
-    const finalTitle =
-        title ||
-        (data
-            ? data.title
-            : "FIN");
+        let percent =
+            Math.round(
+                (
+                    usedScenes /
+                    totalScenes
+                ) * 100
+            );
 
 
-    const finalText =
-        text ||
-        (data
-            ? data.text
-            : "L'histoire se termine ici.");
+        percent =
+            Math.max(
+                0,
+                Math.min(
+                    99,
+                    percent
+                )
+            );
 
 
-    const finalIcon =
-        icon ||
-        (data
-            ? data.icon
-            : "❓");
-
-
-    if($("endingIcon")){
-
-        $("endingIcon").textContent =
-            finalIcon;
-
-    }
-
-
-    if($("endingTitle")){
-
-        $("endingTitle").textContent =
-            finalTitle;
+        if($("progress")){
+            $("progress").textContent =
+                percent + "%";
+        }
 
     }
 
 
-    if($("endingText")){
+    /* =====================================================
+       NOUVELLE PARTIE
+    ===================================================== */
 
-        $("endingText").textContent =
-            finalText;
+    function newGame(){
 
-    }
+        clearInterval(timer);
 
-}
+        typing = false;
 
+        if(window.SaveSystem){
+            window.SaveSystem.clear();
+        }
 
-/* =========================================================
-   STATISTIQUES
-========================================================= */
+        game = freshGame();
 
-function updateStats(){
+        $("ending")?.classList.add("hidden");
+        $("game")?.classList.remove("hidden");
 
-    if(!game){
-        return;
-    }
+        showScene("start");
 
-
-    if($("clueCount")){
-
-        $("clueCount").textContent =
-            game.clues.length;
+        setupMusic();
 
     }
 
 
-    if($("itemCount")){
+    /* =====================================================
+       REJOUER APRÈS UNE FIN
+    ===================================================== */
 
-        $("itemCount").textContent =
-            game.items.length;
+    function again(){
 
-    }
+        clearInterval(timer);
 
+        typing = false;
 
-    /* Progression basée sur les scènes
-       réellement traversées */
+        /*
+           On ne supprime PAS les fins découvertes.
+           On supprime uniquement la partie actuelle.
+        */
 
-    const totalScenes =
-        Math.max(
-            Object.keys(
-                scenes
-            ).length,
-            1
-        );
-
-
-    const usedScenes =
-        new Set(
-            game.decisions.map(
-                decision =>
-                    decision.scene
-            )
-        ).size;
-
-
-    let percent =
-        Math.round(
-            (
-                usedScenes /
-                totalScenes
-            ) * 100
-        );
-
-
-    percent =
-        Math.max(
-            0,
-            Math.min(
-                99,
-                percent
-            )
-        );
-
-
-    if($("progress")){
-
-        $("progress").textContent =
-            percent + "%";
-
-    }
-
-}
-
-
-/* =========================================================
-   RECOMMENCER APRÈS UNE FIN
-========================================================= */
-
-function restart(){
-
-    /* Nouvelle partie :
-       suppression de la sauvegarde,
-       MAIS conservation des fins. */
-
-    if(
-        window.SaveSystem
-    ){
-
-        window.SaveSystem.clear();
-
-    }
-
-
-    game =
-        freshGame();
-
-
-    $("ending")?.classList.add(
-       
+        if(window.SaveSystem){
+            window.SaveS
