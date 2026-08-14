@@ -2,871 +2,984 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-const $ = id => document.getElementById(id);
-const STORY = window.STORY || {};
-const Save = window.SaveSystem || null;
-
-let game = freshGame();
-let typing = false;
-let timer = null;
-
-/* =========================================================
-ÉTAT INITIAL
-========================================================= */
-
-function freshGame() {
-return {
-scene: "start",
-chapter: "PROLOGUE",
-clues: [],
-items: [],
-decisions: [],
-endings: [],
-started: Date.now(),
-lastSaved: Date.now()
-};
-}
-
-/* =========================================================
-NOTIFICATION
-========================================================= */
-
-function toast(message) {
-const el = $("toast");
-if (!el) return;
-
-el.textContent = message;
-el.classList.add("show");
-
-clearTimeout(el._timer);
-
-el._timer = setTimeout(() => {
-    el.classList.remove("show");
-}, 2200);
-
-}
-
-/* =========================================================
-SAUVEGARDE
-========================================================= */
-
-function save(show = false) {
-
-if (!Save || typeof Save.save !== "function")
-    return false;
-
-game.lastSaved = Date.now();
-
-const result = Save.save(game);
-
-if (show && result)
-    toast("💾 Partie sauvegardée");
-
-return result;
-
-}
-
-function load() {
-
-if (!Save || typeof Save.load !== "function")
-    return false;
-
-const data = Save.load();
-
-if (!data)
-    return false;
-
-game = {
-    ...freshGame(),
-    ...data,
-
-    clues: Array.isArray(data.clues)
-        ? data.clues
-        : [],
-
-    items: Array.isArray(data.items)
-        ? data.items
-        : [],
-
-    decisions: Array.isArray(data.decisions)
-        ? data.decisions
-        : [],
-
-    endings: Array.isArray(data.endings)
-        ? data.endings
-        : []
-};
-
-return true;
-
-}
-
-/* =========================================================
-STATISTIQUES
-========================================================= */
-
-function updateStats() {
-
-const clues = $("clueCount");
-const items = $("itemCount");
-const progress = $("progress");
-
-if (clues)
-    clues.textContent = game.clues.length;
-
-if (items)
-    items.textContent = game.items.length;
-
-if (progress) {
-
-    const total = Math.max(
-        Object.keys(STORY).length,
-        1
-    );
-
-    const visited = new Set(
-        game.decisions.map(d => d.scene)
-    ).size;
-
-    const percent = Math.min(
-        99,
-        Math.round((visited / total) * 100)
-    );
-
-    progress.textContent = percent + "%";
-}
-
-}
-
-/* =========================================================
-MUSIQUE
-========================================================= */
-
-function setupMusic() {
-
-const audio = $("music");
-const volume = $("volume");
-const value = $("volumeValue");
-
-if (!audio)
-    return;
-
-let level = 0.45;
-
-if (Save && typeof Save.volume === "function") {
-
-    const saved = Number(Save.volume());
-
-    if (Number.isFinite(saved))
-        level = Math.max(0, Math.min(1, saved));
-}
-
-audio.volume = level;
-
-if (volume)
-    volume.value = Math.round(level * 100);
-
-if (value)
-    value.textContent = Math.round(level * 100) + "%";
-
-
-function startMusic() {
-
-    audio.play().catch(() => {});
-}
-
-
-startMusic();
-
-
-document.addEventListener(
-    "click",
-    startMusic,
-    { once: true }
-);
-
-
-if (volume) {
-
-    volume.addEventListener("input", () => {
-
-        let n = Number(volume.value);
-
-        if (!Number.isFinite(n))
-            n = 0;
-
-        n = Math.max(
-            0,
-            Math.min(100, n)
-        ) / 100;
-
-        audio.volume = n;
-
-        if (value)
-            value.textContent =
-                Math.round(n * 100) + "%";
-
-        if (
-            Save &&
-            typeof Save.setVolume === "function"
-        ) {
-            Save.setVolume(n);
+    const $ = id => document.getElementById(id);
+
+    const STORY = window.STORY || {};
+    const SAVE = window.SaveSystem || null;
+
+    let game = fresh();
+    let typing = false;
+    let timer = null;
+
+    const params = new URLSearchParams(location.search);
+
+
+    /* =========================================================
+       NOUVELLE PARTIE
+    ========================================================= */
+
+    function fresh(){
+        return {
+            scene:"start",
+            chapter:"PROLOGUE",
+            clues:[],
+            items:[],
+            decisions:[],
+            endings:[],
+            started:Date.now(),
+            lastSaved:Date.now()
+        };
+    }
+
+
+    /* =========================================================
+       TRANSITIONS
+    ========================================================= */
+
+    const aliases = {
+        chapter1_start:"chapter1_begin",
+        chapter2_begin:"chapter2_start",
+        chapter3_begin:"chapter3_start",
+        chapter4_begin:"chapter4_start",
+        chapter5_begin:"chapter5_start"
+    };
+
+    function resolve(id){
+        if(STORY[id]) return id;
+
+        if(
+            aliases[id] &&
+            STORY[aliases[id]]
+        ){
+            return aliases[id];
         }
-    });
-}
 
-}
+        return id;
+    }
 
-/* =========================================================
-TEXTE
-========================================================= */
 
-function typeText(text, callback) {
+    /* =========================================================
+       NOTIFICATION
+    ========================================================= */
 
-clearInterval(timer);
+    function toast(text){
 
-const box = $("storyText");
+        const e = $("toast");
 
-if (!box) {
-    typing = false;
+        if(!e) return;
 
-    if (callback)
-        callback();
+        e.textContent = text;
+        e.classList.add("show");
 
-    return;
-}
+        clearTimeout(e._toast);
 
-typing = true;
+        e._toast = setTimeout(() => {
+            e.classList.remove("show");
+        },2200);
+    }
 
-box.textContent = "";
 
-let index = 0;
+    /* =========================================================
+       SAUVEGARDE
+    ========================================================= */
 
-timer = setInterval(() => {
+    function save(show=false){
 
-    box.textContent += text.charAt(index);
+        if(
+            !SAVE ||
+            typeof SAVE.save !== "function"
+        ){
+            return false;
+        }
 
-    index++;
+        game.lastSaved = Date.now();
 
-    if (index >= text.length) {
+        const ok = SAVE.save(game);
+
+        if(show && ok){
+            toast("💾 Partie sauvegardée");
+        }
+
+        return ok;
+    }
+
+
+    function load(){
+
+        if(
+            !SAVE ||
+            typeof SAVE.load !== "function"
+        ){
+            return false;
+        }
+
+        const data = SAVE.load();
+
+        if(
+            !data ||
+            typeof data !== "object"
+        ){
+            return false;
+        }
+
+        game = {
+            ...fresh(),
+            ...data,
+
+            clues:
+                Array.isArray(data.clues)
+                    ? data.clues
+                    : [],
+
+            items:
+                Array.isArray(data.items)
+                    ? data.items
+                    : [],
+
+            decisions:
+                Array.isArray(data.decisions)
+                    ? data.decisions
+                    : [],
+
+            endings:
+                Array.isArray(data.endings)
+                    ? data.endings
+                    : []
+        };
+
+        game.scene = resolve(game.scene);
+
+        return !!STORY[game.scene];
+    }
+
+
+    /* =========================================================
+       STATISTIQUES
+    ========================================================= */
+
+    function stats(){
+
+        const clue = $("clueCount");
+        const item = $("itemCount");
+        const progress = $("progress");
+
+        if(clue){
+            clue.textContent = game.clues.length;
+        }
+
+        if(item){
+            item.textContent = game.items.length;
+        }
+
+        if(progress){
+
+            const total =
+                Object.keys(STORY).length || 1;
+
+            const visited =
+                new Set(
+                    game.decisions.map(
+                        x => x.scene
+                    )
+                ).size;
+
+            progress.textContent =
+                Math.min(
+                    99,
+                    Math.round(
+                        visited / total * 100
+                    )
+                ) + "%";
+        }
+    }
+
+
+    /* =========================================================
+       MUSIQUE
+    ========================================================= */
+
+    function music(){
+
+        const audio = $("music");
+        const slider = $("volume");
+        const value = $("volumeValue");
+
+        if(!audio) return;
+
+        audio.loop = true;
+
+        let volume = 0.45;
+
+        if(
+            SAVE &&
+            typeof SAVE.volume === "function"
+        ){
+            volume = Number(SAVE.volume());
+
+            if(!Number.isFinite(volume)){
+                volume = 0.45;
+            }
+        }
+
+        audio.volume =
+            Math.max(
+                0,
+                Math.min(1,volume)
+            );
+
+        if(slider){
+            slider.value =
+                Math.round(
+                    audio.volume * 100
+                );
+        }
+
+        if(value){
+            value.textContent =
+                Math.round(
+                    audio.volume * 100
+                ) + "%";
+        }
+
+
+        function startMusic(){
+
+            if(audio.paused){
+
+                const promise =
+                    audio.play();
+
+                if(
+                    promise &&
+                    typeof promise.catch === "function"
+                ){
+                    promise.catch(() => {});
+                }
+            }
+        }
+
+
+        /*
+           Tentative immédiate.
+           Si le navigateur bloque l'autoplay,
+           la première interaction lancera la musique.
+        */
+
+        startMusic();
+
+        document.addEventListener(
+            "pointerdown",
+            startMusic,
+            {
+                once:true,
+                passive:true
+            }
+        );
+
+
+        if(slider){
+
+            slider.addEventListener(
+                "input",
+                () => {
+
+                    const n =
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                Number(slider.value) || 0
+                            )
+                        ) / 100;
+
+                    audio.volume = n;
+
+                    if(value){
+                        value.textContent =
+                            Math.round(n * 100) + "%";
+                    }
+
+                    if(
+                        SAVE &&
+                        typeof SAVE.setVolume === "function"
+                    ){
+                        SAVE.setVolume(n);
+                    }
+
+                    startMusic();
+                }
+            );
+        }
+    }
+
+
+    /* =========================================================
+       TEXTE
+    ========================================================= */
+
+    function showText(text,done){
 
         clearInterval(timer);
 
-        typing = false;
+        const box = $("storyText");
 
-        if (callback)
-            callback();
-    }
+        if(!box){
 
-}, 18);
-
-}
-
-/* =========================================================
-TERMINER L'ÉCRITURE
-========================================================= */
-
-function skipTyping(scene) {
-
-clearInterval(timer);
-
-typing = false;
-
-const box = $("storyText");
-
-if (box)
-    box.textContent = scene.text || "";
-
-renderChoices(scene);
-
-}
-
-/* =========================================================
-AFFICHER UNE SCÈNE
-========================================================= */
-
-function showScene(id) {
-
-const scene = STORY[id];
-
-if (!scene) {
-
-    console.error(
-        "Scène introuvable :",
-        id
-    );
-
-    return;
-}
-
-game.scene = id;
-
-if (scene.chapter)
-    game.chapter = scene.chapter;
-
-
-const chapter = $("chapter");
-const location = $("location");
-const time = $("time");
-const speaker = $("speaker");
-const choices = $("choices");
-
-
-if (chapter)
-    chapter.textContent =
-        scene.chapter || "";
-
-
-if (location)
-    location.textContent =
-        scene.location || "";
-
-
-if (time)
-    time.textContent =
-        scene.time || "";
-
-
-if (speaker)
-    speaker.textContent =
-        scene.speaker || "";
-
-
-if (choices)
-    choices.innerHTML = "";
-
-
-updateStats();
-
-save(false);
-
-
-typeText(
-    scene.text || "",
-    () => renderChoices(scene)
-);
-
-}
-
-/* =========================================================
-CONDITIONS
-========================================================= */
-
-function conditionOK(condition) {
-
-if (typeof condition !== "function")
-    return true;
-
-try {
-
-    return !!condition(game);
-
-} catch (error) {
-
-    console.error(
-        "Erreur condition :",
-        error
-    );
-
-    return false;
-}
-
-}
-
-/* =========================================================
-CHOIX
-========================================================= */
-
-function renderChoices(scene) {
-
-const box = $("choices");
-
-if (!box)
-    return;
-
-box.innerHTML = "";
-
-
-const choices = Array.isArray(scene.choices)
-    ? scene.choices
-    : [];
-
-
-choices.forEach((choice, index) => {
-
-    if (
-        choice.condition &&
-        !conditionOK(choice.condition)
-    )
-        return;
-
-
-    const button =
-        document.createElement("button");
-
-    button.type = "button";
-    button.className = "choice";
-
-    button.textContent =
-        choice.text || "Continuer";
-
-
-    button.addEventListener("click", () => {
-
-        /*
-         * Pendant l'écriture :
-         * premier clic = afficher tout le texte.
-         */
-        if (typing) {
-
-            skipTyping(scene);
+            if(done){
+                done();
+            }
 
             return;
         }
 
-        choose(choice, index);
-    });
+        typing = true;
+
+        box.textContent = "";
+
+        /*
+           Nettoyage des lignes vides excessives.
+           Cela évite les énormes espaces entre les phrases.
+        */
+
+        text = String(text || "")
+            .replace(/\r\n/g,"\n")
+            .replace(/\n{3,}/g,"\n\n")
+            .trim();
+
+        let i = 0;
+
+        timer = setInterval(() => {
+
+            box.textContent +=
+                text.charAt(i++);
+
+            if(i >= text.length){
+
+                clearInterval(timer);
+
+                timer = null;
+                typing = false;
+
+                if(done){
+                    done();
+                }
+            }
+
+        },18);
+    }
 
 
-    box.appendChild(button);
-});
+    function finish(scene){
 
-}
+        clearInterval(timer);
 
-/* =========================================================
-EFFECTUER UN CHOIX
-========================================================= */
+        timer = null;
+        typing = false;
 
-function choose(choice, index) {
+        const box = $("storyText");
 
-game.decisions.push({
+        if(box){
+            box.textContent =
+                String(scene.text || "")
+                    .replace(/\r\n/g,"\n")
+                    .replace(/\n{3,}/g,"\n\n")
+                    .trim();
+        }
 
-    scene: game.scene,
-
-    choice: index,
-
-    time: Date.now()
-});
+        renderChoices(scene);
+    }
 
 
-if (typeof choice.effect === "function") {
+    /* =========================================================
+       AFFICHER UNE SCÈNE
+    ========================================================= */
 
-    try {
+    function scene(id){
 
-        choice.effect(game);
+        id = resolve(id);
 
-    } catch (error) {
+        const data = STORY[id];
 
-        console.error(
-            "Erreur effet :",
-            error
+        if(!data){
+
+            console.error(
+                "Scène introuvable :",
+                id
+            );
+
+            toast(
+                "⚠️ Erreur de scène : " + id
+            );
+
+            return;
+        }
+
+        game.scene = id;
+
+        if(data.chapter){
+            game.chapter = data.chapter;
+        }
+
+        const chapter = $("chapter");
+        const location = $("location");
+        const time = $("time");
+        const speaker = $("speaker");
+        const choices = $("choices");
+
+        if(chapter){
+            chapter.textContent =
+                data.chapter ||
+                "MYSTERY JOURNEY";
+        }
+
+        if(location){
+            location.textContent =
+                data.location || "";
+        }
+
+        if(time){
+            time.textContent =
+                data.time || "";
+        }
+
+        if(speaker){
+            speaker.textContent =
+                data.speaker || "";
+        }
+
+        if(choices){
+            choices.innerHTML = "";
+        }
+
+        stats();
+        save();
+
+        showText(
+            data.text || "",
+            () => renderChoices(data)
         );
     }
-}
 
 
-if (
-    choice.clue &&
-    !game.clues.includes(choice.clue)
-) {
+    /* =========================================================
+       CHOIX
+    ========================================================= */
 
-    game.clues.push(choice.clue);
+    function renderChoices(data){
 
-    toast("🔎 Nouvel indice");
-}
+        const box = $("choices");
 
+        if(!box) return;
 
-if (
-    choice.item &&
-    !game.items.includes(choice.item)
-) {
+        box.innerHTML = "";
 
-    game.items.push(choice.item);
+        const choices =
+            Array.isArray(data.choices)
+                ? data.choices
+                : [];
 
-    toast("🎒 Objet obtenu");
-}
+        choices.forEach(
+            (choice,index) => {
 
+                if(
+                    typeof choice.condition ===
+                    "function" &&
+                    !choice.condition(game)
+                ){
+                    return;
+                }
 
-updateStats();
+                const button =
+                    document.createElement(
+                        "button"
+                    );
 
-save(false);
+                button.type = "button";
 
+                button.className =
+                    "choice";
 
-if (choice.end) {
+                button.textContent =
+                    choice.text ||
+                    "Continuer";
 
-    endGame(choice.end);
+                button.addEventListener(
+                    "click",
+                    () => {
 
-    return;
-}
+                        if(typing){
 
+                            finish(data);
 
-if (choice.next) {
+                            return;
+                        }
 
-    showScene(choice.next);
+                        choose(
+                            choice,
+                            index
+                        );
+                    }
+                );
 
-    return;
-}
+                box.appendChild(button);
+            }
+        );
+    }
 
-}
 
-/* =========================================================
-FINS
-========================================================= */
+    /* =========================================================
+       EFFECTUER UN CHOIX
+    ========================================================= */
 
-const endings = {
+    function choose(choice,index){
 
-good: [
-    "🌅",
-    "LE DERNIER APPEL",
-    "Tu découvres enfin l'origine du phénomène."
-],
+        game.decisions.push({
+            scene:game.scene,
+            choice:index,
+            time:Date.now()
+        });
 
-answer: [
-    "📞",
-    "DÉCROCHE",
-    "Tu as fait confiance à la mauvaise voix."
-],
 
-silence: [
-    "🔇",
-    "SILENCE",
-    "Plus personne ne peut t'appeler."
-],
+        if(
+            typeof choice.effect ===
+            "function"
+        ){
 
-hotel: [
-    "🏨",
-    "L'HÔTEL",
-    "Tu es devenu le nouveau gardien du Last Call."
-],
+            try{
 
-loop: [
-    "🔄",
-    "LE NOUVEAU CYCLE",
-    "Tu pensais avoir tout détruit. La route recommence."
-],
+                choice.effect(game);
 
-watched: [
-    "👁️",
-    "ILS TE REGARDENT",
-    "Quelqu'un est toujours derrière toi."
-],
+            }catch(error){
 
-mirror_end: [
-    "🪞",
-    "LE REFLET",
-    "Ton reflet a pris ta place."
-],
+                console.error(
+                    "Erreur effet :",
+                    error
+                );
+            }
+        }
 
-memory_end: [
-    "🧠",
-    "L'OUBLI",
-    "Tu as oublié toute cette histoire."
-],
 
-house_end: [
-    "🚪",
-    "LA PORTE",
-    "Tu quittes les lieux sans regarder derrière toi."
-],
+        /* =========================
+           INDICE
+           Le compteur augmente,
+           mais aucun message
+           "Nouvel indice" n'est affiché.
+        ========================= */
 
-chapter1_escape: [
-    "🏃",
-    "TROP TÔT",
-    "Tu es parti avant de découvrir la vérité."
-],
+        if(
+            choice.clue &&
+            !game.clues.includes(choice.clue)
+        ){
 
-basement_end: [
-    "⬇️",
-    "LE SOUS-SOL",
-    "Les voix utilisent maintenant ta propre voix."
-],
+            game.clues.push(
+                choice.clue
+            );
+        }
 
-secret_escape: [
-    "🔑",
-    "LE SECRET",
-    "Tu refuses d'ouvrir la dernière porte."
-],
 
-upper_end: [
-    "👤",
-    "LA SILHOUETTE",
-    "La silhouette était déjà derrière toi."
-],
+        /* =========================
+           OBJET
+        ========================= */
 
-survivor_end: [
-    "🕯️",
-    "LE DERNIER SURVIVANT",
-    "Tu marches jusqu'à l'aube. Ton ombre n'est pas seule."
-],
+        if(
+            choice.item &&
+            !game.items.includes(choice.item)
+        ){
 
-truth_end: [
-    "🩸",
-    "LA VÉRITÉ",
-    "Le phénomène ne cherchait pas à te tuer. Il voulait ta place."
-]
+            game.items.push(
+                choice.item
+            );
 
-};
+            toast("🎒 Objet obtenu");
+        }
 
-/* =========================================================
-ÉCRAN DE FIN
-========================================================= */
 
-function endGame(id) {
+        stats();
+        save();
 
-if (!id)
-    id = "good";
 
+        if(choice.end){
 
-if (
-    !game.endings.includes(id)
-) {
+            end(choice.end);
 
-    game.endings.push(id);
-}
+            return;
+        }
 
 
-if (
-    Save &&
-    typeof Save.unlockEnding === "function"
-) {
+        if(choice.next){
 
-    Save.unlockEnding(id);
-}
+            scene(choice.next);
 
+            return;
+        }
+    }
 
-save(false);
 
+    /* =========================================================
+       FIN
+    ========================================================= */
 
-const gameScreen = $("game");
-const ending = $("ending");
+    function end(id){
 
+        if(!id) return;
 
-if (gameScreen)
-    gameScreen.classList.add("hidden");
 
+        if(
+            !game.endings.includes(id)
+        ){
+            game.endings.push(id);
+        }
 
-if (ending) {
 
-    ending.classList.remove("hidden");
+        if(
+            SAVE &&
+            typeof SAVE.unlockEnding ===
+            "function"
+        ){
+            SAVE.unlockEnding(id);
+        }
 
-    ending.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-}
 
+        save();
 
-const data =
-    endings[id] ||
-    [
-        "🩸",
-        "FIN",
-        "L'histoire se termine ici."
-    ];
 
+        const gameBox = $("game");
+        const ending = $("ending");
 
-const icon = $("endingIcon");
-const title = $("endingTitle");
-const text = $("endingText");
+        if(gameBox){
+            gameBox.classList.add(
+                "hidden"
+            );
+        }
 
+        if(ending){
+            ending.classList.remove(
+                "hidden"
+            );
+        }
 
-if (icon)
-    icon.textContent = data[0];
 
+        const titles = {
 
-if (title)
-    title.textContent = data[1];
+            good:[
+                "🌅",
+                "LA VÉRITÉ"
+            ],
 
+            loop:[
+                "🔄",
+                "LE CYCLE"
+            ],
 
-if (text)
-    text.textContent = data[2];
+            destroy:[
+                "🔥",
+                "LE FEU"
+            ],
 
-}
+            guardian:[
+                "🔒",
+                "LE GARDIEN"
+            ],
 
-/* =========================================================
-MASQUER LA FIN
-========================================================= */
+            escape:[
+                "🚗",
+                "L'ÉCHAPPÉE"
+            ],
 
-function hideEnding() {
+            watched:[
+                "👁️",
+                "ILS TE REGARDENT"
+            ],
 
-const ending = $("ending");
+            mirror_end:[
+                "🪞",
+                "LE REFLET"
+            ],
 
-if (!ending)
-    return;
+            memory_end:[
+                "🧠",
+                "L'OUBLI"
+            ],
 
-ending.classList.add("hidden");
+            house_end:[
+                "🚪",
+                "LA PORTE"
+            ],
 
-ending.setAttribute(
-    "aria-hidden",
-    "true"
-);
+            chapter1_escape:[
+                "🏃",
+                "TROP TÔT"
+            ],
 
-}
+            basement_end:[
+                "⬇️",
+                "LE SOUS-SOL"
+            ],
 
-/* =========================================================
-NOUVELLE PARTIE
-========================================================= */
+            secret_escape:[
+                "🔑",
+                "LE SECRET"
+            ],
 
-function newGame() {
+            upper_end:[
+                "👤",
+                "LA SILHOUETTE"
+            ],
 
-if (
-    Save &&
-    typeof Save.clear === "function"
-) {
-    Save.clear();
-}
+            survivor_end:[
+                "🕯️",
+                "LE SURVIVANT"
+            ]
+        };
 
 
-clearInterval(timer);
+        const data =
+            titles[id] ||
+            [
+                "❓",
+                "FIN"
+            ];
 
-typing = false;
 
-game = freshGame();
+        const icon =
+            $("endingIcon");
 
-hideEnding();
+        const title =
+            $("endingTitle");
 
+        const text =
+            $("endingText");
 
-const gameScreen = $("game");
 
-if (gameScreen)
-    gameScreen.classList.remove("hidden");
+        if(icon){
+            icon.textContent =
+                data[0];
+        }
 
+        if(title){
+            title.textContent =
+                data[1];
+        }
 
-showScene("start");
 
-}
+        if(text){
 
-/* =========================================================
-REJOUER
-========================================================= */
+            const descriptions = {
 
-function replay() {
+                good:
+                    "Le cycle est terminé. Pour la première fois, aucun téléphone ne sonne.",
 
-clearInterval(timer);
+                loop:
+                    "La route 47 recommence. Le cycle n'est pas terminé.",
 
-typing = false;
+                destroy:
+                    "Blackwood brûle et les voix disparaissent.",
 
-game = freshGame();
+                guardian:
+                    "Tu es devenu le nouveau gardien.",
 
-hideEnding();
+                escape:
+                    "Tu quittes les lieux, mais quelque chose marche toujours derrière toi.",
 
+                watched:
+                    "Quelqu'un te regarde, même lorsque tu ne vois personne.",
 
-const gameScreen = $("game");
+                mirror_end:
+                    "Ton reflet est maintenant libre.",
 
-if (gameScreen)
-    gameScreen.classList.remove("hidden");
+                memory_end:
+                    "Tu as tout oublié. Une nouvelle histoire commence.",
 
+                house_end:
+                    "Tu quittes la maison sans jamais regarder derrière toi.",
 
-showScene("start");
+                chapter1_escape:
+                    "Tu as quitté Blackwood trop tôt.",
 
-}
+                basement_end:
+                    "Tu es enfermé. Des dizaines de voix utilisent maintenant ta voix.",
 
-/* =========================================================
-BOUTONS
-========================================================= */
+                secret_escape:
+                    "Tu refuses d'ouvrir la dernière porte.",
 
-const saveBtn = $("saveBtn");
-const againBtn = $("againBtn");
-const restartBtn = $("restartBtn");
-const menuBtn = $("menuBtn");
-const endingMenuBtn = $("endingMenuBtn");
+                upper_end:
+                    "La silhouette est déjà derrière toi.",
 
-if (saveBtn) {
+                survivor_end:
+                    "Tu marches jusqu'à l'aube, mais ton ombre n'est pas seule."
+            };
 
-saveBtn.addEventListener(
-    "click",
-    () => save(true)
-);
 
-}
+            text.textContent =
+                descriptions[id] ||
+                "L'histoire se termine ici.";
+        }
+    }
 
-if (againBtn) {
 
-againBtn.addEventListener(
-    "click",
-    replay
-);
+    /* =========================================================
+       NOUVELLE PARTIE
+    ========================================================= */
 
-}
+    function newGame(){
 
-if (restartBtn) {
+        if(
+            SAVE &&
+            typeof SAVE.clear ===
+            "function"
+        ){
+            SAVE.clear();
+        }
 
-restartBtn.addEventListener(
-    "click",
-    newGame
-);
+        game = fresh();
 
-}
 
-function goMenu() {
+        const ending =
+            $("ending");
 
-save(false);
+        const gameBox =
+            $("game");
 
-window.location.href =
-    "index.html";
 
-}
+        if(ending){
+            ending.classList.add(
+                "hidden"
+            );
+        }
 
-if (menuBtn)
-menuBtn.addEventListener(
-"click",
-goMenu
-);
+        if(gameBox){
+            gameBox.classList.remove(
+                "hidden"
+            );
+        }
 
-if (endingMenuBtn)
-endingMenuBtn.addEventListener(
-"click",
-goMenu
-);
 
-/* =========================================================
-MUSIQUE
-========================================================= */
+        scene("start");
+    }
 
-setupMusic();
 
-/* =========================================================
-DÉMARRAGE
-========================================================= */
+    /* =========================================================
+       REJOUER
+    ========================================================= */
 
-const params =
-new URLSearchParams(
-window.location.search
-);
+    function replay(){
 
-const forceNew =
-params.get("new") === "1";
+        game = fresh();
 
-const forceContinue =
-params.get("continue") === "1";
 
-hideEnding();
+        const ending =
+            $("ending");
 
-if (forceNew) {
+        const gameBox =
+            $("game");
 
-newGame();
 
-} else if (forceContinue) {
+        if(ending){
+            ending.classList.add(
+                "hidden"
+            );
+        }
 
-if (load()) {
+        if(gameBox){
+            gameBox.classList.remove(
+                "hidden"
+            );
+        }
 
-    showScene(game.scene);
 
-} else {
+        scene("start");
+    }
 
-    newGame();
-}
 
-} else if (load()) {
+    /* =========================================================
+       BOUTONS
+    ========================================================= */
 
-toast("📂 Partie chargée");
+    const saveBtn =
+        $("saveBtn");
 
-showScene(game.scene);
+    const restartBtn =
+        $("restartBtn");
 
-} else {
+    const againBtn =
+        $("againBtn");
 
-showScene("start");
+    const menuBtn =
+        $("menuBtn");
 
-}
+
+    if(saveBtn){
+
+        saveBtn.addEventListener(
+            "click",
+            () => save(true)
+        );
+    }
+
+
+    if(restartBtn){
+
+        restartBtn.addEventListener(
+            "click",
+            newGame
+        );
+    }
+
+
+    if(againBtn){
+
+        againBtn.addEventListener(
+            "click",
+            replay
+        );
+    }
+
+
+    if(menuBtn){
+
+        menuBtn.addEventListener(
+            "click",
+            () => {
+
+                save();
+
+                location.href =
+                    "index.html";
+            }
+        );
+    }
+
+
+    /* =========================================================
+       DÉMARRAGE
+    ========================================================= */
+
+    music();
+
+
+    if(params.get("new") === "1"){
+
+        newGame();
+
+    }else if(
+        params.get("continue") === "1"
+    ){
+
+        if(load()){
+            scene(game.scene);
+        }else{
+            newGame();
+        }
+
+    }else if(load()){
+
+        toast("📂 Partie chargée");
+
+        scene(game.scene);
+
+    }else{
+
+        scene("start");
+    }
 
 });
