@@ -5,9 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050505">
-
-<title>Mystery Journey: Horror 2</title>
-
+<title>MYSTERY JOURNEY: HORROR 2</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -31,42 +29,20 @@ THE LAST CALL
 </div>
 
 <div class="speaker">
-🕵️ MYSTERY JOURNEY
+🕵️ UNE NOUVELLE HISTOIRE
 </div>
 
 <div class="story-text">
 
-Quelques mois après les événements de Blackwood,
-tu pensais que tout était terminé.
+Certaines histoires auraient dû rester oubliées.
 
-Tu avais tort.
+Certains appels n'auraient jamais dû être décrochés.
 
-Un soir, ton téléphone sonne.
+Et certaines réponses auraient dû rester inconnues.
 
-Numéro inconnu.
+Cette fois...
 
-Tu décroches.
-
-Silence.
-
-Puis une voix murmure :
-
-« Ne retourne jamais à Blackwood. »
-
-La ligne coupe.
-
-Quelques secondes plus tard,
-une vidéo arrive sur ton téléphone.
-
-Elle montre un hôtel abandonné.
-
-THE LAST CALL HOTEL.
-
-Et au bout du couloir...
-
-la chambre 17.
-
-Cette vidéo est datée de demain.
+le téléphone sonnera une dernière fois.
 
 </div>
 
@@ -74,13 +50,15 @@ Cette vidéo est datée de demain.
 
 <button
 class="choice"
-id="newGameBtn">
+id="newGameBtn"
+type="button">
 ▶ Nouvelle partie
 </button>
 
 <button
 class="choice"
-id="continueBtn">
+id="continueBtn"
+type="button">
 💾 Continuer
 </button>
 
@@ -90,26 +68,10 @@ id="continueBtn">
 
 </main>
 
-<footer>
-
-<div class="music">
-<span>🎵</span>
-<span>The Last Call</span>
 </div>
 
-</footer>
-
-</div>
-
-<audio
-id="music"
-loop
-preload="auto">
-
-<source
-src="The Last Call.mp3"
-type="audio/mpeg">
-
+<audio id="music" loop preload="auto">
+<source src="The Last Call.mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -122,18 +84,15 @@ const SAVE_KEY =
 const music =
 document.getElementById("music");
 
-
 function startMusic(){
 
-if(!music) return;
+if(!music)return;
 
-music.volume = 0.45;
+music.volume=.45;
 
-const play = music.play();
+const p=music.play();
 
-if(play){
-play.catch(()=>{});
-}
+if(p)p.catch(()=>{});
 
 }
 
@@ -143,87 +102,39 @@ startMusic,
 {once:true}
 );
 
-
 function startGame(){
 
 try{
-
-localStorage.removeItem(
-SAVE_KEY
-);
-
-}catch(error){
-
-console.error(error);
-
+localStorage.removeItem(SAVE_KEY);
+}catch(e){
+console.error(e);
 }
 
-window.location.href =
-"game.html?new=1";
-
+location.href="game.html?new=1";
 }
-
 
 function continueGame(){
 
-let save = null;
+let save=null;
 
 try{
-
-save =
-localStorage.getItem(
-SAVE_KEY
-);
-
-}catch(error){
-
-console.error(error);
-
+save=localStorage.getItem(SAVE_KEY);
+}catch(e){
+console.error(e);
 }
 
-if(save){
-
-window.location.href =
-"game.html?continue=1";
-
-return;
-
+location.href=save
+?"game.html?continue=1"
+:"game.html?new=1";
 }
 
-startGame();
+document
+.getElementById("newGameBtn")
+.addEventListener("click",startGame);
 
-}
-
-
-const newGameBtn =
-document.getElementById(
-"newGameBtn"
-);
-
-const continueBtn =
-document.getElementById(
-"continueBtn"
-);
-
-
-if(newGameBtn){
-
-newGameBtn.addEventListener(
-"click",
-startGame
-);
-
-}
-
-
-if(continueBtn){
-
-continueBtn.addEventListener(
-"click",
-continueGame
-);
-
-}
+document
+.getElementById("continueBtn")
+.addEventListener("click",continueGame);
 
 </script>
 
