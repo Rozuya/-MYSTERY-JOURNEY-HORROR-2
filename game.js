@@ -11,7 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let typing = false;
     let timer = null;
 
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(
+        window.location.search
+    );
 
 
     /* =========================================================
@@ -42,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================================================
-       TRANSITIONS
+       ALIAS DES TRANSITIONS
     ========================================================= */
 
     const aliases = {
@@ -66,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return id;
         }
 
-
         if(
             aliases[id] &&
             STORY[aliases[id]]
@@ -74,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             return aliases[id];
         }
-
 
         return id;
     }
@@ -86,35 +86,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toast(text){
 
-        const e =
+        const element =
             $("toast");
 
-
-        if(!e){
+        if(!element){
 
             return;
         }
 
-
-        e.textContent =
+        element.textContent =
             text;
 
-
-        e.classList.add(
+        element.classList.add(
             "show"
         );
 
-
         clearTimeout(
-            e._toast
+            element._toast
         );
 
-
-        e._toast =
+        element._toast =
             setTimeout(
                 () => {
 
-                    e.classList.remove(
+                    element.classList.remove(
                         "show"
                     );
 
@@ -132,25 +127,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if(
             !SAVE ||
-            typeof SAVE.save !==
-            "function"
+            typeof SAVE.save !== "function"
         ){
 
             return false;
         }
 
-
         game.lastSaved =
             Date.now();
 
-
-        const ok =
+        const result =
             SAVE.save(game);
-
 
         if(
             show &&
-            ok
+            result
         ){
 
             toast(
@@ -158,8 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
-
-        return ok;
+        return result;
     }
 
 
@@ -171,27 +161,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if(
             !SAVE ||
-            typeof SAVE.load !==
-            "function"
+            typeof SAVE.load !== "function"
         ){
 
             return false;
         }
-
 
         const data =
             SAVE.load();
 
-
         if(
             !data ||
-            typeof data !==
-            "object"
+            typeof data !== "object"
         ){
 
             return false;
         }
-
 
         game = {
 
@@ -199,45 +184,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
             ...data,
 
-
             clues:
-                Array.isArray(
-                    data.clues
-                )
+                Array.isArray(data.clues)
                 ? data.clues
                 : [],
 
-
             items:
-                Array.isArray(
-                    data.items
-                )
+                Array.isArray(data.items)
                 ? data.items
                 : [],
 
-
             decisions:
-                Array.isArray(
-                    data.decisions
-                )
+                Array.isArray(data.decisions)
                 ? data.decisions
                 : [],
 
-
             endings:
-                Array.isArray(
-                    data.endings
-                )
+                Array.isArray(data.endings)
                 ? data.endings
                 : []
         };
 
-
         game.scene =
-            resolve(
-                game.scene
-            );
-
+            resolve(game.scene);
 
         return !!STORY[
             game.scene
@@ -260,13 +229,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const progress =
             $("progress");
 
-
         if(clue){
 
             clue.textContent =
                 game.clues.length;
         }
-
 
         if(item){
 
@@ -274,22 +241,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 game.items.length;
         }
 
-
         if(progress){
 
             const total =
-                Object.keys(
-                    STORY
-                ).length || 1;
-
+                Object.keys(STORY).length || 1;
 
             const visited =
                 new Set(
                     game.decisions.map(
-                        x => x.scene
+                        decision =>
+                            decision.scene
                     )
                 ).size;
-
 
             progress.textContent =
                 Math.min(
@@ -306,7 +269,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* =========================================================
        MUSIQUE
-       THE LAST CALL
     ========================================================= */
 
     function music(){
@@ -320,92 +282,43 @@ document.addEventListener("DOMContentLoaded", () => {
         const value =
             $("volumeValue");
 
-
         if(!audio){
 
             return;
         }
 
-
         audio.loop = true;
 
-
         /*
-           Musique officielle du jeu.
+           Le fichier présent dans ton game.html
+           reste utilisé.
         */
-
-        const wantedMusic =
-            "The Last Call.mp3";
-
-
-        const source =
-            audio.querySelector(
-                "source"
-            );
-
-
-        if(source){
-
-            const current =
-                source.getAttribute(
-                    "src"
-                ) || "";
-
-
-            if(
-                current !==
-                wantedMusic
-            ){
-
-                source.setAttribute(
-                    "src",
-                    wantedMusic
-                );
-
-
-                audio.load();
-            }
-
-        }else{
-
-            audio.src =
-                wantedMusic;
-        }
-
-
-        /* =====================================================
-           VOLUME
-        ===================================================== */
 
         let volume =
             0.45;
 
-
         if(
             SAVE &&
-            typeof SAVE.volume ===
-            "function"
+            typeof SAVE.volume === "function"
         ){
 
-            volume =
+            const savedVolume =
                 Number(
                     SAVE.volume()
                 );
 
-
             if(
-                !Number.isFinite(
-                    volume
+                Number.isFinite(
+                    savedVolume
                 )
             ){
 
                 volume =
-                    0.45;
+                    savedVolume;
             }
         }
 
-
-        audio.volume =
+        volume =
             Math.max(
                 0,
                 Math.min(
@@ -414,55 +327,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 )
             );
 
+        audio.volume =
+            volume;
 
         if(slider){
 
             slider.value =
                 Math.round(
-                    audio.volume *
-                    100
+                    volume * 100
                 );
         }
-
 
         if(value){
 
             value.textContent =
                 Math.round(
-                    audio.volume *
-                    100
+                    volume * 100
                 ) + "%";
         }
 
 
         /* =====================================================
-           LANCER LA MUSIQUE
+           LANCEMENT MUSIQUE
         ===================================================== */
 
         function startMusic(){
 
-            if(!audio){
-
-                return;
-            }
-
-
             if(
+                !audio ||
                 !audio.paused
             ){
 
                 return;
             }
 
-
             const promise =
                 audio.play();
 
-
             if(
                 promise &&
-                typeof promise.catch ===
-                "function"
+                typeof promise.catch === "function"
             ){
 
                 promise.catch(
@@ -471,19 +375,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-
-        /*
-           Tentative immédiate.
-        */
-
         startMusic();
-
-
-        /*
-           Si le navigateur bloque
-           l'autoplay, la première
-           interaction lance la musique.
-        */
 
         document.addEventListener(
             "pointerdown",
@@ -496,7 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         /* =====================================================
-           SLIDER VOLUME
+           VOLUME
         ===================================================== */
 
         if(slider){
@@ -505,7 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 "input",
                 () => {
 
-                    const n =
+                    const number =
                         Math.max(
                             0,
                             Math.min(
@@ -514,21 +406,21 @@ document.addEventListener("DOMContentLoaded", () => {
                                     slider.value
                                 ) || 0
                             )
-                        ) / 100;
+                        );
 
+                    const newVolume =
+                        number / 100;
 
                     audio.volume =
-                        n;
-
+                        newVolume;
 
                     if(value){
 
                         value.textContent =
                             Math.round(
-                                n * 100
+                                newVolume * 100
                             ) + "%";
                     }
-
 
                     if(
                         SAVE &&
@@ -537,10 +429,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     ){
 
                         SAVE.setVolume(
-                            n
+                            newVolume
                         );
                     }
-
 
                     startMusic();
                 }
@@ -550,19 +441,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================================================
-       TEXTE
+       TEXTE AVEC EFFET MACHINE À ÉCRIRE
     ========================================================= */
 
-    function showText(text,done){
+    function showText(text, done){
 
         clearInterval(
             timer
         );
 
-
         const box =
             $("storyText");
-
 
         if(!box){
 
@@ -574,19 +463,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-
         typing =
             true;
 
-
         box.textContent =
             "";
-
-
-        /*
-           Nettoyage des lignes
-           vides excessives.
-        */
 
         text =
             String(
@@ -602,21 +483,22 @@ document.addEventListener("DOMContentLoaded", () => {
             )
             .trim();
 
-
-        let i =
+        let index =
             0;
-
 
         timer =
             setInterval(
                 () => {
 
                     box.textContent +=
-                        text.charAt(i++);
+                        text.charAt(
+                            index
+                        );
 
+                    index++;
 
                     if(
-                        i >=
+                        index >=
                         text.length
                     ){
 
@@ -624,14 +506,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             timer
                         );
 
-
                         timer =
                             null;
 
-
                         typing =
                             false;
-
 
                         if(done){
 
@@ -646,34 +525,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================================================
-       TERMINER L'ÉCRITURE
+       TERMINER LE TEXTE IMMÉDIATEMENT
     ========================================================= */
 
-    function finish(scene){
+    function finish(sceneData){
 
         clearInterval(
             timer
         );
 
-
         timer =
             null;
-
 
         typing =
             false;
 
-
         const box =
             $("storyText");
-
 
         if(box){
 
             box.textContent =
                 String(
-                    scene.text ||
-                    ""
+                    sceneData.text || ""
                 )
                 .replace(
                     /\r\n/g,
@@ -686,9 +560,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 .trim();
         }
 
-
         renderChoices(
-            scene
+            sceneData
         );
     }
 
@@ -702,10 +575,8 @@ document.addEventListener("DOMContentLoaded", () => {
         id =
             resolve(id);
 
-
         const data =
             STORY[id];
-
 
         if(!data){
 
@@ -714,20 +585,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 id
             );
 
-
             toast(
-                "⚠️ Erreur de scène : " +
+                "⚠️ Scène introuvable : " +
                 id
             );
-
 
             return;
         }
 
-
         game.scene =
             id;
-
 
         if(data.chapter){
 
@@ -735,6 +602,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.chapter;
         }
 
+
+        /* =====================================================
+           INTERFACE
+        ===================================================== */
 
         const chapter =
             $("chapter");
@@ -759,14 +630,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 "MYSTERY JOURNEY";
         }
 
-
         if(location){
 
             location.textContent =
                 data.location ||
                 "";
         }
-
 
         if(time){
 
@@ -775,7 +644,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 "";
         }
 
-
         if(speaker){
 
             speaker.textContent =
@@ -783,33 +651,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 "";
         }
 
-
         if(choices){
 
             choices.innerHTML =
                 "";
         }
 
-
         stats();
 
         save();
 
 
+        /* =====================================================
+           TEXTE
+        ===================================================== */
+
         showText(
 
             data.text || "",
 
-            () =>
+            () => {
+
                 renderChoices(
                     data
-                )
+                );
+
+            }
         );
     }
 
 
     /* =========================================================
-       CHOIX
+       AFFICHER LES CHOIX
     ========================================================= */
 
     function renderChoices(data){
@@ -817,16 +690,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const box =
             $("choices");
 
-
         if(!box){
 
             return;
         }
 
-
         box.innerHTML =
             "";
-
 
         const choices =
             Array.isArray(
@@ -838,7 +708,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         choices.forEach(
             (choice,index) => {
-
 
                 /* =============================================
                    CONDITION
@@ -859,14 +728,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         "button"
                     );
 
-
                 button.type =
                     "button";
 
-
                 button.className =
                     "choice";
-
 
                 button.textContent =
                     choice.text ||
@@ -877,12 +743,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     "click",
                     () => {
 
-
                         /*
                            Si le texte est encore
-                           en train d'être écrit,
-                           le premier clic termine
-                           simplement le texte.
+                           en cours d'écriture,
+                           le clic termine d'abord
+                           le texte.
                         */
 
                         if(typing){
@@ -894,11 +759,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             return;
                         }
 
-
                         choose(
                             choice,
                             index
                         );
+
                     }
                 );
 
@@ -906,6 +771,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 box.appendChild(
                     button
                 );
+
             }
         );
     }
@@ -916,6 +782,13 @@ document.addEventListener("DOMContentLoaded", () => {
     ========================================================= */
 
     function choose(choice,index){
+
+        /*
+           On mémorise tous les choix.
+
+           Cela permet aux chapitres suivants
+           d'utiliser game.decisions si besoin.
+        */
 
         game.decisions.push({
 
@@ -957,9 +830,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         /* =====================================================
            INDICE
-           L'indice est ajouté au
-           compteur sans apparaître
-           en bas du texte.
         ===================================================== */
 
         if(
@@ -973,16 +843,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 choice.clue
             );
 
-
-            /*
-               Notification d'indice.
-
-               Si tu veux que ton système
-               affiche l'indice comme dans
-               ton accueil, il suffit que
-               #toast soit correctement stylé.
-            */
-
             toast(
                 "🔎 Nouvel indice"
             );
@@ -991,7 +851,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         /* =====================================================
            OBJET
-           Notification flottante.
         ===================================================== */
 
         if(
@@ -1004,17 +863,6 @@ document.addEventListener("DOMContentLoaded", () => {
             game.items.push(
                 choice.item
             );
-
-
-            /*
-               IMPORTANT :
-
-               L'objet n'est PAS ajouté
-               dans storyText.
-
-               Il passe uniquement
-               par la notification.
-            */
 
             toast(
                 "🎒 Objet obtenu"
@@ -1033,8 +881,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if(choice.end){
 
-            end(
+            /*
+               On sauvegarde l'ID de la fin.
+
+               C'est ce même ID qui est utilisé
+               par SaveSystem pour l'accueil.
+            */
+
+            unlockEnding(
                 choice.end
+            );
+
+
+            /*
+               Si une scène de fin est indiquée,
+               on l'affiche directement.
+            */
+
+            if(choice.next){
+
+                const endingScene =
+                    resolve(
+                        choice.next
+                    );
+
+                if(
+                    STORY[
+                        endingScene
+                    ]
+                ){
+
+                    showEnding(
+                        choice.end,
+                        STORY[
+                            endingScene
+                        ]
+                    );
+
+                    return;
+                }
+            }
+
+            /*
+               Si aucune scène de fin
+               n'est indiquée, on affiche
+               simplement l'écran de fin.
+            */
+
+            showEnding(
+                choice.end,
+                null
             );
 
             return;
@@ -1053,15 +949,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
             return;
         }
+
+
+        /*
+           Aucun next et aucune end :
+           on reste simplement sur la scène.
+        */
+
+        renderChoices(
+            STORY[
+                game.scene
+            ]
+        );
     }
 
 
     /* =========================================================
-       FIN
-       15 IDs IDENTIQUES À L'ACCUEIL
+       DÉBLOQUER UNE FIN
     ========================================================= */
 
-    function end(id){
+    function unlockEnding(id){
 
         if(!id){
 
@@ -1069,9 +976,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        /* =====================================================
-           ENREGISTRER LA FIN
-        ===================================================== */
+        if(
+            !Array.isArray(
+                game.endings
+            )
+        ){
+
+            game.endings =
+                [];
+        }
+
 
         if(
             !game.endings.includes(
@@ -1084,11 +998,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
-
-        /*
-           Enregistrement permanent
-           dans localStorage via SaveSystem.
-        */
 
         if(
             SAVE &&
@@ -1103,11 +1012,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         save();
+    }
 
 
-        /* =====================================================
-           AFFICHAGE DE LA FIN
-        ===================================================== */
+    /* =========================================================
+       AFFICHER UNE FIN
+    ========================================================= */
+
+    function showEnding(id,data){
+
+        clearInterval(
+            timer
+        );
+
+        timer =
+            null;
+
+        typing =
+            false;
+
 
         const gameBox =
             $("game");
@@ -1115,16 +1038,5 @@ document.addEventListener("DOMContentLoaded", () => {
         const ending =
             $("ending");
 
-
-        if(gameBox){
-
-            gameBox.classList.add(
-                "hidden"
-            );
-        }
-
-
-        if(ending){
-
-            ending.classList.remove(
-             
+        const endingIcon =
+            $("endingIcon"
