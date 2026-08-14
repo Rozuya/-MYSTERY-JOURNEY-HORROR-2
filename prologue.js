@@ -4,12 +4,17 @@ window.STORY = window.STORY || {};
 
 Object.assign(window.STORY, {
 
-start:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:41",
-speaker:"NARRATEUR",
-text:`Quelques mois ont passé depuis Blackwood.
+    /* =========================================================
+       PROLOGUE — THE LAST CALL
+    ========================================================= */
+
+    start:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:41",
+        speaker:"NARRATEUR",
+
+        text:`Quelques mois ont passé depuis Blackwood.
 
 Tu essaies de vivre normalement.
 
@@ -30,18 +35,35 @@ Une respiration.
 Puis une voix murmure :
 
 « Tu m'entends ? »`,
-choices:[
-{text:"📞 Répondre",next:"call"},
-{text:"🔇 Ignorer",next:"ignore"},
-{text:"📱 Regarder le numéro",next:"number"}
-]},
 
-call:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:42",
-speaker:"VOIX INCONNUE",
-text:`— Qui êtes-vous ?
+        choices:[
+            {
+                text:"📞 Répondre",
+                next:"call"
+            },
+            {
+                text:"🔇 Ignorer",
+                next:"ignore"
+            },
+            {
+                text:"📱 Regarder le numéro",
+                next:"number"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       APPEL
+    ========================================================= */
+
+    call:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:42",
+        speaker:"VOIX INCONNUE",
+
+        text:`— Qui êtes-vous ?
 
 Un long silence.
 
@@ -66,18 +88,36 @@ Une porte.
 CHAMBRE 17.
 
 La vidéo est datée de demain.`,
-choices:[
-{text:"▶ Regarder la vidéo",next:"video",clue:"Vidéo mystérieuse"},
-{text:"📞 Rappeler",next:"recall"},
-{text:"🗑️ Supprimer",next:"delete"}
-]},
 
-ignore:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:43",
-speaker:"NARRATEUR",
-text:`Tu laisses sonner.
+        choices:[
+            {
+                text:"▶ Regarder la vidéo",
+                next:"video",
+                clue:"Vidéo mystérieuse"
+            },
+            {
+                text:"📞 Rappeler",
+                next:"recall"
+            },
+            {
+                text:"🗑️ Supprimer",
+                next:"delete"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       IGNORER
+    ========================================================= */
+
+    ignore:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:43",
+        speaker:"NARRATEUR",
+
+        text:`Tu laisses sonner.
 
 L'appel s'arrête.
 
@@ -98,18 +138,36 @@ THE LAST CALL HOTEL.
 CHAMBRE 17.
 
 La date indique demain.`,
-choices:[
-{text:"▶ Ouvrir la vidéo",next:"video",clue:"Vidéo mystérieuse"},
-{text:"🗑️ Supprimer le message",next:"delete"},
-{text:"📱 Garder le téléphone",next:"number"}
-]},
 
-number:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:44",
-speaker:"NARRATEUR",
-text:`Tu regardes le numéro.
+        choices:[
+            {
+                text:"▶ Ouvrir la vidéo",
+                next:"video",
+                clue:"Vidéo mystérieuse"
+            },
+            {
+                text:"🗑️ Supprimer le message",
+                next:"delete"
+            },
+            {
+                text:"📱 Garder le téléphone",
+                next:"number"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       NUMÉRO
+    ========================================================= */
+
+    number:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:44",
+        speaker:"NARRATEUR",
+
+        text:`Tu regardes le numéro.
 
 Il n'y en a aucun.
 
@@ -130,18 +188,36 @@ Devant un hôtel que tu n'as jamais visité.
 Au dos de la photo :
 
 « SI TU VEUX SAVOIR, VIENS SEUL. »`,
-choices:[
-{text:"📷 Examiner la photo",next:"photo",clue:"Photo de l'hôtel"},
-{text:"📞 Rappeler",next:"recall"},
-{text:"🗑️ Supprimer",next:"delete"}
-]},
 
-video:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:46",
-speaker:"NARRATEUR",
-text:`La vidéo montre une ville plongée dans la nuit.
+        choices:[
+            {
+                text:"📷 Examiner la photo",
+                next:"photo",
+                clue:"Photo de l'hôtel"
+            },
+            {
+                text:"📞 Rappeler",
+                next:"recall"
+            },
+            {
+                text:"🗑️ Supprimer",
+                next:"delete"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       VIDÉO
+    ========================================================= */
+
+    video:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:46",
+        speaker:"NARRATEUR",
+
+        text:`La vidéo montre une ville plongée dans la nuit.
 
 La caméra avance lentement.
 
@@ -164,18 +240,36 @@ Ton téléphone affiche une nouvelle adresse.
 Tu reconnais immédiatement la route.
 
 Elle mène hors de la ville.`,
-choices:[
-{text:"🏨 Aller à l'hôtel",next:"go_hotel",clue:"Last Call Hotel"},
-{text:"📞 Rappeler la voix",next:"recall"},
-{text:"🚫 Ne pas y aller",next:"stay_home"}
-]},
 
-recall:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:47",
-speaker:"VOIX INCONNUE",
-text:`Tu rappelles.
+        choices:[
+            {
+                text:"🏨 Aller à l'hôtel",
+                next:"go_hotel",
+                clue:"Last Call Hotel"
+            },
+            {
+                text:"📞 Rappeler la voix",
+                next:"recall"
+            },
+            {
+                text:"🚫 Ne pas y aller",
+                next:"stay_home"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       RAPPELER
+    ========================================================= */
+
+    recall:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:47",
+        speaker:"VOIX INCONNUE",
+
+        text:`Tu rappelles.
 
 Une sonnerie.
 
@@ -198,18 +292,36 @@ La réponse tombe :
 « Parce que tu es déjà impliqué. »
 
 La ligne coupe.`,
-choices:[
-{text:"🏨 Aller au Last Call",next:"go_hotel",clue:"La vérité sur Blackwood"},
-{text:"🚫 Refuser",next:"stay_home"},
-{text:"📞 Rappeler encore",next:"recall_again"}
-]},
 
-recall_again:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:48",
-speaker:"TA VOIX",
-text:`Tu rappelles.
+        choices:[
+            {
+                text:"🏨 Aller au Last Call",
+                next:"go_hotel",
+                clue:"La vérité sur Blackwood"
+            },
+            {
+                text:"🚫 Refuser",
+                next:"stay_home"
+            },
+            {
+                text:"📞 Rappeler encore",
+                next:"recall_again"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       RAPPELER ENCORE
+    ========================================================= */
+
+    recall_again:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:48",
+        speaker:"TA VOIX",
+
+        text:`Tu rappelles.
 
 Cette fois quelqu'un répond immédiatement.
 
@@ -226,18 +338,35 @@ Puis la voix murmure :
 « J'ai déjà vécu cette nuit. »
 
 La communication coupe.`,
-choices:[
-{text:"🏨 Aller quand même",next:"go_hotel"},
-{text:"🚫 Rester chez toi",next:"stay_home"},
-{text:"📱 Attendre un autre appel",next:"last_call"}
-]},
 
-delete:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:49",
-speaker:"NARRATEUR",
-text:`Tu supprimes tout.
+        choices:[
+            {
+                text:"🏨 Aller quand même",
+                next:"go_hotel"
+            },
+            {
+                text:"🚫 Rester chez toi",
+                next:"stay_home"
+            },
+            {
+                text:"📱 Attendre un autre appel",
+                next:"last_call"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       SUPPRIMER
+    ========================================================= */
+
+    delete:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:49",
+        speaker:"NARRATEUR",
+
+        text:`Tu supprimes tout.
 
 La vidéo.
 
@@ -256,18 +385,36 @@ Un seul texte apparaît :
 Une adresse apparaît.
 
 THE LAST CALL HOTEL.`,
-choices:[
-{text:"🏨 Aller à l'hôtel",next:"go_hotel"},
-{text:"🚫 Éteindre le téléphone",next:"stay_home"},
-{text:"📱 Photographier l'écran",next:"screen",clue:"Message impossible"}
-]},
 
-photo:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:50",
-speaker:"NARRATEUR",
-text:`Tu examines la photographie.
+        choices:[
+            {
+                text:"🏨 Aller à l'hôtel",
+                next:"go_hotel"
+            },
+            {
+                text:"🚫 Éteindre le téléphone",
+                next:"stay_home"
+            },
+            {
+                text:"📱 Photographier l'écran",
+                next:"screen",
+                clue:"Message impossible"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       PHOTO
+    ========================================================= */
+
+    photo:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:50",
+        speaker:"NARRATEUR",
+
+        text:`Tu examines la photographie.
 
 L'hôtel semble abandonné.
 
@@ -286,18 +433,36 @@ La silhouette a disparu.
 Au dos de la photo apparaît une nouvelle phrase :
 
 « DEMAIN, TU COMPRENDRAS. »`,
-choices:[
-{text:"🏨 Aller au Last Call",next:"go_hotel"},
-{text:"🔥 Détruire la photo",next:"destroy_photo"},
-{text:"📷 Garder la photo",next:"keep_photo",clue:"Silhouette"}
-]},
 
-screen:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:51",
-speaker:"NARRATEUR",
-text:`Tu photographies l'écran.
+        choices:[
+            {
+                text:"🏨 Aller au Last Call",
+                next:"go_hotel"
+            },
+            {
+                text:"🔥 Détruire la photo",
+                next:"destroy_photo"
+            },
+            {
+                text:"📷 Garder la photo",
+                next:"keep_photo",
+                clue:"Silhouette"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       ÉCRAN
+    ========================================================= */
+
+    screen:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:51",
+        speaker:"NARRATEUR",
+
+        text:`Tu photographies l'écran.
 
 Le flash éclaire la pièce.
 
@@ -312,18 +477,35 @@ Personne.
 Tu regardes l'écran.
 
 La personne est toujours là.`,
-choices:[
-{text:"👀 Regarder derrière toi",next:"look"},
-{text:"🏨 Quitter la maison",next:"go_hotel"},
-{text:"📱 Garder la photo",next:"keep_photo"}
-]},
 
-look:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:52",
-speaker:"NARRATEUR",
-text:`Tu te retournes.
+        choices:[
+            {
+                text:"👀 Regarder derrière toi",
+                next:"look"
+            },
+            {
+                text:"🏨 Quitter la maison",
+                next:"go_hotel"
+            },
+            {
+                text:"📱 Garder la photo",
+                next:"keep_photo"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       REGARDER
+    ========================================================= */
+
+    look:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:52",
+        speaker:"NARRATEUR",
+
+        text:`Tu te retournes.
 
 Personne.
 
@@ -336,17 +518,31 @@ Tu décroches.
 Ta propre voix murmure :
 
 « Maintenant, tu peux commencer. »`,
-choices:[
-{text:"📞 Écouter",next:"last_call"},
-{text:"🔇 Raccrocher",next:"go_hotel"}
-]},
 
-last_call:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:53",
-speaker:"TA VOIX",
-text:`« Écoute-moi.
+        choices:[
+            {
+                text:"📞 Écouter",
+                next:"last_call"
+            },
+            {
+                text:"🔇 Raccrocher",
+                next:"go_hotel"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       DERNIER APPEL
+    ========================================================= */
+
+    last_call:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:53",
+        speaker:"TA VOIX",
+
+        text:`« Écoute-moi.
 
 Le Last Call n'est pas un hôtel ordinaire.
 
@@ -365,17 +561,32 @@ La ligne coupe.
 Pour la première fois depuis Blackwood...
 
 tu sais que quelqu'un t'attend.`,
-choices:[
-{text:"🏨 Partir pour le Last Call",next:"go_hotel",clue:"Le dernier appel"},
-{text:"🚫 Refuser",next:"stay_home"}
-]},
 
-keep_photo:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:54",
-speaker:"NARRATEUR",
-text:`Tu gardes la photographie.
+        choices:[
+            {
+                text:"🏨 Partir pour le Last Call",
+                next:"go_hotel",
+                clue:"Le dernier appel"
+            },
+            {
+                text:"🚫 Refuser",
+                next:"stay_home"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       GARDER PHOTO
+    ========================================================= */
+
+    keep_photo:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:54",
+        speaker:"NARRATEUR",
+
+        text:`Tu gardes la photographie.
 
 Tu la poses sur la table.
 
@@ -392,17 +603,31 @@ Ton téléphone affiche une adresse.
 Le Last Call Hotel.
 
 Tu prends tes clés.`,
-choices:[
-{text:"🏨 Partir",next:"go_hotel"},
-{text:"🚫 Rester",next:"stay_home"}
-]},
 
-destroy_photo:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:55",
-speaker:"NARRATEUR",
-text:`Tu déchires la photographie.
+        choices:[
+            {
+                text:"🏨 Partir",
+                next:"go_hotel"
+            },
+            {
+                text:"🚫 Rester",
+                next:"stay_home"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       DÉTRUIRE PHOTO
+    ========================================================= */
+
+    destroy_photo:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:55",
+        speaker:"NARRATEUR",
+
+        text:`Tu déchires la photographie.
 
 Les morceaux tombent au sol.
 
@@ -419,17 +644,31 @@ Elle montre l'hôtel.
 Cette fois, tu es devant la porte.
 
 Tu n'y es pourtant jamais allé.`,
-choices:[
-{text:"🏨 Aller au Last Call",next:"go_hotel"},
-{text:"📱 Garder le téléphone",next:"keep_phone"}
-]},
 
-keep_phone:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"22:56",
-speaker:"NARRATEUR",
-text:`Tu gardes ton téléphone.
+        choices:[
+            {
+                text:"🏨 Aller au Last Call",
+                next:"go_hotel"
+            },
+            {
+                text:"📱 Garder le téléphone",
+                next:"keep_phone"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       GARDER TÉLÉPHONE
+    ========================================================= */
+
+    keep_phone:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"22:56",
+        speaker:"NARRATEUR",
+
+        text:`Tu gardes ton téléphone.
 
 L'écran devient noir.
 
@@ -438,16 +677,27 @@ Puis une dernière phrase apparaît :
 « À DEMAIN. »
 
 Tu comprends que rester chez toi ne changera rien.`,
-choices:[
-{text:"🏨 Partir",next:"go_hotel"}
-]},
 
-stay_home:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"23:00",
-speaker:"NARRATEUR",
-text:`Tu décides de ne pas y aller.
+        choices:[
+            {
+                text:"🏨 Partir",
+                next:"go_hotel"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       RESTER CHEZ SOI
+    ========================================================= */
+
+    stay_home:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"23:00",
+        speaker:"NARRATEUR",
+
+        text:`Tu décides de ne pas y aller.
 
 Tu éteins toutes les lumières.
 
@@ -474,18 +724,35 @@ Ton téléphone s'allume.
 Un message :
 
 « TU AS OUBLIÉ LA CHAMBRE 17. »`,
-choices:[
-{text:"🚪 Ouvrir la porte",next:"door"},
-{text:"📱 Regarder le message",next:"message"},
-{text:"🏨 Aller finalement à l'hôtel",next:"go_hotel"}
-]},
 
-door:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"23:01",
-speaker:"NARRATEUR",
-text:`Tu ouvres la porte.
+        choices:[
+            {
+                text:"🚪 Ouvrir la porte",
+                next:"door"
+            },
+            {
+                text:"📱 Regarder le message",
+                next:"message"
+            },
+            {
+                text:"🏨 Aller finalement à l'hôtel",
+                next:"go_hotel"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       PORTE
+    ========================================================= */
+
+    door:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"23:01",
+        speaker:"NARRATEUR",
+
+        text:`Tu ouvres la porte.
 
 Personne.
 
@@ -502,17 +769,32 @@ Sur la clé :
 Une adresse est écrite sur une feuille.
 
 THE LAST CALL HOTEL.`,
-choices:[
-{text:"🔑 Prendre la clé",next:"go_hotel",item:"Clé 17"},
-{text:"🚫 Laisser la clé",next:"go_hotel"}
-]},
 
-message:{
-chapter:"PROLOGUE",
-location:"CHEZ TOI",
-time:"23:02",
-speaker:"NARRATEUR",
-text:`Tu regardes le message.
+        choices:[
+            {
+                text:"🔑 Prendre la clé",
+                next:"go_hotel",
+                item:"Clé 17"
+            },
+            {
+                text:"🚫 Laisser la clé",
+                next:"go_hotel"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       MESSAGE
+    ========================================================= */
+
+    message:{
+        chapter:"PROLOGUE",
+        location:"CHEZ TOI",
+        time:"23:02",
+        speaker:"NARRATEUR",
+
+        text:`Tu regardes le message.
 
 « IL EST TROP TARD. »
 
@@ -525,16 +807,28 @@ Puis une adresse.
 Tu prends tes clés.
 
 Tu sais déjà où elle mène.`,
-choices:[
-{text:"🏨 Aller au Last Call",next:"go_hotel",clue:"Adresse du Last Call"}
-]},
 
-go_hotel:{
-chapter:"PROLOGUE",
-location:"ROUTE",
-time:"23:41",
-speaker:"NARRATEUR",
-text:`La route est presque déserte.
+        choices:[
+            {
+                text:"🏨 Aller au Last Call",
+                next:"go_hotel",
+                clue:"Adresse du Last Call"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       ROUTE VERS L'HÔTEL
+    ========================================================= */
+
+    go_hotel:{
+        chapter:"PROLOGUE",
+        location:"ROUTE",
+        time:"23:41",
+        speaker:"NARRATEUR",
+
+        text:`La route est presque déserte.
 
 La pluie tombe depuis plusieurs minutes.
 
@@ -559,18 +853,35 @@ Tu décroches.
 Une voix murmure :
 
 « Bienvenue. »`,
-choices:[
-{text:"📞 Répondre",next:"hotel_call"},
-{text:"🔇 Refuser",next:"hotel"},
-{text:"🚗 Continuer",next:"hotel"}
-]},
 
-hotel_call:{
-chapter:"PROLOGUE",
-location:"ROUTE",
-time:"23:42",
-speaker:"TA VOIX",
-text:`Tu décroches.
+        choices:[
+            {
+                text:"📞 Répondre",
+                next:"hotel_call"
+            },
+            {
+                text:"🔇 Refuser",
+                next:"hotel"
+            },
+            {
+                text:"🚗 Continuer",
+                next:"hotel"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       APPEL SUR LA ROUTE
+    ========================================================= */
+
+    hotel_call:{
+        chapter:"PROLOGUE",
+        location:"ROUTE",
+        time:"23:42",
+        speaker:"TA VOIX",
+
+        text:`Tu décroches.
 
 C'est ta propre voix.
 
@@ -589,17 +900,32 @@ Tu demandes :
 La réponse :
 
 « Celui que tu deviendras. »`,
-choices:[
-{text:"🏨 Entrer dans l'hôtel",next:"hotel"},
-{text:"🚗 Faire demi-tour",next:"hotel"}
-]},
 
-hotel:{
-chapter:"PROLOGUE",
-location:"LAST CALL HOTEL",
-time:"23:47",
-speaker:"NARRATEUR",
-text:`Tu entres dans le parking.
+        choices:[
+            {
+                text:"🏨 Entrer dans l'hôtel",
+                next:"hotel"
+            },
+            {
+                text:"🚗 Faire demi-tour",
+                next:"hotel"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       ENTRÉE DE L'HÔTEL
+       TRANSITION VERS CHAPITRE 1
+    ========================================================= */
+
+    hotel:{
+        chapter:"PROLOGUE",
+        location:"LAST CALL HOTEL",
+        time:"23:47",
+        speaker:"NARRATEUR",
+
+        text:`Tu entres dans le parking.
 
 Le moteur s'arrête.
 
@@ -616,18 +942,41 @@ Les portes se verrouillent derrière toi.
 Devant l'entrée...
 
 un vieux téléphone sonne.`,
-choices:[
-{text:"🏨 Entrer",next:"chapter1_start",clue:"Entrée du Last Call"},
-{text:"📞 Répondre au téléphone",next:"chapter1_start"},
-{text:"🚗 Retourner à la voiture",next:"chapter1_start"}
-]},
 
-chapter1_start:{
-chapter:"CHAPITRE 1",
-location:"LAST CALL HOTEL",
-time:"00:00",
-speaker:"NARRATEUR",
-text:`Tu franchis les portes du Last Call.
+        choices:[
+            {
+                text:"🏨 Entrer",
+                next:"chapter1_start",
+                clue:"Entrée du Last Call"
+            },
+            {
+                text:"📞 Répondre au téléphone",
+                next:"chapter1_start"
+            },
+            {
+                text:"🚗 Retourner à la voiture",
+                next:"chapter1_start"
+            }
+        ]
+    },
+
+
+    /* =========================================================
+       POINT DE TRANSITION CHAPITRE 1
+       
+       IMPORTANT :
+       Cette scène reste dans prologue.js.
+       Le fichier chapter1.js doit ensuite fournir
+       les scènes suivantes du chapitre 1.
+    ========================================================= */
+
+    chapter1_start:{
+        chapter:"CHAPITRE 1",
+        location:"LAST CALL HOTEL",
+        time:"00:00",
+        speaker:"NARRATEUR",
+
+        text:`Tu franchis les portes du Last Call.
 
 L'hôtel est silencieux.
 
@@ -642,8 +991,13 @@ une cassette portant une inscription :
 BLACKWOOD — ENREGISTREMENT 01.
 
 Tu comprends que cette nuit ne fait que commencer.`,
-choices:[
-{text:"➡️ Continuer",next:"chapter1_start"}
-]}
+
+        choices:[
+            {
+                text:"➡️ Continuer",
+                next:"chapter1_start"
+            }
+        ]
+    }
 
 });
