@@ -6,19 +6,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const STORY = window.STORY || {};
     const SAVE = window.SaveSystem || null;
 
-    let game = {
-        scene: "start",
-        chapter: "PROLOGUE",
-        clues: [],
-        items: [],
-        decisions: [],
-        endings: [],
-        started: Date.now(),
-        lastSaved: Date.now()
-    };
-
+    let game = fresh();
     let typing = false;
     let timer = null;
+
+    const params = new URLSearchParams(location.search);
+
+    /* =====================================================
+       NOUVELLE PARTIE
+    ===================================================== */
+
+    function fresh() {
+        return {
+            scene: "start",
+            chapter: "PROLOGUE",
+            clues: [],
+            items: [],
+            decisions: [],
+            endings: [],
+            started: Date.now(),
+            lastSaved: Date.now()
+        };
+    }
+
+    /* =====================================================
+       ALIAS
+    ===================================================== */
 
     const aliases = {
         chapter1_start: "chapter1_begin",
@@ -28,19 +41,16 @@ document.addEventListener("DOMContentLoaded", () => {
         chapter5_begin: "chapter5_start"
     };
 
-
-    /* =====================================================
-       OUTILS
-    ===================================================== */
-
     function resolve(id) {
-        return STORY[id]
-            ? id
-            : (aliases[id] && STORY[aliases[id]]
-                ? aliases[id]
-                : id);
+        if (STORY[id]) return id;
+        return aliases[id] && STORY[aliases[id]]
+            ? aliases[id]
+            : id;
     }
 
+    /* =====================================================
+       NOTIFICATION
+    ===================================================== */
 
     function toast(text) {
         const e = $("toast");
@@ -49,14 +59,16 @@ document.addEventListener("DOMContentLoaded", () => {
         e.textContent = text;
         e.classList.add("show");
 
-        clearTimeout(e._toast);
+        clearTimeout(e._timer);
 
-        e._toast = setTimeout(
-            () => e.classList.remove("show"),
-            2200
-        );
+        e._timer = setTimeout(() => {
+            e.classList.remove("show");
+        }, 2200);
     }
 
+    /* =====================================================
+       NETTOYAGE TEXTE
+    ===================================================== */
 
     function clean(text) {
         return String(text || "")
@@ -65,37 +77,45 @@ document.addEventListener("DOMContentLoaded", () => {
             .trim();
     }
 
-
     /* =====================================================
        SAUVEGARDE
     ===================================================== */
 
     function save(show = false) {
-        if (!SAVE || typeof SAVE.save !== "function")
+
+        if (!SAVE || typeof SAVE.save !== "function") {
             return false;
+        }
 
         game.lastSaved = Date.now();
 
         const ok = SAVE.save(game);
 
-        if (show && ok)
+        if (show && ok) {
             toast("💾 Partie sauvegardée");
+        }
 
         return ok;
     }
 
+    /* =====================================================
+       CHARGEMENT
+    ===================================================== */
 
     function load() {
-        if (!SAVE || typeof SAVE.load !== "function")
+
+        if (!SAVE || typeof SAVE.load !== "function") {
             return false;
+        }
 
         const data = SAVE.load();
 
-        if (!data || typeof data !== "object")
+        if (!data || typeof data !== "object") {
             return false;
+        }
 
         game = {
-            ...game,
+            ...fresh(),
             ...data,
             clues: Array.isArray(data.clues) ? data.clues : [],
             items: Array.isArray(data.items) ? data.items : [],
@@ -112,48 +132,75 @@ document.addEventListener("DOMContentLoaded", () => {
         return !!STORY[game.scene];
     }
 
-
     /* =====================================================
        STATISTIQUES
     ===================================================== */
 
     function stats() {
+
         const clue = $("clueCount");
         const item = $("itemCount");
         const progress = $("progress");
 
-        if (clue)
+        if (clue) {
             clue.textContent = game.clues.length;
+        }
 
-        if (item)
+        if (item) {
             item.textContent = game.items.length;
+        }
 
         if (progress) {
-            const total = Object.keys(STORY).length || 1;
 
-            const visited = new Set(
-                game.decisions.map(x => x.scene)
-            ).size;
+            const total =
+                Object.keys(STORY).length || 1;
+
+            const visited =
+                new Set(
+                    game.decisions.map(x => x.scene)
+                ).size;
 
             progress.textContent =
                 Math.min(
                     99,
-                    Math.round(visited / total * 100)
+                    Math.round(
+                        visited / total * 100
+                    )
                 ) + "%";
         }
     }
-
 
     /* =====================================================
        MUSIQUE
     ===================================================== */
 
-    function music() {
+    function setupMusic() {
+
         const audio = $("music");
         const slider = $("volume");
         const value = $("volumeValue");
 
         if (!audio) return;
+
+        /*
+         * Le fichier présent dans ton GitHub est :
+         * The Last Call.mp3
+         *
+         * On force également la source ici pour éviter
+         * une erreur de nom dans game.html.
+         */
+
+        const source =
+            audio.querySelector("source");
+
+        if (source) {
+            source.src = "The Last Call.mp3";
+            audio.load();
+        } else {
+            audio.src = "The Last Call.mp3";
+        }
+
+        audio.loop = true;
 
         let volume = 0.45;
 
@@ -161,79 +208,102 @@ document.addEventListener("DOMContentLoaded", () => {
             SAVE &&
             typeof SAVE.volume === "function"
         ) {
-            const v = Number(SAVE.volume());
+            const saved = Number(SAVE.volume());
 
-            if (Number.isFinite(v))
-                volume = v;
-        }
-
-        volume = Math.max(0, Math.min(1, volume));
-        audio.volume = volume;
-
-        if (slider)
-            slider.value = Math.round(volume * 100);
-
-        if (value)
-            value.textContent =
-                Math.round(volume * 100) + "%";
-
-
-        function startMusic() {
-            if (!audio || !audio.paused)
-                return;
-
-            audio.play().catch(() => {});
-        }
-
-        startMusic();
-
-        document.addEventListener(
-            "pointerdown",
-            startMusic,
-            {
-                once: true,
-                passive: true
+            if (Number.isFinite(saved)) {
+                volume = saved;
             }
+        }
+
+        volume = Math.max(
+            0,
+            Math.min(1, volume)
         );
 
+        audio.volume = volume;
 
         if (slider) {
+            slider.value =
+                Math.round(volume * 100);
+        }
+
+        if (value) {
+            value.textContent =
+                Math.round(volume * 100) + "%";
+        }
+
+        function playMusic() {
+
+            audio.play().catch(() => {
+                /*
+                 * Le navigateur peut bloquer
+                 * l'autoplay avant le premier clic.
+                 */
+            });
+        }
+
+        /*
+         * Tentative immédiate.
+         */
+        playMusic();
+
+        /*
+         * Premier toucher/clic :
+         * parfait pour Android/mobile.
+         */
+        document.addEventListener(
+            "pointerdown",
+            playMusic,
+            { once: true }
+        );
+
+        document.addEventListener(
+            "keydown",
+            playMusic,
+            { once: true }
+        );
+
+        if (slider) {
+
             slider.addEventListener(
                 "input",
                 () => {
-                    const v = Math.max(
+
+                    let v =
+                        Number(slider.value) / 100;
+
+                    v = Math.max(
                         0,
-                        Math.min(
-                            1,
-                            Number(slider.value) / 100
-                        )
+                        Math.min(1, v)
                     );
 
                     audio.volume = v;
 
-                    if (value)
+                    if (value) {
                         value.textContent =
                             Math.round(v * 100) + "%";
+                    }
 
                     if (
                         SAVE &&
-                        typeof SAVE.setVolume === "function"
+                        typeof SAVE.setVolume ===
+                        "function"
                     ) {
                         SAVE.setVolume(v);
                     }
 
-                    startMusic();
+                    playMusic();
                 }
             );
         }
     }
 
-
     /* =====================================================
-       TEXTE
+       TEXTE MACHINE À ÉCRIRE
     ===================================================== */
 
     function showText(text, done) {
+
         clearInterval(timer);
 
         const box = $("storyText");
@@ -248,24 +318,26 @@ document.addEventListener("DOMContentLoaded", () => {
         box.textContent = "";
         typing = true;
 
-        let index = 0;
+        let i = 0;
 
         timer = setInterval(() => {
-            box.textContent += text.charAt(index++);
 
-            if (index >= text.length) {
+            box.textContent += text.charAt(i++);
+
+            if (i >= text.length) {
+
                 clearInterval(timer);
                 timer = null;
                 typing = false;
 
-                if (done)
-                    done();
+                if (done) done();
             }
+
         }, 18);
     }
 
-
     function finish(data) {
+
         clearInterval(timer);
 
         timer = null;
@@ -273,33 +345,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const box = $("storyText");
 
-        if (box)
-            box.textContent = clean(data.text);
+        if (box) {
+            box.textContent =
+                clean(data.text);
+        }
 
         renderChoices(data);
     }
-
 
     /* =====================================================
        AFFICHER UNE SCÈNE
     ===================================================== */
 
     function scene(id) {
+
         id = resolve(id);
 
         const data = STORY[id];
 
         if (!data) {
-            console.error("Scène introuvable :", id);
+
+            console.error(
+                "Scène introuvable :",
+                id
+            );
+
             toast("⚠️ Scène introuvable");
+
             return;
         }
 
         game.scene = id;
 
-        if (data.chapter)
+        if (data.chapter) {
             game.chapter = data.chapter;
-
+        }
 
         const chapter = $("chapter");
         const location = $("location");
@@ -307,21 +387,29 @@ document.addEventListener("DOMContentLoaded", () => {
         const speaker = $("speaker");
         const choices = $("choices");
 
-        if (chapter)
+        if (chapter) {
             chapter.textContent =
                 data.chapter || "MYSTERY JOURNEY";
+        }
 
-        if (location)
-            location.textContent = data.location || "";
+        if (location) {
+            location.textContent =
+                data.location || "";
+        }
 
-        if (time)
-            time.textContent = data.time || "";
+        if (time) {
+            time.textContent =
+                data.time || "";
+        }
 
-        if (speaker)
-            speaker.textContent = data.speaker || "";
+        if (speaker) {
+            speaker.textContent =
+                data.speaker || "";
+        }
 
-        if (choices)
+        if (choices) {
             choices.innerHTML = "";
+        }
 
         stats();
         save();
@@ -332,26 +420,28 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-
     /* =====================================================
        CHOIX
     ===================================================== */
 
     function renderChoices(data) {
+
         const box = $("choices");
 
         if (!box) return;
 
         box.innerHTML = "";
 
-        const choices = Array.isArray(data.choices)
-            ? data.choices
-            : [];
+        const choices =
+            Array.isArray(data.choices)
+                ? data.choices
+                : [];
 
         choices.forEach((choice, index) => {
 
             if (
-                typeof choice.condition === "function" &&
+                typeof choice.condition ===
+                "function" &&
                 !choice.condition(game)
             ) {
                 return;
@@ -379,7 +469,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
     /* =====================================================
        EFFECTUER UN CHOIX
     ===================================================== */
@@ -392,8 +481,8 @@ document.addEventListener("DOMContentLoaded", () => {
             time: Date.now()
         });
 
-
         if (typeof choice.effect === "function") {
+
             try {
                 choice.effect(game);
             } catch (error) {
@@ -404,17 +493,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-
         /* INDICE */
 
         if (
             choice.clue &&
             !game.clues.includes(choice.clue)
         ) {
+
             game.clues.push(choice.clue);
+
             toast("🔎 Nouvel indice");
         }
-
 
         /* OBJET */
 
@@ -422,21 +511,25 @@ document.addEventListener("DOMContentLoaded", () => {
             choice.item &&
             !game.items.includes(choice.item)
         ) {
+
             game.items.push(choice.item);
+
             toast("🎒 Objet obtenu");
         }
-
 
         stats();
         save();
 
-
         /* FIN */
 
         if (choice.end) {
+
             unlockEnding(choice.end);
 
-            if (choice.next && STORY[resolve(choice.next)]) {
+            if (
+                choice.next &&
+                STORY[resolve(choice.next)]
+            ) {
                 scene(choice.next);
             } else {
                 showEnding(choice.end);
@@ -445,7 +538,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-
         /* SCÈNE SUIVANTE */
 
         if (choice.next) {
@@ -453,23 +545,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
     /* =====================================================
-       FINS
+       DÉBLOQUER UNE FIN
     ===================================================== */
 
     function unlockEnding(id) {
+
         if (!id) return;
 
-        if (!Array.isArray(game.endings))
+        if (!Array.isArray(game.endings)) {
             game.endings = [];
+        }
 
-        if (!game.endings.includes(id))
+        if (!game.endings.includes(id)) {
             game.endings.push(id);
+        }
 
         if (
             SAVE &&
-            typeof SAVE.unlockEnding === "function"
+            typeof SAVE.unlockEnding ===
+            "function"
         ) {
             SAVE.unlockEnding(id);
         }
@@ -477,8 +572,12 @@ document.addEventListener("DOMContentLoaded", () => {
         save();
     }
 
+    /* =====================================================
+       ÉCRAN DE FIN
+    ===================================================== */
 
     function showEnding(id) {
+
         clearInterval(timer);
 
         timer = null;
@@ -487,8 +586,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const gameBox = $("game");
         const ending = $("ending");
 
-        if (gameBox)
+        if (gameBox) {
             gameBox.classList.add("hidden");
+        }
 
         if (!ending) {
             toast("🏆 Fin débloquée");
@@ -501,32 +601,101 @@ document.addEventListener("DOMContentLoaded", () => {
         const title = $("endingTitle");
         const text = $("endingText");
 
-        if (icon)
+        if (icon) {
             icon.textContent = "🩸";
+        }
 
-        if (title)
-            title.textContent = "FIN DÉBLOQUÉE";
+        if (title) {
+            title.textContent =
+                "FIN DÉBLOQUÉE";
+        }
 
-        if (text)
+        if (text) {
             text.textContent =
                 "Tu as débloqué la fin : " + id;
-
-        const button = $("endingButton");
-
-        if (button) {
-            button.onclick = () => {
-                window.location.href = "index.html";
-            };
         }
     }
 
+    /* =====================================================
+       BOUTON SAUVEGARDER
+    ===================================================== */
+
+    const saveBtn = $("saveBtn");
+
+    if (saveBtn) {
+
+        saveBtn.type = "button";
+
+        saveBtn.onclick = () => {
+            save(true);
+        };
+    }
+
+    /* =====================================================
+       BOUTON MENU
+    ===================================================== */
+
+    const menuBtn = $("menuBtn");
+
+    if (menuBtn) {
+
+        menuBtn.type = "button";
+
+        menuBtn.onclick = () => {
+
+            save();
+
+            window.location.href =
+                "index.html";
+        };
+    }
+
+    /* =====================================================
+       BOUTONS DE FIN
+    ===================================================== */
+
+    const restartBtn = $("restartBtn");
+    const againBtn = $("againBtn");
+    const endingMenuBtn = $("endingMenuBtn");
+
+    if (restartBtn) {
+
+        restartBtn.onclick = () => {
+
+            if (SAVE && SAVE.clear) {
+                SAVE.clear();
+            }
+
+            window.location.href =
+                "game.html?new=1";
+        };
+    }
+
+    if (againBtn) {
+
+        againBtn.onclick = () => {
+
+            if (SAVE && SAVE.clear) {
+                SAVE.clear();
+            }
+
+            window.location.href =
+                "game.html?new=1";
+        };
+    }
+
+    if (endingMenuBtn) {
+
+        endingMenuBtn.onclick = () => {
+
+            window.location.href =
+                "index.html";
+        };
+    }
 
     /* =====================================================
        DÉMARRAGE
     ===================================================== */
-
-    const params =
-        new URLSearchParams(window.location.search);
 
     if (
         params.has("continue") &&
@@ -537,6 +706,6 @@ document.addEventListener("DOMContentLoaded", () => {
         scene(resolve("start"));
     }
 
-    music();
+    setupMusic();
 
 });
