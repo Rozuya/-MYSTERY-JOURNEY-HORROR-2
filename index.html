@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#050505">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050507">
+<meta name="description" content="MYSTERY JOURNEY: HORROR 2 — THE LAST CALL">
 <title>MYSTERY JOURNEY: HORROR 2</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -14,127 +14,764 @@
 <div id="game">
 
 <header class="game-header">
-<div>
-<small>MYSTERY JOURNEY</small>
-<h1>HORROR 2</h1>
-</div>
+    <div>
+        <small>MYSTERY JOURNEY</small>
+        <h1>HORROR 2</h1>
+    </div>
 </header>
 
 <main>
 
 <section class="story-box">
 
-<div class="story-time">
-THE LAST CALL
-</div>
+    <div class="story-time">
+        THE LAST CALL
+    </div>
 
-<div class="speaker">
-🕵️ UNE NOUVELLE HISTOIRE
-</div>
+    <div class="speaker">
+        📞 UN NUMÉRO INCONNU
+    </div>
 
-<div class="story-text">
+    <div class="story-text">
+        Certaines histoires auraient dû rester oubliées.
 
-Certaines histoires auraient dû rester oubliées.
+        Certains appels n'auraient jamais dû être décrochés.
 
-Certains appels n'auraient jamais dû être décrochés.
+        Et certaines réponses auraient dû rester inconnues.
 
-Et certaines réponses auraient dû rester inconnues.
+        Cette fois...
 
-Cette fois...
+        le téléphone sonnera une dernière fois.
+    </div>
 
-le téléphone sonnera une dernière fois.
+    <div class="choices">
 
-</div>
+        <button
+            class="choice"
+            id="newGameBtn"
+            type="button">
+            ▶ Nouvelle partie
+        </button>
 
-<div class="choices">
+        <button
+            class="choice"
+            id="continueBtn"
+            type="button">
+            💾 Continuer
+        </button>
 
-<button
-class="choice"
-id="newGameBtn"
-type="button">
-▶ Nouvelle partie
-</button>
+        <button
+            class="choice"
+            id="endingsBtn"
+            type="button">
+            🩸 Mes fins
+        </button>
 
-<button
-class="choice"
-id="continueBtn"
-type="button">
-💾 Continuer
-</button>
-
-</div>
+    </div>
 
 </section>
 
 </main>
 
+<footer>
+
+    <div class="music">
+
+        <span>🎵</span>
+
+        <span>The Last Call</span>
+
+        <input
+            id="volume"
+            type="range"
+            min="0"
+            max="100"
+            value="45"
+            aria-label="Volume de la musique">
+
+        <span id="volumeValue">
+            45%
+        </span>
+
+    </div>
+
+</footer>
+
 </div>
 
-<audio id="music" loop preload="auto">
-<source src="The Last Call.mp3" type="audio/mpeg">
+
+<!-- =====================================================
+     MES FINS
+===================================================== -->
+
+<div
+    id="endingsScreen"
+    class="hidden"
+    aria-hidden="true">
+
+    <div class="endings-card">
+
+        <button
+            id="closeEndings"
+            class="close-btn"
+            type="button"
+            aria-label="Fermer">
+            ✕
+        </button>
+
+        <div class="endings-header">
+
+            <small>
+                MYSTERY JOURNEY: HORROR 2
+            </small>
+
+            <h2>
+                MES FINS
+            </h2>
+
+            <p id="endingProgress">
+                0/15
+            </p>
+
+        </div>
+
+        <div id="endingsList"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MUSIQUE
+===================================================== -->
+
+<audio
+    id="music"
+    loop
+    preload="auto">
+
+    <source
+        src="The Last Call.mp3"
+        type="audio/mpeg">
+
 </audio>
+
 
 <script>
 
 "use strict";
 
+
+/* =====================================================
+   CONFIGURATION
+===================================================== */
+
 const SAVE_KEY =
-"mystery_journey_horror_2_save_v1";
+    "mystery_journey_horror_2_save_v1";
+
+const ENDINGS_KEY =
+    "mystery_journey_horror_2_endings_v1";
+
+const VOLUME_KEY =
+    "mjh2_volume";
+
+
+/* =====================================================
+   ÉLÉMENTS
+===================================================== */
 
 const music =
-document.getElementById("music");
+    document.getElementById("music");
+
+const volume =
+    document.getElementById("volume");
+
+const volumeValue =
+    document.getElementById("volumeValue");
+
+const newGameBtn =
+    document.getElementById("newGameBtn");
+
+const continueBtn =
+    document.getElementById("continueBtn");
+
+const endingsBtn =
+    document.getElementById("endingsBtn");
+
+const endingsScreen =
+    document.getElementById("endingsScreen");
+
+const endingsList =
+    document.getElementById("endingsList");
+
+const endingProgress =
+    document.getElementById("endingProgress");
+
+const closeEndings =
+    document.getElementById("closeEndings");
+
+
+/* =====================================================
+   LES 15 FINS
+===================================================== */
+
+const ENDINGS = [
+
+    {
+        id:"last_call",
+        icon:"📞",
+        name:"LE DERNIER APPEL",
+        text:"Tu réponds au dernier téléphone et découvres enfin l'origine du phénomène."
+    },
+
+    {
+        id:"answer",
+        icon:"☎️",
+        name:"DÉCROCHE",
+        text:"Tu fais confiance à la voix au bout du fil. Mais elle ne t'a pas tout dit."
+    },
+
+    {
+        id:"silence",
+        icon:"🔇",
+        name:"SILENCE",
+        text:"Tu détruis les téléphones et fais taire les appels. Mais ton propre téléphone sonne encore."
+    },
+
+    {
+        id:"hotel",
+        icon:"🏨",
+        name:"L'HÔTEL",
+        text:"Tu restes dans le Last Call Hotel. Peu à peu, les portes disparaissent autour de toi."
+    },
+
+    {
+        id:"new_cycle",
+        icon:"🔄",
+        name:"LE NOUVEAU CYCLE",
+        text:"Tu crois avoir détruit le phénomène avant de découvrir qu'il recommence déjà."
+    },
+
+    {
+        id:"other",
+        icon:"👁️",
+        name:"L'AUTRE",
+        text:"Une autre version de toi prend ta place dans le monde réel."
+    },
+
+    {
+        id:"mirror",
+        icon:"🪞",
+        name:"LE REFLET",
+        text:"Tu détruis le miroir, mais ton reflet continue de bouger."
+    },
+
+    {
+        id:"offline",
+        icon:"🚗",
+        name:"HORS RÉSEAU",
+        text:"Tu quittes la ville. Tout semble terminé jusqu'à ce qu'un appel provenant de Blackwood apparaisse."
+    },
+
+    {
+        id:"cassette",
+        icon:"📼",
+        name:"LA CASSETTE",
+        text:"Tu découvres la vérité sur Blackwood et comprends que son histoire est beaucoup plus ancienne."
+    },
+
+    {
+        id:"after_blackwood",
+        icon:"🌑",
+        name:"APRÈS BLACKWOOD",
+        text:"Tu comprends que Blackwood n'était qu'un des nombreux endroits liés au phénomène."
+    },
+
+    {
+        id:"last_survivor",
+        icon:"🕯️",
+        name:"LE DERNIER SURVIVANT",
+        text:"Tu retrouves une personne disparue depuis des années, mais elle semble te connaître."
+    },
+
+    {
+        id:"room17",
+        icon:"🚪",
+        name:"LA CHAMBRE 17",
+        text:"Tu entres dans la chambre 17 et découvres une photographie qui n'aurait jamais dû exister."
+    },
+
+    {
+        id:"tomorrow",
+        icon:"⏳",
+        name:"DEMAIN",
+        text:"Tu découvres que certaines vidéos ont été enregistrées par toi-même."
+    },
+
+    {
+        id:"nobody",
+        icon:"🌘",
+        name:"PERSONNE NE RÉPOND",
+        text:"Tu détruis ton téléphone et rentres chez toi. Puis quelqu'un frappe à ta porte."
+    },
+
+    {
+        id:"truth",
+        icon:"🩸",
+        name:"LA VÉRITÉ",
+        text:"Tu comprends enfin ce que le phénomène cherche réellement : quelqu'un pour prendre ta place."
+    }
+
+];
+
+
+/* =====================================================
+   LECTURE DES FINS
+===================================================== */
+
+function getDiscoveredEndings(){
+
+    try{
+
+        const raw =
+            localStorage.getItem(
+                ENDINGS_KEY
+            );
+
+        if(!raw){
+            return [];
+        }
+
+        const data =
+            JSON.parse(raw);
+
+        if(!Array.isArray(data)){
+            return [];
+        }
+
+        /*
+         * On garde uniquement les IDs
+         * qui existent réellement parmi
+         * les 15 fins.
+         */
+
+        const validIds =
+            new Set(
+                ENDINGS.map(
+                    ending => ending.id
+                )
+            );
+
+        return [
+            ...new Set(
+                data.filter(
+                    id => validIds.has(id)
+                )
+            )
+        ];
+
+    }catch(error){
+
+        console.error(
+            "Erreur lecture des fins :",
+            error
+        );
+
+        return [];
+    }
+}
+
+
+/* =====================================================
+   AFFICHER LES FINS
+===================================================== */
+
+function renderEndings(){
+
+    const discovered =
+        getDiscoveredEndings();
+
+    endingsList.innerHTML = "";
+
+
+    /* ================================================
+       COMPTEUR
+    ================================================ */
+
+    endingProgress.textContent =
+        discovered.length +
+        "/15";
+
+
+    /* ================================================
+       LISTE
+    ================================================ */
+
+    ENDINGS.forEach(
+        (ending,index)=>{
+
+            const unlocked =
+                discovered.includes(
+                    ending.id
+                );
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "ending-entry " +
+                (
+                    unlocked
+                    ? "unlocked"
+                    : "locked"
+                );
+
+
+            /* ========================================
+               FIN DÉBLOQUÉE
+            ======================================== */
+
+            if(unlocked){
+
+                card.innerHTML = `
+
+                    <div class="ending-number">
+                        FIN ${index + 1}
+                    </div>
+
+                    <div class="ending-icon">
+                        ${ending.icon}
+                    </div>
+
+                    <div class="ending-info">
+
+                        <h3>
+                            ${ending.name}
+                        </h3>
+
+                        <p>
+                            ${ending.text}
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+
+            /* ========================================
+               FIN NON DÉBLOQUÉE
+            ======================================== */
+
+            else{
+
+                card.innerHTML = `
+
+                    <div class="ending-number">
+                        FIN ${index + 1}
+                    </div>
+
+                    <div class="ending-icon">
+                        🔒
+                    </div>
+
+                    <div class="ending-info">
+
+                        <h3>
+                            FIN NON DÉBLOQUÉE
+                        </h3>
+
+                        <p>
+                            Cette fin n'a pas encore été découverte.
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+
+            endingsList.appendChild(card);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   NOUVELLE PARTIE
+   IMPORTANT :
+   LES FINS NE SONT PAS SUPPRIMÉES.
+===================================================== */
+
+newGameBtn.addEventListener(
+    "click",
+    ()=>{
+
+        localStorage.removeItem(
+            SAVE_KEY
+        );
+
+        window.location.href =
+            "game.html?new=1";
+
+    }
+);
+
+
+/* =====================================================
+   CONTINUER
+===================================================== */
+
+continueBtn.addEventListener(
+    "click",
+    ()=>{
+
+        const save =
+            localStorage.getItem(
+                SAVE_KEY
+            );
+
+        if(save){
+
+            window.location.href =
+                "game.html?continue=1";
+
+        }else{
+
+            window.location.href =
+                "game.html?new=1";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   OUVRIR MES FINS
+===================================================== */
+
+endingsBtn.addEventListener(
+    "click",
+    ()=>{
+
+        renderEndings();
+
+        endingsScreen.classList.remove(
+            "hidden"
+        );
+
+        endingsScreen.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   FERMER MES FINS
+===================================================== */
+
+function closeEndingsScreen(){
+
+    endingsScreen.classList.add(
+        "hidden"
+    );
+
+    endingsScreen.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+}
+
+
+closeEndings.addEventListener(
+    "click",
+    closeEndingsScreen
+);
+
+
+/* =====================================================
+   CLIQUER EN DEHORS
+===================================================== */
+
+endingsScreen.addEventListener(
+    "click",
+    event=>{
+
+        if(
+            event.target ===
+            endingsScreen
+        ){
+
+            closeEndingsScreen();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   ÉCHAP
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    event=>{
+
+        if(
+            event.key === "Escape" &&
+            !endingsScreen.classList.contains(
+                "hidden"
+            )
+        ){
+
+            closeEndingsScreen();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   VOLUME
+===================================================== */
+
+function loadVolume(){
+
+    let value;
+
+    try{
+
+        const saved =
+            localStorage.getItem(
+                VOLUME_KEY
+            );
+
+        value =
+            saved === null
+            ? 0.45
+            : Number(saved);
+
+    }catch{
+
+        value = 0.45;
+
+    }
+
+    if(!Number.isFinite(value)){
+        value = 0.45;
+    }
+
+    value =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                value
+            )
+        );
+
+    music.volume = value;
+
+    volume.value =
+        Math.round(
+            value * 100
+        );
+
+    volumeValue.textContent =
+        Math.round(
+            value * 100
+        ) + "%";
+
+}
+
+
+function setVolume(){
+
+    let value =
+        Number(volume.value) / 100;
+
+    if(!Number.isFinite(value)){
+        value = 0.45;
+    }
+
+    value =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                value
+            )
+        );
+
+    music.volume = value;
+
+    volumeValue.textContent =
+        Math.round(
+            value * 100
+        ) + "%";
+
+    localStorage.setItem(
+        VOLUME_KEY,
+        value
+    );
+
+}
+
+
+volume.addEventListener(
+    "input",
+    setVolume
+);
+
+loadVolume();
+
+
+/* =====================================================
+   MUSIQUE
+   Le navigateur bloque parfois
+   l'autoplay : le premier clic
+   lance donc la musique.
+===================================================== */
 
 function startMusic(){
 
-if(!music)return;
+    if(!music){
+        return;
+    }
 
-music.volume=.45;
-
-const p=music.play();
-
-if(p)p.catch(()=>{});
+    music.play().catch(
+        ()=>{}
+    );
 
 }
+
 
 document.addEventListener(
-"click",
-startMusic,
-{once:true}
+    "click",
+    startMusic,
+    {
+        once:true
+    }
 );
 
-function startGame(){
 
-try{
-localStorage.removeItem(SAVE_KEY);
-}catch(e){
-console.error(e);
-}
+/* =====================================================
+   INITIALISATION
+===================================================== */
 
-location.href="game.html?new=1";
-}
-
-function continueGame(){
-
-let save=null;
-
-try{
-save=localStorage.getItem(SAVE_KEY);
-}catch(e){
-console.error(e);
-}
-
-location.href=save
-?"game.html?continue=1"
-:"game.html?new=1";
-}
-
-document
-.getElementById("newGameBtn")
-.addEventListener("click",startGame);
-
-document
-.getElementById("continueBtn")
-.addEventListener("click",continueGame);
+renderEndings();
 
 </script>
 
