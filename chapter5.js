@@ -1,1404 +1,420 @@
 "use strict";
 
-/* =========================================================
-   🕵️ MYSTERY JOURNEY: HORROR 2
-   CHAPTER V — LE DERNIER APPEL
-========================================================= */
+window.STORY=window.STORY||{};
 
-window.STORY = window.STORY || {};
+Object.assign(window.STORY,{
 
-Object.assign(window.STORY, {
+chapter5_start:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
+location:"ROUTE 47",
+time:"03:17",
+speaker:"NARRATEUR",
+text:`Le téléphone sonne encore.
 
-chapter5_start: {
+Tu regardes l'écran.
 
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "02:48",
-    speaker: "NARRATEUR",
+APPEL ENTRANT — DERNIER APPEL.
 
-    text:
-`Tu es de nouveau sur la route 47.
+Tu sais que cette fois, il n'y aura pas de deuxième chance.
 
-L'hôtel a disparu.
+Tu décroches.
 
-Le ciel commence à s'éclaircir.
+Une voix répond.
+
+La tienne.
+
+« Tout ce que tu as vu depuis Blackwood était une seule et même histoire. »`,
+choices:[
+{text:"📞 Demander la vérité",next:"truth"},
+{text:"🔇 Raccrocher",next:"silence"},
+{text:"🔥 Détruire le téléphone",next:"destroy"}
+]
+},
+
+truth:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
+location:"ROUTE 47",
+time:"03:20",
+speaker:"TA VOIX",
+text:`« Blackwood n'était pas le début.
+
+Le Last Call n'est pas la fin.
+
+Ce sont des portes.
+
+Et toi...
+
+tu es la personne capable de les ouvrir. »
+
+Un silence.
+
+« Mais quelqu'un doit rester derrière. »`,
+choices:[
+{text:"❓ Demander qui doit rester",next:"choice_guardian"},
+{text:"🚪 Chercher une sortie",next:"escape"},
+{text:"📞 Continuer l'appel",next:"final_truth"}
+]
+},
+
+choice_guardian:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
+location:"LAST CALL HOTEL",
+time:"03:24",
+speaker:"TA VOIX",
+text:`Tu retournes dans l'hôtel.
+
+Le hall est vide.
+
+Quinze téléphones sont posés devant toi.
+
+Tous affichent ton nom.
+
+Une dernière voix murmure :
+
+« Choisis. »`,
+choices:[
+{text:"🔒 Rester et devenir le gardien",next:"ending_guardian",end:"guardian"},
+{text:"🔥 Détruire les téléphones",next:"ending_destroy",end:"destroy"},
+{text:"🚪 Quitter l'hôtel",next:"ending_escape",end:"escape"}
+]
+},
+
+escape:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
+location:"ROUTE 47",
+time:"03:31",
+speaker:"NARRATEUR",
+text:`Tu démarres la voiture.
+
+L'hôtel disparaît derrière toi.
+
+La route devient normale.
+
+Tu continues pendant plusieurs kilomètres.
+
+Puis ton téléphone s'allume.
+
+APPEL ENTRANT — BLACKWOOD.
+
+Tu souris nerveusement.
+
+Tu comprends que le phénomène n'est pas terminé.`,
+choices:[
+{text:"📞 Répondre",next:"ending_watched",end:"watched"},
+{text:"🔇 Éteindre le téléphone",next:"ending_escape",end:"escape"}
+]
+},
+
+silence:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
+location:"ROUTE 47",
+time:"03:28",
+speaker:"NARRATEUR",
+text:`Tu raccroches.
+
+Le téléphone s'éteint.
+
+La route devient silencieuse.
+
+Pendant quelques secondes, tu crois être libre.
+
+Puis...
+
+TOC.
+
+TOC.
+
+TOC.
+
+Quelqu'un frappe à la vitre arrière.`,
+choices:[
+{text:"👀 Regarder",next:"ending_watched",end:"watched"},
+{text:"🚗 Continuer",next:"ending_loop",end:"loop"}
+]
+},
+
+destroy:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
+location:"ROUTE 47",
+time:"03:30",
+speaker:"NARRATEUR",
+text:`Tu écrases le téléphone.
+
+L'écran se brise.
+
+Toutes les lumières autour de toi s'éteignent.
+
+Puis les téléphones de l'hôtel cessent de sonner.
+
+Pour la première fois...
+
+plus aucun appel.
+
+Tu crois avoir gagné.
+
+Mais un dernier message apparaît sur l'écran brisé :
+
+« UN APPEL RESTE. »`,
+choices:[
+{text:"📱 Lire le message",next:"ending_memory",end:"memory_end"},
+{text:"🚗 Partir sans regarder",next:"ending_escape",end:"escape"}
+]
+},
+
+final_truth:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
+location:"LAST CALL HOTEL",
+time:"03:35",
+speaker:"TA VOIX",
+text:`« Tu veux vraiment savoir ? »
+
+Les lumières s'allument.
+
+Tu vois des dizaines de portes.
+
+Derrière chacune...
+
+une autre version de toi.
+
+Certaines ont disparu.
+
+Certaines sont encore enfermées.
+
+Et toutes attendent la même chose.
+
+Quelqu'un pour prendre leur place.`,
+choices:[
+{text:"🪞 Chercher ton double",next:"ending_other",end:"mirror_end"},
+{text:"🚪 Refuser et partir",next:"ending_secret",end:"secret_escape"},
+{text:"🔒 Prendre leur place",next:"ending_guardian",end:"guardian"}
+]
+},
+
+ending_guardian:{
+chapter:"FIN",
+location:"LAST CALL HOTEL",
+time:"03:41",
+speaker:"NARRATEUR",
+text:`Tu restes.
+
+Les téléphones se taisent.
+
+Les portes se ferment.
+
+Tu comprends enfin ton rôle.
+
+Chaque fois qu'une personne reçoit un appel...
+
+tu seras là.
+
+À attendre.
+
+À prévenir.
+
+À choisir.
+
+Le Last Call a trouvé son nouveau gardien.`,
+choices:[
+{text:"🎬 Voir la fin",next:"ending_done",end:"guardian"}
+]
+},
+
+ending_destroy:{
+chapter:"FIN",
+location:"LAST CALL HOTEL",
+time:"03:43",
+speaker:"NARRATEUR",
+text:`Tu détruis le dernier téléphone.
+
+Une lumière blanche envahit l'hôtel.
+
+Les voix disparaissent.
+
+Les portes s'ouvrent.
+
+Tu cours dehors.
+
+Derrière toi, le Last Call s'effondre.
+
+Pour la première fois depuis Blackwood...
+
+le silence est réel.`,
+choices:[
+{text:"🎬 Voir la fin",next:"ending_done",end:"destroy"}
+]
+},
+
+ending_escape:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"04:02",
+speaker:"NARRATEUR",
+text:`Tu quittes définitivement la ville.
+
+Le soleil commence à se lever.
 
 Tu regardes ton téléphone.
 
 Aucun réseau.
 
-Puis l'écran s'allume.
+Aucun appel.
 
-APPEL N°07.
+Rien.
 
-Tu n'as jamais vu ce numéro auparavant.
+Puis une notification apparaît.
 
-Le téléphone sonne.
-
-Une fois.
-
-Deux fois.
-
-Trois fois.
-
-Puis une phrase apparaît :
-
-« SI TU RÉPONDS, TU TE SOUVIENDRAS DE TOUT. »`,
-
-    choices: [
-
-        {
-            text: "📞 Répondre",
-            next: "seventh_call",
-            clue: "Appel numéro 07"
-        },
-
-        {
-            text: "📵 Refuser l'appel",
-            next: "refuse_seventh"
-        },
-
-        {
-            text: "🚗 Reprendre la voiture",
-            next: "drive_away"
-        }
-
-    ]
-
+« BLACKWOOD — APPEL ENTRANT. »`,
+choices:[
+{text:"🎬 Voir la fin",next:"ending_done",end:"escape"}
+]
 },
 
+ending_watched:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"04:07",
+speaker:"NARRATEUR",
+text:`Tu regardes dans le rétroviseur.
 
-/* =========================================================
-   APPEL 07
-========================================================= */
+Personne.
 
-seventh_call: {
+Tu regardes à nouveau.
 
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "02:49",
-    speaker: "TA PROPRE VOIX",
+Une silhouette est assise derrière toi.
 
-    text:
-`Tu décroches.
-
-Tu entends ta propre voix.
-
-— Enfin.
-
-Tu restes silencieux.
-
-— Tu veux savoir pourquoi tu es revenu ?
-
-— Oui.
-
-— Parce que tu n'es jamais parti.
-
-Un silence.
-
-— Le Last Call n'est pas un endroit.
-
-— Alors c'est quoi ?
-
-Ta voix répond :
-
-« C'est toi. »`,
-
-    choices: [
-
-        {
-            text: "🧠 Demander toute la vérité",
-            next: "full_truth"
-        },
-
-        {
-            text: "📞 Demander comment sortir",
-            next: "real_exit"
-        },
-
-        {
-            text: "📵 Raccrocher",
-            next: "hangup_seventh"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   VÉRITÉ
-========================================================= */
-
-full_truth: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "02:51",
-    speaker: "TA PROPRE VOIX",
-
-    text:
-`— Tu es mort à 23:17.
-
-Mais ton esprit refusait de partir.
-
-Le premier appel a créé une copie de tes souvenirs.
-
-Le deuxième a créé ton identité.
-
-Le troisième a recréé ta mémoire.
-
-Le quatrième a créé ton double.
-
-Le cinquième a séparé vos identités.
-
-Le sixième devait décider lequel était réel.
-
-Mais tu as refusé de choisir.
-
-C'est pour cela que le cycle continue.`,
-
-    choices: [
-
-        {
-            text: "🧠 Accepter la vérité",
-            next: "accept_truth"
-        },
-
-        {
-            text: "❌ Refuser la vérité",
-            next: "deny_truth"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   SORTIE
-========================================================= */
-
-real_exit: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "02:52",
-    speaker: "TA PROPRE VOIX",
-
-    text:
-`— Il existe une sortie.
-
-— Où ?
-
-— Là où tout a commencé.
-
-Tu regardes la route.
-
-Au loin apparaît une maison.
-
-Numéro 17.
-
-Tu comprends.
-
-La sortie n'est pas devant toi.
-
-Elle est derrière.`,
-
-    choices: [
-
-        {
-            text: "🏚️ Retourner à la maison 17",
-            next: "return_house"
-        },
-
-        {
-            text: "🚗 Continuer sur la route",
-            next: "drive_away"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   REFUSER L'APPEL
-========================================================= */
-
-refuse_seventh: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "02:50",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu refuses l'appel.
-
-Le téléphone s'éteint.
-
-Tu respires.
-
-Tu avances.
-
-La route semble normale.
-
-Puis tu remarques quelque chose.
-
-Chaque kilomètre porte le même numéro.
-
-47.
-
-47.
-
-47.
-
-Tu regardes derrière toi.
-
-L'hôtel est là.
-
-Tu n'es jamais parti.`,
-
-    choices: [
-
-        {
-            text: "🏃 Courir",
-            next: "run_road"
-        },
-
-        {
-            text: "📞 Rappeler le numéro",
-            next: "seventh_call"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   VOITURE
-========================================================= */
-
-drive_away: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "02:53",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu montes dans la voiture.
-
-Le moteur démarre.
-
-Tu accélères.
-
-La route défile.
-
-Pendant quelques minutes, tout semble normal.
-
-Puis la radio s'allume.
-
-Une voix annonce :
-
-« Il est 23 heures 17. »
-
-Tu regardes l'horloge.
-
-23:17.
-
-Le temps vient de revenir en arrière.`,
-
-    choices: [
-
-        {
-            text: "🚗 Continuer",
-            next: "road_loop"
-        },
-
-        {
-            text: "🛑 Arrêter la voiture",
-            next: "stop_car"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   RETOUR MAISON 17
-========================================================= */
-
-return_house: {
-
-    chapter: "CHAPITRE V",
-    location: "MAISON 17",
-    time: "02:55",
-    speaker: "NARRATEUR",
-
-    text:
-`La maison numéro 17 est exactement comme dans tes souvenirs.
-
-La porte est ouverte.
-
-À l'intérieur :
-
-un téléphone.
-
-Une chaise.
-
-Un miroir.
-
-Et une vieille photo.
-
-Tu la prends.
-
-Sur la photo, tu vois six personnes.
-
-La dernière personne est toi.
-
-Mais derrière la photo est écrit :
-
-« SEPTIÈME APPEL — DÉCISION FINALE. »`,
-
-    choices: [
-
-        {
-            text: "📞 Répondre au téléphone",
-            next: "final_call"
-        },
-
-        {
-            text: "🪞 Regarder le miroir",
-            next: "final_mirror"
-        },
-
-        {
-            text: "🔥 Brûler la photo",
-            next: "burn_final_photo"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   APPEL FINAL
-========================================================= */
-
-final_call: {
-
-    chapter: "CHAPITRE V",
-    location: "MAISON 17",
-    time: "02:57",
-    speaker: "VOIX INCONNUE",
-
-    text:
-`Le téléphone sonne.
-
-Tu décroches.
-
-La voix dit :
-
-« Tu as enfin compris. »
-
-— Qui êtes-vous ?
-
-« Celui qui répondait avant toi. »
-
-— Que dois-je faire ?
-
-« Choisir.
-
-Vivre avec tes souvenirs.
-
-Ou vivre sans eux. »`,
-
-    choices: [
-
-        {
-            text: "🧠 Garder tous mes souvenirs",
-            next: "keep_memory"
-        },
-
-        {
-            text: "🕊️ Tout oublier",
-            next: "forget_everything"
-        },
-
-        {
-            text: "🔥 Détruire le téléphone",
-            next: "destroy_phone"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   MIROIR FINAL
-========================================================= */
-
-final_mirror: {
-
-    chapter: "CHAPITRE V",
-    location: "MAISON 17",
-    time: "02:58",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu regardes le miroir.
-
-Ton reflet n'est plus là.
-
-À sa place :
-
-une porte.
-
-Tu poses la main dessus.
-
-Elle s'ouvre.
-
-Derrière se trouve la route 47.
-
-Mais cette fois...
-
-il fait jour.`,
-
-    choices: [
-
-        {
-            text: "🚪 Traverser",
-            next: "mirror_exit"
-        },
-
-        {
-            text: "🔙 Revenir en arrière",
-            next: "return_house"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   DÉTRUIRE LA PHOTO
-========================================================= */
-
-burn_final_photo: {
-
-    chapter: "CHAPITRE V",
-    location: "MAISON 17",
-    time: "02:59",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu brûles la photo.
-
-Les flammes deviennent bleues.
-
-Les personnes disparaissent une par une.
-
-Puis la dernière silhouette se retourne.
-
-C'est toi.
-
-Elle murmure :
-
-« Merci. »`,
-
-    choices: [
-
-        {
-            text: "🚪 Quitter la maison",
-            next: "destroy_ending"
-        }
-    ]
-
-},
-
-
-/* =========================================================
-   GARDER LES SOUVENIRS
-========================================================= */
-
-keep_memory: {
-
-    chapter: "CHAPITRE V",
-    location: "MAISON 17",
-    time: "03:00",
-    speaker: "VOIX INCONNUE",
-
-    text:
-`Tu choisis de te souvenir.
-
-Tout revient.
-
-La route.
-
-L'accident.
-
-Les appels.
-
-Les copies.
-
-Les morts.
-
-Tu te souviens de chaque version de toi.
-
-Puis tu comprends quelque chose.
-
-Tu n'es pas le premier.
-
-Tu es simplement le dernier.`,
-
-    choices: [
-
-        {
-            text: "🚪 Quitter la maison",
-            next: "truth_ending"
-        },
-
-        {
-            text: "🏚️ Rester dans la maison",
-            next: "guardian_ending"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   OUBLI TOTAL
-========================================================= */
-
-forget_everything: {
-
-    chapter: "CHAPITRE V",
-    location: "MAISON 17",
-    time: "03:01",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu acceptes.
-
-Ton nom disparaît.
-
-Tes souvenirs disparaissent.
-
-La maison disparaît.
-
-La route disparaît.
-
-Tout devient blanc.
-
-Puis tu ouvres les yeux.
-
-Tu es dans une voiture.
-
-Tu conduis.
-
-Tu ne sais pas où tu vas.
-
-La radio annonce :
-
-« Il est 23 heures 17. »`,
-
-    choices: [
-
-        {
-            text: "▶ Continuer",
-            next: "memory_ending"
-        }
-    ]
-
-},
-
-
-/* =========================================================
-   DÉTRUIRE LE TÉLÉPHONE
-========================================================= */
-
-destroy_phone: {
-
-    chapter: "CHAPITRE V",
-    location: "MAISON 17",
-    time: "03:02",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu prends le téléphone.
-
-Tu le frappes contre le sol.
-
-Une fois.
-
-Deux fois.
-
-Trois fois.
-
-L'écran se brise.
-
-Tous les téléphones de l'hôtel se mettent à sonner en même temps.
-
-Puis...
-
-plus rien.
-
-La maison commence à trembler.`,
-
-    choices: [
-
-        {
-            text: "🔥 Mettre le feu à la maison",
-            next: "fire_house"
-        },
-
-        {
-            text: "🏃 Fuir",
-            next: "escape_house"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   ROUTE
-========================================================= */
-
-run_road: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "03:03",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu cours.
-
-La route semble interminable.
-
-Puis tu aperçois une voiture.
-
-Elle s'arrête.
-
-Le conducteur ouvre la porte.
-
-Tu montes.
-
-Il te regarde.
-
-C'est toi.`,
-
-    choices: [
-
-        {
-            text: "🚗 Monter dans la voiture",
-            next: "copy_car"
-        },
-
-        {
-            text: "🏃 Continuer à courir",
-            next: "road_loop"
-        }
-
-    ]
-
-},
-
-
-road_loop: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "23:17",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu continues.
-
-La pluie commence.
-
-Les phares apparaissent au loin.
-
-Une voiture arrive.
-
-Elle te percute.
-
-Tout devient noir.
-
-Tu ouvres les yeux.
-
-Tu es au début de la route 47.
-
-23:17.
-
-Le téléphone sonne.
-
-Encore.`,
-
-    choices: [
-
-        {
-            text: "📞 Répondre",
-            next: "loop_ending"
-        }
-    ]
-
-},
-
-
-stop_car: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "03:04",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu arrêtes la voiture.
-
-Le moteur s'éteint.
-
-Tu descends.
-
-Devant toi se trouve une maison.
-
-Numéro 17.
-
-Derrière toi :
-
-la route a disparu.`,
-
-    choices: [
-
-        {
-            text: "🏚️ Entrer dans la maison",
-            next: "return_house"
-        },
-
-        {
-            text: "🚶 Avancer dans le noir",
-            next: "watched_ending"
-        }
-
-    ]
-
-},
-
-
-copy_car: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "03:05",
-    speaker: "TON DOUBLE",
-
-    text:
-`Ton double conduit.
-
-— Où allons-nous ?
-
-Il sourit.
-
-— Là où tu es déjà allé.
-
-Tu regardes par la fenêtre.
-
-L'hôtel apparaît.
-
-Mais cette fois, tu es à l'extérieur.
-
-Ton double arrête la voiture.
-
-— C'est ton tour de répondre.`,
-
-    choices: [
-
-        {
-            text: "📞 Prendre le téléphone",
-            next: "guardian_choice"
-        },
-
-        {
-            text: "🚪 Sortir de la voiture",
-            next: "escape_house"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   MIROIR EXIT
-========================================================= */
-
-mirror_exit: {
-
-    chapter: "CHAPITRE V",
-    location: "ROUTE 47",
-    time: "03:06",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu traverses le miroir.
-
-Tu es dehors.
-
-Le soleil se lève.
-
-Tu regardes derrière toi.
-
-La maison n'existe plus.
+Elle sourit.
 
 Ton téléphone affiche :
 
-« 0 APPEL EN ATTENTE. »
-
-Pour la première fois...
-
-le silence est réel.`,
-
-    choices: [
-
-        {
-            text: "🌅 Continuer",
-            next: "truth_ending"
-        }
-    ]
-
+« ILS TE REGARDENT. »`,
+choices:[
+{text:"🎬 Voir la fin",next:"ending_done",end:"watched"}
+]
 },
 
+ending_loop:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"04:17",
+speaker:"NARRATEUR",
+text:`Tu continues.
 
-/* =========================================================
-   FEU
-========================================================= */
+Puis tu aperçois une enseigne.
 
-fire_house: {
+LAST CALL HOTEL.
 
-    chapter: "CHAPITRE V",
-    location: "MAISON 17",
-    time: "03:07",
-    speaker: "NARRATEUR",
-
-    text:
-`Le feu se propage.
-
-Les murs deviennent rouges.
-
-Les téléphones sonnent encore.
-
-Puis les voix commencent à disparaître.
-
-Une dernière voix murmure :
-
-« Merci de nous avoir libérés. »
-
-La maison s'effondre.`,
-
-    choices: [
-
-        {
-            text: "🏃 Sortir",
-            next: "destroy_ending"
-        }
-    ]
-
-},
-
-
-/* =========================================================
-   FUITE
-========================================================= */
-
-escape_house: {
-
-    chapter: "CHAPITRE V",
-    location: "EXTÉRIEUR",
-    time: "03:08",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu cours.
-
-Tu ne regardes pas derrière toi.
-
-Tu arrives sur une route normale.
-
-Des voitures passent.
-
-Une ville apparaît au loin.
-
-Tu crois être sauvé.
-
-Puis ton téléphone vibre.
-
-Un message :
-
-« TU AS OUBLIÉ QUELQU'UN. »`,
-
-    choices: [
-
-        {
-            text: "📱 Regarder le message",
-            next: "watched_ending"
-        },
-
-        {
-            text: "📵 Jeter le téléphone",
-            next: "escape_ending"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   FINITIONS — 15 FINS
-========================================================= */
-
-/* 1 */
-truth_ending: {
-
-    chapter: "FIN",
-    location: "AUBE",
-    time: "06:17",
-    speaker: "NARRATEUR",
-
-    text:
-`Le soleil se lève.
-
-Tu as compris la vérité.
-
-Le cycle est terminé.
-
-Pour la première fois depuis des années, aucun téléphone ne sonne.
-
-Blackwood disparaît derrière toi.
-
-Tu es enfin libre.`,
-
-    choices: [
-        {
-            text: "🌅 Terminer",
-            end: "good"
-        }
-    ]
-
-},
-
-
-/* 2 */
-loop_ending: {
-
-    chapter: "FIN",
-    location: "ROUTE 47",
-    time: "23:17",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu ouvres les yeux.
-
-La pluie tombe.
-
-La route 47.
-
-La même voiture.
-
-Le même téléphone.
-
-Le même appel.
+Tu freines.
 
 Tu comprends.
 
-Le cycle recommence.`,
-
-    choices: [
-        {
-            text: "🔄 Accepter le cycle",
-            end: "loop"
-        }
-    ]
-
+La route t'a ramené au début.`,
+choices:[
+{text:"🎬 Voir la fin",next:"ending_done",end:"loop"}
+]
 },
 
+ending_memory:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"04:20",
+speaker:"NARRATEUR",
+text:`Tu rentres chez toi.
 
-/* 3 */
-destroy_ending: {
+Tu poses ton téléphone.
 
-    chapter: "FIN",
-    location: "BLACKWOOD",
-    time: "03:10",
-    speaker: "NARRATEUR",
+Tu t'allonges.
 
-    text:
-`Les flammes engloutissent la maison.
+Puis tu réalises quelque chose.
 
-Les téléphones cessent de sonner.
+Tu ne te souviens plus de Blackwood.
 
-Les voix disparaissent.
+Ni du Last Call.
 
-Blackwood brûle.
+Ni de cette nuit.
 
-Tu es le dernier à quitter les lieux.`,
+Ton téléphone sonne.
 
-    choices: [
-        {
-            text: "🔥 Regarder les flammes",
-            end: "destroy"
-        }
-    ]
+Tu ne sais pas pourquoi...
 
+mais tu connais déjà le numéro.`,
+choices:[
+{text:"🎬 Voir la fin",next:"ending_done",end:"memory_end"}
+]
 },
 
-
-/* 4 */
-guardian_ending: {
-
-    chapter: "FIN",
-    location: "MAISON 17",
-    time: "03:11",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu décides de rester.
-
-La maison devient silencieuse.
-
-Tu prends place devant le téléphone.
-
-Une nouvelle sonnerie retentit.
-
-Quelqu'un vient d'entrer.
-
-Tu comprends ton rôle.
-
-Tu es devenu le gardien.`,
-
-    choices: [
-        {
-            text: "🔒 Accepter",
-            end: "guardian"
-        }
-    ]
-
-},
-
-
-/* 5 */
-escape_ending: {
-
-    chapter: "FIN",
-    location: "ROUTE",
-    time: "03:12",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu jettes le téléphone.
-
-Tu continues de marcher.
-
-La ville se rapproche.
-
-Tu ne regardes jamais derrière toi.
-
-Mais quelque chose marche à la même vitesse que toi.`,
-
-    choices: [
-        {
-            text: "🚗 Continuer",
-            end: "escape"
-        }
-    ]
-
-},
-
-
-/* 6 */
-watched_ending: {
-
-    chapter: "FIN",
-    location: "ROUTE",
-    time: "03:13",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu regardes derrière toi.
-
-Personne.
-
-Tu avances.
-
-Puis ton téléphone s'allume.
-
-La caméra frontale est activée.
-
-Sur l'écran...
-
-quelqu'un se tient derrière toi.
-
-Tu te retournes.
-
-Personne.
-
-L'écran affiche :
-
-« ILS TE REGARDENT. »`,
-
-    choices: [
-        {
-            text: "👁️ Comprendre",
-            end: "watched"
-        }
-    ]
-
-},
-
-
-/* 7 */
-mirror_end_scene: {
-
-    chapter: "FIN",
-    location: "MAISON 17",
-    time: "03:14",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu regardes ton reflet.
+ending_other:{
+chapter:"FIN",
+location:"MIROIR",
+time:"04:25",
+speaker:"NARRATEUR",
+text:`Ton reflet te regarde.
 
 Il sourit.
 
-Tu ne souris pas.
-
-Il lève la main.
-
-Tu ne bouges pas.
-
 Puis il sort du miroir.
 
-Tu comprends trop tard.
+Toi, tu restes prisonnier derrière la vitre.
 
-Le reflet est maintenant libre.`,
+Le monde extérieur continue normalement.
 
-    choices: [
-        {
-            text: "🪞 Regarder",
-            end: "mirror_end"
-        }
-    ]
+Personne ne remarque la différence.
 
+Ton reflet vient de prendre ta place.`,
+choices:[
+{text:"🎬 Voir la fin",next:"ending_done",end:"mirror_end"}
+]
 },
 
+ending_secret:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"04:30",
+speaker:"NARRATEUR",
+text:`Tu refuses.
 
-/* 8 */
-memory_ending: {
+Tu quittes l'hôtel.
 
-    chapter: "FIN",
-    location: "ROUTE 47",
-    time: "23:17",
-    speaker: "NARRATEUR",
+Tu ne réponds plus jamais aux appels.
 
-    text:
-`Tu as tout oublié.
+Tu ne retournes jamais à Blackwood.
 
-Tu ne sais plus qui tu es.
+Mais une question reste dans ta tête.
 
-Mais quelque chose semble familier.
+Pourquoi toi ?
 
-La route.
-
-La pluie.
-
-Le téléphone.
-
-Une nouvelle histoire commence.`,
-
-    choices: [
-        {
-            text: "🧠 Tout oublier",
-            end: "memory_end"
-        }
-    ]
-
+Tu sais que tu n'as découvert qu'une partie de la vérité.`,
+choices:[
+{text:"🎬 Voir la fin",next:"ending_done",end:"secret_escape"}
+]
 },
 
+ending_done:{
+chapter:"FIN",
+location:"ÉCRAN NOIR",
+time:"",
+speaker:"NARRATEUR",
+text:`Écran noir.
 
-/* 9 */
-house_end_scene: {
+Un téléphone sonne.
 
-    chapter: "FIN",
-    location: "MAISON 17",
-    time: "03:15",
-    speaker: "NARRATEUR",
+Une fois.
 
-    text:
-`Tu quittes la maison.
+Silence.
 
-La porte se ferme derrière toi.
+Deux fois.
 
-Tu avances sans regarder.
+Puis une voix murmure :
 
-Puis tu entends la porte se rouvrir.
+« Vous avez trouvé le premier. »
 
-Tu continues.
+Une respiration.
 
-Tu ne te retournes pas.`,
+« Maintenant...
 
-    choices: [
-        {
-            text: "🚪 Partir",
-            end: "house_end"
-        }
-    ]
+trouvez le deuxième. »
 
-},
+ÉCRAN NOIR.`,
+choices:[]
+}
 
-
-/* 10 */
-chapter1_escape_end: {
-
-    chapter: "FIN",
-    location: "ROUTE 47",
-    time: "03:16",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu as quitté Blackwood trop tôt.
-
-Tu n'as jamais découvert toute la vérité.
-
-Mais certaines histoires ne restent jamais derrière nous.`,
-
-    choices: [
-        {
-            text: "🏃 Continuer",
-            end: "chapter1_escape"
-        }
-    ]
-
-},
-
-
-/* 11 */
-basement_end_scene: {
-
-    chapter: "FIN",
-    location: "SOUS-SOL",
-    time: "03:17",
-    speaker: "NARRATEUR",
-
-    text:
-`Les portes se ferment.
-
-Tu es enfermé.
-
-Une voix murmure ton prénom.
-
-Puis une autre.
-
-Puis des dizaines.
-
-Toutes utilisent ta voix.`,
-
-    choices: [
-        {
-            text: "⬇️ Rester",
-            end: "basement_end"
-        }
-    ]
-
-},
-
-
-/* 12 */
-secret_end_scene: {
-
-    chapter: "FIN",
-    location: "MAISON 17",
-    time: "03:18",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu refuses d'ouvrir la dernière porte.
-
-Tu pars.
-
-Peut-être était-ce la meilleure décision de toute ta vie.
-
-Ou peut-être que tu viens simplement de laisser quelque chose derrière toi.`,
-
-    choices: [
-        {
-            text: "🔑 Garder le secret",
-            end: "secret_escape"
-        }
-    ]
-
-},
-
-
-/* 13 */
-upper_end_scene: {
-
-    chapter: "FIN",
-    location: "ÉTAGE SUPÉRIEUR",
-    time: "03:19",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu refuses de suivre la silhouette.
-
-Tu descends l'escalier.
-
-Une marche.
-
-Deux.
-
-Trois.
-
-Puis tu sens une respiration derrière ton oreille.
-
-La silhouette est déjà là.`,
-
-    choices: [
-        {
-            text: "👤 Se retourner",
-            end: "upper_end"
-        }
-    ]
-
-},
-
-
-/* 14 */
-survivor_end_scene: {
-
-    chapter: "FIN",
-    location: "ROUTE 47",
-    time: "03:20",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu laisses l'inconnu derrière toi.
-
-Tu ne sauras jamais s'il disait la vérité.
-
-Tu marches jusqu'à l'aube.
-
-Mais lorsque tu regardes ton ombre...
-
-elle n'est pas seule.`,
-
-    choices: [
-        
+});
