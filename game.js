@@ -12,10 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const params = new URLSearchParams(location.search);
 
-    /* =====================================================
-       NOUVELLE PARTIE
-    ===================================================== */
-
     function fresh() {
         return {
             scene: "start",
@@ -28,10 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
             lastSaved: Date.now()
         };
     }
-
-    /* =====================================================
-       ALIAS
-    ===================================================== */
 
     const aliases = {
         chapter1_start: "chapter1_begin",
@@ -48,10 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
             : id;
     }
 
-    /* =====================================================
-       NOTIFICATION
-    ===================================================== */
-
     function toast(text) {
         const e = $("toast");
         if (!e) return;
@@ -66,20 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2200);
     }
 
-    /* =====================================================
-       NETTOYAGE TEXTE
-    ===================================================== */
-
     function clean(text) {
         return String(text || "")
             .replace(/\r\n/g, "\n")
             .replace(/\n{3,}/g, "\n\n")
             .trim();
     }
-
-    /* =====================================================
-       SAUVEGARDE
-    ===================================================== */
 
     function save(show = false) {
 
@@ -97,10 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return ok;
     }
-
-    /* =====================================================
-       CHARGEMENT
-    ===================================================== */
 
     function load() {
 
@@ -131,10 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return !!STORY[game.scene];
     }
-
-    /* =====================================================
-       STATISTIQUES
-    ===================================================== */
 
     function stats() {
 
@@ -170,10 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /* =====================================================
-       MUSIQUE
-    ===================================================== */
-
     function setupMusic() {
 
         const audio = $("music");
@@ -181,14 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const value = $("volumeValue");
 
         if (!audio) return;
-
-        /*
-         * Le fichier présent dans ton GitHub est :
-         * The Last Call.mp3
-         *
-         * On force également la source ici pour éviter
-         * une erreur de nom dans game.html.
-         */
 
         const source =
             audio.querySelector("source");
@@ -233,24 +193,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function playMusic() {
-
-            audio.play().catch(() => {
-                /*
-                 * Le navigateur peut bloquer
-                 * l'autoplay avant le premier clic.
-                 */
-            });
+            audio.play().catch(() => {});
         }
 
-        /*
-         * Tentative immédiate.
-         */
         playMusic();
 
-        /*
-         * Premier toucher/clic :
-         * parfait pour Android/mobile.
-         */
         document.addEventListener(
             "pointerdown",
             playMusic,
@@ -297,10 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
     }
-
-    /* =====================================================
-       TEXTE MACHINE À ÉCRIRE
-    ===================================================== */
 
     function showText(text, done) {
 
@@ -352,10 +295,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         renderChoices(data);
     }
-
-    /* =====================================================
-       AFFICHER UNE SCÈNE
-    ===================================================== */
 
     function scene(id) {
 
@@ -420,10 +359,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    /* =====================================================
-       CHOIX
-    ===================================================== */
-
     function renderChoices(data) {
 
         const box = $("choices");
@@ -469,10 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* =====================================================
-       EFFECTUER UN CHOIX
-    ===================================================== */
-
     function choose(choice, index) {
 
         game.decisions.push({
@@ -494,33 +425,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         /* INDICE */
-
         if (
             choice.clue &&
             !game.clues.includes(choice.clue)
         ) {
-
             game.clues.push(choice.clue);
-
-            toast("🔎 Nouvel indice");
+            // Notification supprimée volontairement
         }
 
         /* OBJET */
-
         if (
             choice.item &&
             !game.items.includes(choice.item)
         ) {
-
             game.items.push(choice.item);
-
-            toast("🎒 Objet obtenu");
+            // Notification supprimée volontairement
         }
 
         stats();
         save();
-
-        /* FIN */
 
         if (choice.end) {
 
@@ -538,16 +461,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        /* SCÈNE SUIVANTE */
-
         if (choice.next) {
             scene(choice.next);
         }
     }
-
-    /* =====================================================
-       DÉBLOQUER UNE FIN
-    ===================================================== */
 
     function unlockEnding(id) {
 
@@ -571,10 +488,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         save();
     }
-
-    /* =====================================================
-       ÉCRAN DE FIN
-    ===================================================== */
 
     function showEnding(id) {
 
@@ -616,10 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /* =====================================================
-       BOUTON SAUVEGARDER
-    ===================================================== */
-
     const saveBtn = $("saveBtn");
 
     if (saveBtn) {
@@ -630,10 +539,6 @@ document.addEventListener("DOMContentLoaded", () => {
             save(true);
         };
     }
-
-    /* =====================================================
-       BOUTON MENU
-    ===================================================== */
 
     const menuBtn = $("menuBtn");
 
@@ -649,10 +554,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 "index.html";
         };
     }
-
-    /* =====================================================
-       BOUTONS DE FIN
-    ===================================================== */
 
     const restartBtn = $("restartBtn");
     const againBtn = $("againBtn");
@@ -692,10 +593,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 "index.html";
         };
     }
-
-    /* =====================================================
-       DÉMARRAGE
-    ===================================================== */
 
     if (
         params.has("continue") &&
