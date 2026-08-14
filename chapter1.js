@@ -1,1299 +1,902 @@
 "use strict";
 
-/* =========================================================
-   🕵️ MYSTERY JOURNEY: HORROR 2
-   CHAPTER I — L'HÔTEL
-========================================================= */
-
 window.STORY = window.STORY || {};
 
 Object.assign(window.STORY, {
 
-/* =========================================================
-   ARRIVÉE AU CHAPITRE 1
-========================================================= */
+chapter1_start:{
+chapter:"CHAPITRE 1",
+location:"LAST CALL HOTEL",
+time:"00:00",
+speaker:"NARRATEUR",
+text:`Tu franchis les portes du Last Call.
 
-chapter1_begin: {
+L'air est froid.
 
-    chapter: "CHAPITRE I",
-    location: "LAST CALL HOTEL",
-    time: "00:19",
-    speaker: "NARRATEUR",
+Le hall semble abandonné depuis des années.
 
-    text:
-`L'ascenseur s'ouvre lentement.
+Pourtant, derrière le comptoir, une vieille lampe fonctionne encore.
 
-Une odeur de poussière et d'humidité envahit le couloir.
+Sur le bureau :
 
-Tu entres.
-
-Les portes se referment derrière toi.
-
-17.
-
-Le seul bouton disponible.
-
-Tu appuies.
-
-L'ascenseur commence à monter.
-
-1...
-
-2...
-
-3...
-
-Puis l'affichage s'éteint.
-
-Le silence devient total.
-
-Une voix sort du haut-parleur.
-
-« Tu as répondu au premier appel. »
-
-Tu te figes.
-
-Tu n'as pourtant jamais parlé à personne.
-
-« Maintenant, tu dois écouter le deuxième. »`,
-
-    choices: [
-
-        {
-            text: "📞 Sortir ton téléphone",
-            next: "elevator_phone",
-            clue: "Deuxième appel"
-        },
-
-        {
-            text: "🔢 Chercher un autre bouton",
-            next: "elevator_buttons"
-        },
-
-        {
-            text: "🔊 Parler à la voix",
-            next: "elevator_voice"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   TÉLÉPHONE DANS L'ASCENSEUR
-========================================================= */
-
-elevator_phone: {
-
-    chapter: "CHAPITRE I",
-    location: "ASCENSEUR",
-    time: "00:20",
-    speaker: "NARRATEUR",
-
-    text:
-`Ton téléphone s'allume.
-
-Aucun réseau.
-
-Pourtant, un appel arrive.
-
-Numéro inconnu.
-
-Tu hésites.
-
-Puis l'écran affiche :
+une clé.
 
 CHAMBRE 17.
 
-L'appel est toujours en cours.
+À côté se trouve une cassette.
 
-Tu n'as même pas décroché.
+BLACKWOOD — ENREGISTREMENT 01.
 
-Une voix murmure depuis ton téléphone :
+Puis le téléphone de la réception sonne.`,
+choices:[
+{text:"🔑 Prendre la clé",next:"take_key",item:"Clé chambre 17"},
+{text:"📼 Prendre la cassette",next:"take_tape",item:"Cassette Blackwood"},
+{text:"📞 Répondre au téléphone",next:"reception_call",clue:"Téléphone du hall"}
+]},
 
-« Ne raccroche pas. »`,
+take_key:{
+chapter:"CHAPITRE 1",
+location:"RÉCEPTION",
+time:"00:02",
+speaker:"NARRATEUR",
+text:`Tu prends la clé.
 
-    choices: [
+Elle est glaciale.
 
-        {
-            text: "📞 Répondre",
-            next: "second_call",
-            clue: "Le deuxième appel"
-        },
+Au dos du porte-clés :
 
-        {
-            text: "❌ Raccrocher",
-            next: "hang_second_call"
-        },
+17.
 
-        {
-            text: "📱 Mettre le téléphone en haut-parleur",
-            next: "speaker_call"
-        }
+Le téléphone cesse soudain de sonner.
 
-    ]
+Puis l'ascenseur s'allume.
 
-},
+Étage 1.
 
+Les portes s'ouvrent.
 
-/* =========================================================
-   DEUXIÈME APPEL
-========================================================= */
+Personne à l'intérieur.`,
+choices:[
+{text:"⬆️ Prendre l'ascenseur",next:"elevator"},
+{text:"📼 Prendre aussi la cassette",next:"take_tape",item:"Cassette Blackwood"},
+{text:"🚶 Monter par les escaliers",next:"stairs"}
+]},
 
-second_call: {
+take_tape:{
+chapter:"CHAPITRE 1",
+location:"RÉCEPTION",
+time:"00:03",
+speaker:"NARRATEUR",
+text:`Tu prends la cassette.
 
-    chapter: "CHAPITRE I",
-    location: "ASCENSEUR",
-    time: "00:21",
-    speaker: "VOIX INCONNUE",
+Une inscription est gravée sur le plastique :
 
-    text:
-`Tu réponds.
+BLACKWOOD — ENREGISTREMENT 01.
 
-Pendant plusieurs secondes...
+Tu n'as aucun lecteur.
 
-rien.
+Pourtant...
 
-Puis :
-
-« Tu as trouvé la clé ? »
-
-Tu regardes ta main.
-
-Si tu as pris la clé, elle est toujours là.
-
-— Qui êtes-vous ?
-
-La voix répond :
-
-« Je suis au bout du couloir. »
-
-— Dans la chambre 17 ?
-
-Silence.
-
-« Non.
-
-Dans la chambre 18. »
-
-Puis l'appel coupe.`,
-
-    choices: [
-
-        {
-            text: "🚪 Aller vers la chambre 18",
-            next: "room18"
-        },
-
-        {
-            text: "🔑 Aller vers la chambre 17",
-            next: "room17"
-        },
-
-        {
-            text: "🏃 Descendre de l'ascenseur",
-            next: "elevator_escape"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   RACCROCHER
-========================================================= */
-
-hang_second_call: {
-
-    chapter: "CHAPITRE I",
-    location: "ASCENSEUR",
-    time: "00:21",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu raccroches.
-
-L'écran devient noir.
-
-Puis l'ascenseur s'arrête brutalement.
-
-Les lumières s'éteignent.
-
-Dans le noir, tu entends une respiration.
-
-Juste derrière toi.
+la cassette se met à jouer toute seule.
 
 Une voix murmure :
 
-« Mauvais choix. »`,
+« Si tu écoutes ceci, c'est que tu as trouvé le Last Call. »
 
-    choices: [
+La voix s'arrête.
 
-        {
-            text: "🔦 Allumer la lampe",
-            next: "elevator_dark"
-        },
+Puis :
 
-        {
-            text: "🚪 Essayer d'ouvrir les portes",
-            next: "elevator_escape"
-        }
+« Ne fais confiance à personne. »`,
+choices:[
+{text:"🔊 Continuer l'enregistrement",next:"tape_end",clue:"Enregistrement Blackwood"},
+{text:"⬆️ Chercher la chambre 17",next:"elevator"},
+{text:"📞 Répondre au téléphone",next:"reception_call"}
+]},
 
-    ]
+tape_end:{
+chapter:"CHAPITRE 1",
+location:"RÉCEPTION",
+time:"00:05",
+speaker:"VOIX ENREGISTRÉE",
+text:`La cassette reprend.
 
-},
+« Blackwood n'était pas le premier endroit.
 
+Et le Last Call ne sera pas le dernier.
 
-/* =========================================================
-   HAUT-PARLEUR
-========================================================= */
+Si tu veux comprendre...
 
-speaker_call: {
+trouve les archives.
 
-    chapter: "CHAPITRE I",
-    location: "ASCENSEUR",
-    time: "00:22",
-    speaker: "VOIX INCONNUE",
+Mais surtout...
 
-    text:
-`Tu mets l'appel en haut-parleur.
+ne regarde jamais ton reflet trop longtemps. »
 
-Une respiration se fait entendre.
+La bande s'arrête.
 
-Puis une deuxième.
+Un bruit de pas résonne à l'étage.`,
+choices:[
+{text:"⬆️ Monter",next:"elevator"},
+{text:"🚪 Explorer le hall",next:"lobby"},
+{text:"📼 Garder la cassette",next:"lobby",item:"Cassette Blackwood"}
+]},
 
-Tu comprends alors quelque chose.
+reception_call:{
+chapter:"CHAPITRE 1",
+location:"RÉCEPTION",
+time:"00:06",
+speaker:"VOIX INCONNUE",
+text:`Tu décroches.
 
-Il n'y a pas une personne au bout du fil.
+Silence.
 
-Il y en a plusieurs.
+Puis une voix :
 
-Des voix chuchotent :
+« Tu as trouvé la clé. »
 
-« Dix-sept... »
+— Qui êtes-vous ?
 
-« Dix-huit... »
+« Quelqu'un qui connaît Blackwood. »
 
-« Dix-neuf... »
+— Que voulez-vous ?
 
-Puis toutes ensemble :
+Un souffle.
 
-« Vingt. »
+« Trouve la chambre 17.
 
-L'ascenseur s'arrête.`,
+La vérité est derrière cette porte. »
 
-    choices: [
+La communication coupe.`,
+choices:[
+{text:"🔑 Aller à la chambre 17",next:"elevator",clue:"Chambre 17"},
+{text:"📞 Rappeler",next:"call_back"},
+{text:"🚶 Explorer le hall",next:"lobby"}
+]},
 
-        {
-            text: "🚪 Sortir",
-            next: "floor20"
-        },
+call_back:{
+chapter:"CHAPITRE 1",
+location:"RÉCEPTION",
+time:"00:07",
+speaker:"NARRATEUR",
+text:`Tu rappelles.
 
-        {
-            text: "📞 Demander qui ils sont",
-            next: "voices_answer"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   BOUTONS
-========================================================= */
-
-elevator_buttons: {
-
-    chapter: "CHAPITRE I",
-    location: "ASCENSEUR",
-    time: "00:22",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu cherches un autre bouton.
-
-Il n'y en a qu'un.
-
-17.
-
-Mais sous le bouton, tu remarques une petite trappe.
-
-Elle est verrouillée.
-
-Sur la serrure, un symbole identique à celui de ta clé.
-
-Tu approches la clé.`,
-
-    choices: [
-
-        {
-            text: "🔑 Utiliser la clé",
-            next: "secret_elevator",
-            clue: "Symbole de la clé"
-        },
-
-        {
-            text: "🚫 Ne pas l'ouvrir",
-            next: "floor17"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   PARLER À LA VOIX
-========================================================= */
-
-elevator_voice: {
-
-    chapter: "CHAPITRE I",
-    location: "ASCENSEUR",
-    time: "00:23",
-    speaker: "NARRATEUR",
-
-    text:
-`— Qui êtes-vous ?
-
-La voix répond immédiatement.
-
-« Une question plus importante serait :
-
-qui es-tu ? »
-
-Tu ne réponds pas.
-
-« Tu ne te souviens déjà plus. »
-
-L'ascenseur ralentit.
-
-« La chambre 17 va te rappeler. »
-
-Les portes s'ouvrent.`,
-
-    choices: [
-
-        {
-            text: "🚪 Sortir",
-            next: "floor17"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   CHAMBRE 17
-========================================================= */
-
-floor17: {
-
-    chapter: "CHAPITRE I",
-    location: "ÉTAGE 17",
-    time: "00:25",
-    speaker: "NARRATEUR",
-
-    text:
-`Les portes s'ouvrent.
-
-Un long couloir.
-
-Toutes les portes sont ouvertes.
-
-Sauf une.
-
-17.
-
-La clé que tu as trouvée correspond parfaitement à la serrure.
-
-Mais avant que tu puisses l'utiliser...
-
-le téléphone sonne.
-
-Encore.
-
-Tu regardes l'écran.
-
-CHAMBRE 17.`,
-
-    choices: [
-
-        {
-            text: "🔑 Ouvrir la chambre 17",
-            next: "room17",
-            clue: "Chambre 17"
-        },
-
-        {
-            text: "📞 Répondre au téléphone",
-            next: "room17_call"
-        },
-
-        {
-            text: "🚪 Examiner les autres chambres",
-            next: "other_rooms"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   CHAMBRE 18
-========================================================= */
-
-room18: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 18",
-    time: "00:26",
-    speaker: "NARRATEUR",
-
-    text:
-`La porte de la chambre 18 est entrouverte.
-
-Tu pousses doucement.
-
-La pièce est vide.
-
-Un vieux téléviseur fonctionne.
-
-L'écran affiche une caméra de surveillance.
-
-Tu reconnais le parking.
-
-Puis tu vois ta voiture.
-
-La caméra change.
-
-Elle montre le hall.
-
-Puis l'ascenseur.
-
-Puis...
-
-toi.
-
-Debout devant la télévision.
-
-Mais sur l'image...
-
-quelqu'un se tient derrière toi.`,
-
-    choices: [
-
-        {
-            text: "👀 Se retourner",
-            next: "room18_turn"
-        },
-
-        {
-            text: "📺 Examiner la caméra",
-            next: "camera_room",
-            clue: "Caméras de surveillance"
-        },
-
-        {
-            text: "🚪 Sortir de la chambre",
-            next: "room18_leave"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   REGARDER DERRIÈRE
-========================================================= */
-
-room18_turn: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 18",
-    time: "00:27",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu te retournes.
-
-Personne.
-
-Tu regardes à nouveau l'écran.
-
-La silhouette est toujours là.
-
-Elle est maintenant beaucoup plus proche.
-
-Puis la télévision s'éteint.
-
-Une phrase apparaît sur l'écran noir :
-
-« NE REGARDE PLUS DERRIÈRE TOI. »`,
-
-    choices: [
-
-        {
-            text: "🚪 Quitter la chambre",
-            next: "room18_leave"
-        },
-
-        {
-            text: "📺 Rallumer la télévision",
-            next: "camera_room"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   CAMÉRAS
-========================================================= */
-
-camera_room: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 18",
-    time: "00:28",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu manipules les boutons.
-
-Caméra 01 : parking.
-
-Caméra 02 : hall.
-
-Caméra 03 : ascenseur.
-
-Caméra 04 : chambre 17.
-
-Tu sélectionnes la caméra 04.
-
-La porte de la chambre 17 est ouverte.
-
-Une silhouette est debout au milieu de la pièce.
-
-Elle regarde directement la caméra.
-
-Puis elle lève lentement la main.
-
-Elle montre le chiffre :
-
-3.`,
-
-    choices: [
-
-        {
-            text: "📺 Continuer à regarder",
-            next: "camera_three"
-        },
-
-        {
-            text: "🚪 Aller à la chambre 17",
-            next: "room17"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   CHAMBRE 17
-========================================================= */
-
-room17: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:30",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu ouvres la porte.
-
-La chambre est étrangement propre.
-
-Un lit.
-
-Une table.
-
-Une vieille horloge.
-
-Et un téléphone fixe.
-
-L'horloge indique :
-
-00:17.
-
-Le téléphone se met à sonner.
+Le téléphone sonne.
 
 Une fois.
 
 Deux fois.
 
-Trois fois.
+Puis tu entends ta propre voix :
 
-Tu te souviens de l'avertissement.
+« Pourquoi continues-tu ? »
 
-Ne réponds pas au troisième appel.
+Tu raccroches immédiatement.
 
-Mais le téléphone continue.
+Le téléphone affiche :
 
-Puis une voix sort du combiné :
+APPEL TERMINÉ.
 
-« Tu es enfin revenu. »`,
+Puis l'ascenseur s'ouvre.`,
+choices:[
+{text:"⬆️ Entrer dans l'ascenseur",next:"elevator"},
+{text:"🚶 Prendre les escaliers",next:"stairs"}
+]},
 
-    choices: [
+lobby:{
+chapter:"CHAPITRE 1",
+location:"HALL",
+time:"00:09",
+speaker:"NARRATEUR",
+text:`Tu explores le hall.
 
-        {
-            text: "📞 Décrocher",
-            next: "room17_answer"
-        },
+Des cadres sont accrochés aux murs.
 
-        {
-            text: "🔇 Laisser sonner",
-            next: "room17_ignore"
-        },
+Des dizaines de photographies.
 
-        {
-            text: "🔌 Débrancher le téléphone",
-            next: "disconnect_phone",
-            item: "Combiné du téléphone"
-        }
+Des personnes disparues.
 
-    ]
+Certaines photos sont très anciennes.
 
-},
+Puis tu trouves une photo de Blackwood.
 
+Au centre...
 
-/* =========================================================
-   APPEL CHAMBRE 17
-========================================================= */
+tu reconnais la maison du premier jeu.
 
-room17_call: {
+Derrière la photo :
 
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:30",
-    speaker: "VOIX INCONNUE",
+« DOSSIER 01 — NON RÉSOLU. »`,
+choices:[
+{text:"🔎 Examiner les dossiers",next:"archives",clue:"Dossier Blackwood"},
+{text:"⬆️ Monter à l'étage",next:"elevator"},
+{text:"🚪 Sortir de l'hôtel",next:"hotel_exit"}
+]},
 
-    text:
-`Tu réponds.
+stairs:{
+chapter:"CHAPITRE 1",
+location:"ESCALIERS",
+time:"00:11",
+speaker:"NARRATEUR",
+text:`Tu prends les escaliers.
 
-— Qui êtes-vous ?
+Un étage.
 
-La voix :
+Deux.
 
-« Tu veux vraiment le savoir ? »
+Trois.
 
-— Oui.
+Tu continues.
 
-« Alors regarde sous le lit. »
+Puis tu réalises quelque chose.
 
-La communication coupe.
+Tu es toujours au premier étage.
 
-Tu regardes le lit.
+Tu redescends.
 
-Une petite boîte est cachée dessous.`,
+La réception est vide.
 
-    choices: [
+Sur le comptoir, quelqu'un a écrit :
 
-        {
-            text: "📦 Prendre la boîte",
-            next: "box_under_bed",
-            item: "Boîte métallique"
-        },
+« TU ES DÉJÀ MONTÉ. »`,
+choices:[
+{text:"⬆️ Reprendre les escaliers",next:"stairs_again"},
+{text:"🔎 Chercher la réception",next:"archives"},
+{text:"🚪 Quitter l'hôtel",next:"hotel_exit"}
+]},
 
-        {
-            text: "🚫 Ne pas regarder",
-            next: "room17_ignore"
-        }
+stairs_again:{
+chapter:"CHAPITRE 1",
+location:"ESCALIERS",
+time:"00:13",
+speaker:"NARRATEUR",
+text:`Tu montes encore.
 
-    ]
+Cette fois, les marches semblent normales.
 
-},
+Arrivé à l'étage, tu aperçois un long couloir.
 
-
-/* =========================================================
-   SOUS LE LIT
-========================================================= */
-
-box_under_bed: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:32",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu tires la boîte.
-
-Elle est verrouillée.
-
-Sur le couvercle :
-
-17 / 47 / 00:17
-
-Tu trouves une petite serrure.
-
-La clé de l'hôtel pourrait fonctionner.
-
-Mais avant que tu puisses essayer...
-
-trois coups frappent à la porte.
-
-TOC.
-
-TOC.
-
-TOC.`,
-
-    choices: [
-
-        {
-            text: "🚪 Ouvrir la porte",
-            next: "door_three_knocks"
-        },
-
-        {
-            text: "🔒 Verrouiller la porte",
-            next: "lock_room"
-        },
-
-        {
-            text: "📦 Essayer d'ouvrir la boîte",
-            next: "open_box"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   OUVRIR LA BOÎTE
-========================================================= */
-
-open_box: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:33",
-    speaker: "NARRATEUR",
-
-    text:
-`La clé entre dans la serrure.
-
-CLIC.
-
-La boîte s'ouvre.
-
-À l'intérieur :
-
-une photo.
-
-Une cassette.
-
-Et une feuille.
-
-Tu prends la photo.
-
-Ton sang se glace.
-
-C'est toi.
-
-Debout devant le Last Call Hotel.
-
-Mais la photo semble avoir été prise des années auparavant.
-
-Au dos :
-
-« PREMIER ARRIVÉ. DERNIER SORTI. »`,
-
-    choices: [
-
-        {
-            text: "📸 Examiner la photo",
-            next: "old_photo",
-            clue: "Photo du passé"
-        },
-
-        {
-            text: "📼 Prendre la cassette",
-            next: "hotel_cassette",
-            item: "Cassette de la chambre 17"
-        },
-
-        {
-            text: "📄 Lire la feuille",
-            next: "mysterious_note",
-            clue: "Premier arrivé"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   PHOTO DU PASSÉ
-========================================================= */
-
-old_photo: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:35",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu observes la photo.
-
-Derrière toi, devant l'hôtel...
-
-il y a plusieurs personnes.
-
-Toutes ont le visage rayé.
-
-Sauf une.
-
-Une personne au centre.
-
-Elle te ressemble exactement.
-
-Au dos de la photo :
-
-« JOUR 1. »`,
-
-    choices: [
-
-        {
-            text: "📄 Chercher la feuille",
-            next: "mysterious_note"
-        },
-
-        {
-            text: "📼 Prendre la cassette",
-            next: "hotel_cassette",
-            item: "Cassette de la chambre 17"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   FEUILLE
-========================================================= */
-
-mysterious_note: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:36",
-    speaker: "NARRATEUR",
-
-    text:
-`La feuille contient une seule phrase :
-
-« À chaque appel, quelqu'un oublie. »
-
-En dessous, une liste de noms.
-
-Le dernier nom est le tien.
-
-À côté :
-
-APPEL N°01 — MÉMOIRE INTACTE.
-
-Tu comprends alors pourquoi tu as l'impression de connaître cet endroit.`,
-
-    choices: [
-
-        {
-            text: "📼 Écouter la cassette",
-            next: "hotel_cassette",
-            clue: "Appel numéro 1"
-        },
-
-        {
-            text: "🚪 Quitter la chambre",
-            next: "chapter1_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   CASSETTE
-========================================================= */
-
-hotel_cassette: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:38",
-    speaker: "ENREGISTREMENT",
-
-    text:
-`Tu insères la cassette dans un vieux lecteur.
-
-Un souffle.
-
-Puis une voix.
-
-La tienne.
-
-« Si tu écoutes cette cassette, c'est que tu as oublié. »
-
-Silence.
-
-« Ne fais confiance à personne. »
-
-Un bruit de pas.
-
-« Même pas à la personne qui t'a envoyé ici. »
-
-Puis la voix ajoute :
-
-« Le prochain appel viendra de la chambre 23. »`,
-
-    choices: [
-
-        {
-            text: "🔎 Noter le numéro 23",
-            next: "remember_23",
-            clue: "Chambre 23"
-        },
-
-        {
-            text: "🚪 Quitter la chambre",
-            next: "chapter1_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   APPEL CHAMBRE 23
-========================================================= */
-
-remember_23: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:40",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu notes le numéro.
-
-23.
-
-Soudain...
-
-le téléphone fixe sonne.
-
-L'écran affiche :
-
-CHAMBRE 23.
-
-Tu n'as pourtant aucun téléphone dans cette pièce connecté à une ligne extérieure.
-
-La sonnerie continue.
-
-Tu décroches.`,
-
-    choices: [
-
-        {
-            text: "📞 Répondre",
-            next: "room23_call"
-        },
-
-        {
-            text: "🔇 Laisser sonner",
-            next: "room23_ignore"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   RÉPONSE CHAMBRE 23
-========================================================= */
-
-room23_call: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:41",
-    speaker: "VOIX INCONNUE",
-
-    text:
-`— Allô ?
-
-Une respiration.
-
-Puis :
-
-« Tu as trouvé la photo. »
-
-Tu ne réponds pas.
-
-« Tu dois maintenant trouver celui qui est encore vivant. »
-
-— Qui ?
-
-« Chambre 23. »
-
-Puis :
-
-« Mais ne lui donne surtout pas ton nom. »`,
-
-    choices: [
-
-        {
-            text: "🚪 Aller à la chambre 23",
-            next: "room23"
-        },
-
-        {
-            text: "🔍 Explorer le couloir",
-            next: "chapter1_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   IGNORER CHAMBRE 23
-========================================================= */
-
-room23_ignore: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:42",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu laisses sonner.
-
-La sonnerie s'arrête.
-
-Puis le téléphone affiche :
-
-APPEL MANQUÉ.
-
-Une seconde plus tard :
-
-APPEL MANQUÉ.
-
-Puis encore.
-
-APPEL MANQUÉ.
-
-17 appels.
-
-Tu regardes l'heure.
-
-00:47.
-
-Une porte s'ouvre dans le couloir.`,
-
-    choices: [
-
-        {
-            text: "🚪 Sortir",
-            next: "chapter1_hall"
-        },
-
-        {
-            text: "🔒 Rester dans la chambre",
-            next: "stay_room17"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   PORTE — TROIS COUPS
-========================================================= */
-
-door_three_knocks: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:34",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu approches de la porte.
-
-Tu regardes par le judas.
-
-Personne.
-
-Tu ouvres.
-
-Le couloir est vide.
-
-Mais une enveloppe se trouve sur le sol.
-
-Ton nom est écrit dessus.
-
-À l'intérieur :
-
-« NE VA PAS À LA CHAMBRE 23. »`,
-
-    choices: [
-
-        {
-            text: "📄 Garder l'enveloppe",
-            next: "keep_letter",
-            clue: "Lettre mystérieuse"
-        },
-
-        {
-            text: "🚪 Aller à la chambre 23",
-            next: "room23"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   VERROUILLER
-========================================================= */
-
-lock_room: {
-
-    chapter: "CHAPITRE I",
-    location: "CHAMBRE 17",
-    time: "00:34",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu verrouilles la porte.
-
-Trois secondes de silence.
-
-Puis quelqu'un frappe.
-
-TOC.
-
-TOC.
-
-TOC.
-
-Une voix murmure :
-
-« Tu sais déjà qui je suis. »
-
-La poignée commence à tourner.`,
-
-    choices: [
-
-        {
-            text: "🔑 Ouvrir",
-            next: "door_three_knocks"
-        },
-
-        {
-            text: "🛏️ Se cacher",
-            next: "hide_room"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   COULOIR
-========================================================= */
-
-chapter1_hall: {
-
-    chapter: "CHAPITRE I",
-    location: "ÉTAGE 17",
-    time: "00:48",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu sors dans le couloir.
-
-Les lumières clignotent.
-
-Les portes portent toutes des numéros.
+Une seule porte est éclairée.
 
 17.
 
+La porte est entrouverte.`,
+choices:[
+{text:"🚪 Entrer dans la chambre 17",next:"room17"},
+{text:"👂 Écouter derrière la porte",next:"listen_room"},
+{text:"⬇️ Redescendre",next:"lobby"}
+]},
+
+elevator:{
+chapter:"CHAPITRE 1",
+location:"ASCENSEUR",
+time:"00:15",
+speaker:"NARRATEUR",
+text:`Tu entres dans l'ascenseur.
+
+Les portes se ferment.
+
+Tu appuies sur 1.
+
+L'ascenseur descend.
+
+2...
+
+3...
+
+4...
+
+Puis l'écran affiche :
+
+-1.
+
+Les portes s'ouvrent.
+
+Un couloir sombre se trouve devant toi.
+
+Au fond...
+
+une lumière rouge.`,
+choices:[
+{text:"🚪 Sortir",next:"basement"},
+{text:"🔼 Appuyer sur 1",next:"floor1"},
+{text:"🔒 Fermer les portes",next:"elevator_close"}
+]},
+
+elevator_close:{
+chapter:"CHAPITRE 1",
+location:"ASCENSEUR",
+time:"00:17",
+speaker:"NARRATEUR",
+text:`Tu appuies sur le bouton.
+
+Les portes commencent à se fermer.
+
+Une main apparaît entre les deux portes.
+
+Tu recules.
+
+La main disparaît.
+
+L'ascenseur remonte.
+
+Quand les portes s'ouvrent...
+
+tu es devant la chambre 17.`,
+choices:[
+{text:"🚪 Entrer",next:"room17"},
+{text:"🏃 Revenir au hall",next:"lobby"}
+]},
+
+floor1:{
+chapter:"CHAPITRE 1",
+location:"PREMIER ÉTAGE",
+time:"00:18",
+speaker:"NARRATEUR",
+text:`Les portes s'ouvrent.
+
+Le couloir est silencieux.
+
+Toutes les portes sont fermées.
+
+Sauf une.
+
+17.
+
+Une faible lumière vient de l'intérieur.
+
+Tu avances.`,
+choices:[
+{text:"🚪 Entrer dans la chambre 17",next:"room17"},
+{text:"👂 Écouter",next:"listen_room"},
+{text:"🚶 Explorer le couloir",next:"hallway"}
+]},
+
+hallway:{
+chapter:"CHAPITRE 1",
+location:"PREMIER ÉTAGE",
+time:"00:20",
+speaker:"NARRATEUR",
+text:`Tu avances dans le couloir.
+
+Les numéros des chambres changent.
+
+15.
+
+16.
+
 18.
 
-19.
+Puis 17.
 
-20.
+Tu te retournes.
 
-21.
+Le couloir derrière toi est devenu beaucoup plus long.
 
-22.
+La porte 17 est maintenant ouverte.`,
+choices:[
+{text:"🚪 Entrer",next:"room17"},
+{text:"🏃 Courir vers l'ascenseur",next:"elevator_escape"}
+]},
 
-23.
+listen_room:{
+chapter:"CHAPITRE 1",
+location:"CHAMBRE 17",
+time:"00:21",
+speaker:"NARRATEUR",
+text:`Tu approches ton oreille de la porte.
 
-Puis tu remarques quelque chose.
+Quelqu'un respire derrière.
 
-La porte 24 n'existe pas.
+Puis une voix murmure :
 
-Pourtant...
+« Entre. »
 
-une lumière passe sous une porte sans numéro.`,
+Tu reconnais cette voix.
 
-    choices: [
+C'est la tienne.`,
+choices:[
+{text:"🚪 Entrer",next:"room17"},
+{text:"🏃 Fuir",next:"elevator_escape"}
+]},
 
-        {
-            text: "🚪 Aller à la chambre 23",
-            next: "room23"
-        },
+room17:{
+chapter:"CHAPITRE 1",
+location:"CHAMBRE 17",
+time:"00:23",
+speaker:"NARRATEUR",
+text:`Tu entres.
 
-        {
-            text: "👤 Examiner la porte sans numéro",
-            next: "unnumbered_door",
-            clue: "Porte sans numéro"
-        },
+La chambre ressemble étrangement à celle de Blackwood.
 
-        {
-            text: "⬇️ Prendre l'escalier",
-            next: "stairs"
-        }
+Même papier peint.
 
-    ]
+Même odeur.
 
-},
+Même silence.
 
+Sur le lit repose un magnétophone.
 
-/* ====================================
+À côté :
+
+une cassette.
+
+BLACKWOOD — ENREGISTREMENT 01.
+
+Au mur se trouve une photographie.
+
+C'est toi.
+
+Mais la photo semble avoir été prise demain.`,
+choices:[
+{text:"📼 Écouter la cassette",next:"recording"},
+{text:"📷 Examiner la photographie",next:"future_photo",clue:"Photo du futur"},
+{text:"🪞 Regarder le miroir",next:"mirror"}
+]},
+
+future_photo:{
+chapter:"CHAPITRE 1",
+location:"CHAMBRE 17",
+time:"00:25",
+speaker:"NARRATEUR",
+text:`Tu prends la photographie.
+
+Au dos :
+
+« TU ARRIVERAS JUSQU'ICI. »
+
+Puis une seconde phrase apparaît :
+
+« MAIS TU NE DOIS PAS DESCENDRE. »
+
+Un bruit vient du plafond.
+
+Quelqu'un marche au-dessus de toi.`,
+choices:[
+{text:"📼 Écouter la cassette",next:"recording"},
+{text:"⬆️ Chercher l'étage supérieur",next:"upper_floor"},
+{text:"🪞 Regarder le miroir",next:"mirror"}
+]},
+
+mirror:{
+chapter:"CHAPITRE 1",
+location:"CHAMBRE 17",
+time:"00:27",
+speaker:"NARRATEUR",
+text:`Tu regardes le miroir.
+
+Ton reflet te regarde.
+
+Tu lèves la main.
+
+Il ne bouge pas.
+
+Puis ton reflet sourit.
+
+Toi, tu ne souris pas.
+
+Il pose un doigt sur ses lèvres.
+
+Derrière toi...
+
+quelqu'un frappe à la porte.`,
+choices:[
+{text:"🚪 Regarder la porte",next:"door17"},
+{text:"🪞 Continuer à regarder",next:"mirror_again"},
+{text:"🏃 Quitter la chambre",next:"elevator_escape"}
+]},
+
+mirror_again:{
+chapter:"CHAPITRE 1",
+location:"CHAMBRE 17",
+time:"00:29",
+speaker:"NARRATEUR",
+text:`Ton reflet s'approche du miroir.
+
+Il murmure :
+
+« Tu aurais dû rester à Blackwood. »
+
+Puis le miroir devient noir.
+
+Quand tu regardes à nouveau...
+
+ton reflet a disparu.`,
+choices:[
+{text:"🚪 Quitter la chambre",next:"door17"},
+{text:"📼 Écouter la cassette",next:"recording"}
+]},
+
+door17:{
+chapter:"CHAPITRE 1",
+location:"CHAMBRE 17",
+time:"00:31",
+speaker:"NARRATEUR",
+text:`Tu ouvres la porte.
+
+Le couloir est vide.
+
+Mais au sol se trouve un dossier.
+
+Ton nom est inscrit dessus.
+
+À l'intérieur :
+
+une photographie de toi.
+
+Une date.
+
+Demain.
+
+Et une phrase :
+
+« IL A SURVÉCU À BLACKWOOD. »`,
+choices:[
+{text:"📂 Ouvrir le dossier",next:"file",clue:"Dossier personnel"},
+{text:"📼 Retourner à la cassette",next:"recording"},
+{text:"🏃 Quitter l'étage",next:"elevator_escape"}
+]},
+
+file:{
+chapter:"CHAPITRE 1",
+location:"COULOIR",
+time:"00:33",
+speaker:"NARRATEUR",
+text:`Tu lis le dossier.
+
+Une seule phrase est lisible :
+
+« SUJET : SURVIVANT DE BLACKWOOD. »
+
+Puis :
+
+« PROCHAINE ÉTAPE : SOUS-SOL. »
+
+Tu comprends que quelqu'un t'observe depuis longtemps.`,
+choices:[
+{text:"⬇️ Chercher le sous-sol",next:"basement",clue:"Le sous-sol"},
+{text:"📼 Écouter la cassette",next:"recording"},
+{text:"🚪 Quitter l'hôtel",next:"hotel_exit"}
+]},
+
+recording:{
+chapter:"CHAPITRE 1",
+location:"CHAMBRE 17",
+time:"00:35",
+speaker:"VOIX ENREGISTRÉE",
+text:`La cassette commence.
+
+Une voix parle :
+
+« Si tu écoutes ceci, Blackwood est déjà derrière toi.
+
+Mais ce n'était qu'un point.
+
+Il existe d'autres endroits.
+
+D'autres personnes.
+
+D'autres versions de toi.
+
+Le Last Call les relie tous. »
+
+Un bruit parasite.
+
+Puis :
+
+« Descends au sous-sol.
+
+Tu trouveras les archives. »`,
+choices:[
+{text:"⬇️ Descendre au sous-sol",next:"basement",clue:"Archives du Last Call"},
+{text:"🪞 Examiner le miroir",next:"mirror"},
+{text:"🚪 Quitter l'hôtel",next:"hotel_exit"}
+]},
+
+basement:{
+chapter:"CHAPITRE 1",
+location:"SOUS-SOL",
+time:"00:40",
+speaker:"NARRATEUR",
+text:`Tu descends.
+
+Le sous-sol est immense.
+
+Des centaines de dossiers sont rangés sur des étagères.
+
+Au centre de la pièce...
+
+des téléphones.
+
+Des dizaines.
+
+Certains sonnent.
+
+Puis l'un d'eux affiche ton nom.
+
+APPEL ENTRANT.`,
+choices:[
+{text:"📞 Répondre",next:"basement_call"},
+{text:"📂 Chercher ton dossier",next:"your_file",clue:"Archives"},
+{text:"🚪 Remonter",next:"hotel_exit"}
+]},
+
+basement_call:{
+chapter:"CHAPITRE 1",
+location:"SOUS-SOL",
+time:"00:42",
+speaker:"TA VOIX",
+text:`Tu décroches.
+
+Ta propre voix :
+
+« Tu as trouvé les archives. »
+
+— Qui es-tu ?
+
+« Je suis toi.
+
+Mais pas celui que tu connais. »
+
+Un silence.
+
+« Et bientôt...
+
+tu comprendras pourquoi Blackwood t'a laissé partir. »`,
+choices:[
+{text:"📞 Demander pourquoi",next:"why_blackwood"},
+{text:"📂 Chercher ton dossier",next:"your_file"},
+{text:"🔇 Raccrocher",next:"phone_wall"}
+]},
+
+why_blackwood:{
+chapter:"CHAPITRE 1",
+location:"SOUS-SOL",
+time:"00:44",
+speaker:"TA VOIX",
+text:`« Blackwood n'était qu'une porte.
+
+Le Last Call en est une autre.
+
+Et toi...
+
+tu es la clé. »
+
+La communication coupe.
+
+Tous les téléphones du sous-sol se mettent à sonner en même temps.`,
+choices:[
+{text:"📂 Chercher ton dossier",next:"your_file"},
+{text:"🏃 Fuir",next:"basement_escape"}
+]},
+
+your_file:{
+chapter:"CHAPITRE 1",
+location:"ARCHIVES",
+time:"00:46",
+speaker:"NARRATEUR",
+text:`Tu trouves ton dossier.
+
+Il est beaucoup plus épais que les autres.
+
+À l'intérieur :
+
+des photos de Blackwood.
+
+Des photos du Last Call.
+
+Et une dernière photo.
+
+Une pièce remplie de téléphones.
+
+Au dos :
+
+« PROCHAINE PHASE : L'AUTRE. »`,
+choices:[
+{text:"📂 Continuer à lire",next:"file_truth",clue:"Dossier du survivant"},
+{text:"🏃 Quitter les archives",next:"basement_escape"}
+]},
+
+file_truth:{
+chapter:"CHAPITRE 1",
+location:"ARCHIVES",
+time:"00:48",
+speaker:"NARRATEUR",
+text:`Une dernière feuille attire ton attention.
+
+« Le sujet a survécu à Blackwood.
+
+Le phénomène a donc changé de méthode.
+
+Il ne doit plus être éliminé.
+
+Il doit être remplacé. »
+
+Tu entends des pas derrière toi.
+
+Tu te retournes.
+
+Personne.
+
+Mais un téléphone sonne.`,
+choices:[
+{text:"📞 Répondre",next:"basement_call"},
+{text:"🏃 Fuir",next:"basement_escape"}
+]},
+
+phone_wall:{
+chapter:"CHAPITRE 1",
+location:"SOUS-SOL",
+time:"00:50",
+speaker:"NARRATEUR",
+text:`Tu raccroches.
+
+Tous les téléphones se taisent.
+
+Puis un seul recommence à sonner.
+
+Tu t'approches.
+
+L'écran affiche :
+
+BLACKWOOD.
+
+Tu décroches.
+
+Une voix murmure :
+
+« Tu n'aurais jamais dû revenir. »`,
+choices:[
+{text:"📞 Écouter",next:"blackwood_call"},
+{text:"🔇 Raccrocher",next:"basement_escape"}
+]},
+
+blackwood_call:{
+chapter:"CHAPITRE 1",
+location:"SOUS-SOL",
+time:"00:52",
+speaker:"VOIX INCONNUE",
+text:`« Tu pensais que la maison était la fin.
+
+Elle n'était que le début.
+
+Le Last Call était déjà là.
+
+Et maintenant...
+
+il sait que tu es revenu. »
+
+La ligne coupe.
+
+Toutes les lumières s'éteignent.`,
+choices:[
+{text:"🔦 Chercher une sortie",next:"basement_escape"},
+{text:"📞 Attendre",next:"basement_wait"}
+]},
+
+basement_wait:{
+chapter:"CHAPITRE 1",
+location:"SOUS-SOL",
+time:"00:54",
+speaker:"NARRATEUR",
+text:`Tu attends dans le noir.
+
+Un téléphone sonne.
+
+Puis un autre.
+
+Puis tous.
+
+Une voix résonne dans la pièce :
+
+« CHOISIS. »
+
+Une lumière s'allume au fond.
+
+Une porte.
+
+Derrière elle commence quelque chose que tu ne comprends pas encore.`,
+choices:[
+{text:"🚪 Ouvrir la porte",next:"chapter2_start"}
+]},
+
+basement_escape:{
+chapter:"CHAPITRE 1",
+location:"SOUS-SOL",
+time:"00:56",
+speaker:"NARRATEUR",
+text:`Tu cours.
+
+Les téléphones sonnent derrière toi.
+
+Tu remontes les escaliers.
+
+Quand tu arrives dans le hall...
+
+tout est redevenu silencieux.
+
+Sur le comptoir repose une feuille.
+
+« TU AS TROUVÉ LE PREMIER. »
+
+En dessous :
+
+« MAINTENANT, TROUVE L'AUTRE. »`,
+choices:[
+{text:"➡️ Continuer",next:"chapter2_start",clue:"L'autre"}
+]},
+
+elevator_escape:{
+chapter:"CHAPITRE 1",
+location:"ASCENSEUR",
+time:"00:58",
+speaker:"NARRATEUR",
+text:`Tu entres dans l'ascenseur.
+
+Les portes se ferment.
+
+Tu appuies sur le rez-de-chaussée.
+
+L'ascenseur descend.
+
+Puis s'arrête.
+
+Une voix résonne :
+
+« CHAPITRE SUIVANT. »`,
+choices:[
+{text:"➡️ Continuer",next:"chapter2_start"}
+]},
+
+hotel_exit:{
+chapter:"CHAPITRE 1",
+location:"DEVANT LE LAST CALL",
+time:"01:00",
+speaker:"NARRATEUR",
+text:`Tu quittes l'hôtel.
+
+La pluie tombe toujours.
+
+Tu regardes derrière toi.
+
+Le Last Call semble complètement abandonné.
+
+Tu avances.
+
+Ton téléphone vibre.
+
+Un message :
+
+« TU N'AS PAS ENCORE COMPRIS. »
+
+Puis une deuxième ligne :
+
+« L'AUTRE T'ATTEND. »`,
+choices:[
+{text:"📱 Lire la suite",next:"chapter2_start",clue:"L'autre"},
+{text:"🚗 Partir",next:"chapter2_start"}
+]},
+
+chapter2_start:{
+chapter:"CHAPITRE 2",
+location:"ROUTE 47",
+time:"01:07",
+speaker:"NARRATEUR",
+text:`Tu quittes le Last Call.
+
+Mais une chose est certaine.
+
+Blackwood n'était pas un accident.
+
+Et le Last Call n'était pas la fin.
+
+Quelqu'un d'autre existe.
+
+Une autre version de toi.
+
+Et elle sait déjà où tu vas.`,
+choices:[
+{text:"➡️ Continuer",next:"chapter2_start"}
+]}
+
+});
