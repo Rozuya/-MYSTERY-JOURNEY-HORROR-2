@@ -1,1142 +1,600 @@
 "use strict";
 
-/* =========================================================
-   🕵️ MYSTERY JOURNEY: HORROR 2
-   CHAPTER III — SOUS-SOL
-========================================================= */
-
 window.STORY = window.STORY || {};
 
 Object.assign(window.STORY, {
 
-chapter3_start: {
+chapter3_start:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"SOUS-SOL DU LAST CALL",
+time:"01:08",
+speaker:"NARRATEUR",
+text:`Le téléphone reste allumé dans l'obscurité.
 
-    chapter: "CHAPITRE III",
-    location: "SOUS-SOL",
-    time: "01:48",
-    speaker: "NARRATEUR",
+Tu décroches.
 
-    text:
-`La porte se referme derrière toi.
+Une voix tremblante répond.
 
-Tu es au sous-sol.
-
-L'air est glacial.
-
-Une ampoule clignote au plafond.
-
-Devant toi se trouvent trois couloirs.
-
-À gauche : ARCHIVES.
-
-Au centre : MAINTENANCE.
-
-À droite : NIVEAU -2.
-
-Puis ton téléphone vibre.
-
-Un message apparaît :
-
-« NE DESCENDS PAS PLUS BAS. »`,
-
-    choices: [
-
-        {
-            text: "📁 Aller aux archives",
-            next: "archives",
-            clue: "Archives du sous-sol"
-        },
-
-        {
-            text: "🔧 Aller en maintenance",
-            next: "maintenance"
-        },
-
-        {
-            text: "⬇️ Descendre au niveau -2",
-            next: "level_minus2"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   ARCHIVES
-========================================================= */
-
-archives: {
-
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:50",
-    speaker: "NARRATEUR",
-
-    text:
-`Les archives sont immenses.
-
-Des dossiers remplissent les étagères.
-
-Tu allumes une lampe.
-
-Les dossiers portent des noms.
-
-Certains sont très anciens.
-
-Tu avances.
-
-Puis tu trouves un dossier portant ton nom.
-
-Date d'entrée :
-
-14 AOÛT.
-
-Date de sortie :
-
-INCONNUE.
-
-À l'intérieur se trouve une photo.
-
-Tu reconnais l'hôtel.
-
-Mais la photo semble avoir été prise depuis le sous-sol.`,
-
-    choices: [
-
-        {
-            text: "📂 Lire le dossier",
-            next: "personal_file",
-            clue: "Ton dossier"
-        },
-
-        {
-            text: "📸 Examiner la photo",
-            next: "basement_photo",
-            clue: "Photo du sous-sol"
-        },
-
-        {
-            text: "🚪 Quitter les archives",
-            next: "basement_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   DOSSIER PERSONNEL
-========================================================= */
-
-personal_file: {
-
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:52",
-    speaker: "NARRATEUR",
-
-    text:
-`Le dossier contient plusieurs pages.
-
-PAGE 1 :
-
-« Sujet : PATIENT 01. »
-
-PAGE 2 :
-
-« Mémoire instable. »
-
-PAGE 3 :
-
-« Répond aux appels malgré les avertissements. »
-
-Tu tournes la page.
-
-La dernière phrase est écrite à la main :
-
-« IL NE DOIT JAMAIS SE SOUVENIR DE SA MORT. »
-
-Tu lâches presque le dossier.`,
-
-    choices: [
-
-        {
-            text: "📄 Lire la dernière page",
-            next: "death_file",
-            clue: "Patient 01"
-        },
-
-        {
-            text: "🔥 Détruire le dossier",
-            next: "burn_file"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   LA MORT
-========================================================= */
-
-death_file: {
-
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:54",
-    speaker: "NARRATEUR",
-
-    text:
-`La dernière page est différente.
-
-Une seule phrase :
-
-« PATIENT 01 — DÉCÉDÉ SUR LA ROUTE 47 À 23:17. »
-
-Tu relis.
-
-23:17.
-
-L'heure exacte du début de ton histoire.
-
-Tu comprends.
-
-Tu n'es pas arrivé à l'hôtel.
-
-Tu y es retourné.`,
-
-    choices: [
-
-        {
-            text: "😨 Continuer à lire",
-            next: "death_truth"
-        },
-
-        {
-            text: "📁 Fermer le dossier",
-            next: "basement_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   VÉRITÉ
-========================================================= */
-
-death_truth: {
-
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:55",
-    speaker: "NARRATEUR",
-
-    text:
-`Une note est cachée derrière le dossier.
-
-« Le sujet oublie sa mort après chaque cycle.
-
-Le Last Call lui permet de revenir.
-
-Mais chaque retour crée une copie.
-
-La copie croit être l'original.
-
-L'original reste ici. »
-
-Tu entends un bruit derrière les étagères.
-
-Quelqu'un marche.`,
-
-    choices: [
-
-        {
-            text: "🔦 Chercher la personne",
-            next: "archive_figure"
-        },
-
-        {
-            text: "🏃 Fuir",
-            next: "basement_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   PHOTO
-========================================================= */
-
-basement_photo: {
-
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:53",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu regardes la photo.
-
-Elle montre une pièce souterraine.
-
-Au centre :
-
-un téléphone.
-
-Derrière lui :
-
-six chaises.
-
-Cinq sont occupées.
-
-La sixième est vide.
-
-Sous la photo :
-
-« LA PROCHAINE PLACE EST POUR TOI. »`,
-
-    choices: [
-
-        {
-            text: "📸 Garder la photo",
-            next: "keep_basement_photo",
-            clue: "Les six chaises"
-        },
-
-        {
-            text: "🔥 Brûler la photo",
-            next: "burn_photo"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   MAINTENANCE
-========================================================= */
-
-maintenance: {
-
-    chapter: "CHAPITRE III",
-    location: "MAINTENANCE",
-    time: "01:57",
-    speaker: "NARRATEUR",
-
-    text:
-`La salle de maintenance est remplie de machines.
-
-Des générateurs tournent encore.
-
-Tu remarques un panneau :
-
-SYSTÈME LAST CALL.
-
-Un voyant rouge clignote.
-
-Une inscription :
-
-« APPELS RESTANTS : 4 »
-
-Puis un bruit mécanique démarre.`,
-
-    choices: [
-
-        {
-            text: "🔧 Examiner le système",
-            next: "last_call_system",
-            clue: "Système Last Call"
-        },
-
-        {
-            text: "🔌 Couper le système",
-            next: "shutdown_system"
-        },
-
-        {
-            text: "🚪 Quitter",
-            next: "basement_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   SYSTÈME LAST CALL
-========================================================= */
-
-last_call_system: {
-
-    chapter: "CHAPITRE III",
-    location: "MAINTENANCE",
-    time: "01:59",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu examines le panneau.
-
-Le système affiche :
-
-APPEL 01 — TERMINÉ
-
-APPEL 02 — TERMINÉ
-
-APPEL 03 — EN COURS
-
-APPEL 04 — VERROUILLÉ
-
-APPEL 05 — VERROUILLÉ
-
-APPEL 06 — FINAL
-
-Sous la liste :
-
-« SIX APPELS.
-
-UNE SEULE SORTIE. »`,
-
-    choices: [
-
-        {
-            text: "🔓 Chercher comment déverrouiller",
-            next: "unlock_calls",
-            clue: "Six appels"
-        },
-
-        {
-            text: "🔌 Couper le système",
-            next: "shutdown_system"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   COUPER LE SYSTÈME
-========================================================= */
-
-shutdown_system: {
-
-    chapter: "CHAPITRE III",
-    location: "MAINTENANCE",
-    time: "02:00",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu coupes le courant.
-
-Toutes les machines s'arrêtent.
-
-Le silence revient.
-
-Puis un générateur redémarre tout seul.
-
-Un écran s'allume :
-
-« TU NE PEUX PAS ARRÊTER UN APPEL. »
-
-Le téléphone de la salle sonne.`,
-
-    choices: [
-
-        {
-            text: "📞 Répondre",
-            next: "third_call"
-        },
-
-        {
-            text: "🏃 Partir",
-            next: "basement_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   NIVEAU -2
-========================================================= */
-
-level_minus2: {
-
-    chapter: "CHAPITRE III",
-    location: "NIVEAU -2",
-    time: "02:02",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu descends.
-
-Un étage.
-
-Puis deux.
-
-La température chute.
-
-Les murs deviennent humides.
-
-Au bout du couloir se trouve une porte métallique.
-
-Sur celle-ci :
-
-PATIENTS.
-
-Tu entends quelqu'un frapper de l'autre côté.`,
-
-    choices: [
-
-        {
-            text: "🚪 Ouvrir",
-            next: "patients_room"
-        },
-
-        {
-            text: "🔙 Remonter",
-            next: "basement_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   PATIENTS
-========================================================= */
-
-patients_room: {
-
-    chapter: "CHAPITRE III",
-    location: "NIVEAU -2",
-    time: "02:04",
-    speaker: "NARRATEUR",
-
-    text:
-`La pièce ressemble à un ancien hôpital.
-
-Des lits.
-
-Des sangles.
-
-Des dossiers.
-
-Sur le premier lit :
-
-PATIENT 03.
-
-Le lit est vide.
-
-Sur le deuxième :
-
-PATIENT 04.
-
-Vide.
-
-Troisième :
-
-PATIENT 05.
-
-Vide.
-
-Puis tu arrives au dernier.
-
-PATIENT 01.
-
-Ton nom.
-
-Le lit est occupé.`,
-
-    choices: [
-
-        {
-            text: "👤 Regarder le patient",
-            next: "patient01"
-        },
-
-        {
-            text: "🏃 Fuir",
-            next: "basement_hall"
-        }
-
-    ]
-
-},
-
-
-/* =========================================================
-   PATIENT 01
-========================================================= */
-
-patient01: {
-
-    chapter: "CHAPITRE III",
-    location: "NIVEAU -2",
-    time: "02:05",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu t'approches.
-
-La personne sur le lit ouvre les yeux.
-
-C'est toi.
-
-Exactement toi.
-
-Il te regarde.
-
-— Tu as mis longtemps.
-
-Tu recules.
+« Enfin... quelqu'un a répondu. »
 
 — Qui êtes-vous ?
 
-Il sourit.
+« Je suis ici depuis tellement longtemps... »
 
-— La version qui est morte ici.
+La voix s'arrête.
 
-Puis il murmure :
-
-— Et toi, tu es la copie.`,
-
-    choices: [
-
-        {
-            text: "😨 Lui demander la vérité",
-            next: "patient_truth",
-            clue: "L'original"
-        },
-
-        {
-            text: "🏃 Partir",
-            next: "basement_hall"
-        },
-
-        {
-            text: "📞 Lui demander s'il connaît les appels",
-            next: "patient_calls"
-        }
-
-    ]
-
+« Cherche les dossiers. Tu comprendras. »`,
+choices:[
+{text:"📁 Chercher les dossiers",next:"files"},
+{text:"📞 Demander qui parle",next:"survivor_voice"},
+{text:"🚪 Remonter",next:"stairs"}
+]
 },
 
+files:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ARCHIVES SOUTERRAINES",
+time:"01:14",
+speaker:"NARRATEUR",
+text:`Tu avances entre les étagères.
 
-/* =========================================================
-   VÉRITÉ DU PATIENT
-========================================================= */
+Des centaines de dossiers.
 
-patient_truth: {
+Chaque nom correspond à une personne disparue.
 
-    chapter: "CHAPITRE III",
-    location: "NIVEAU -2",
-    time: "02:07",
-    speaker: "PATIENT 01",
+Toutes ont reçu un appel.
 
-    text:
-`— L'hôtel ne tue personne.
+Toutes sont venues ici.
 
-Il crée des copies.
+Puis tu trouves un dossier portant un nom familier.
 
-— Pourquoi ?
+BLACKWOOD.
 
-— Pour empêcher les morts de partir.
+À l'intérieur, plusieurs photographies.
 
-Il te regarde.
+La maison n°17.
 
-— Chaque fois que tu réponds, une nouvelle version de toi apparaît.
+Des téléphones.
 
-— Et l'original ?
-
-Il désigne le lit.
-
-— Il reste ici.
-
-Puis il ajoute :
-
-— Mais tu peux encore choisir laquelle de nous deux sortira.`,
-
-    choices: [
-
-        {
-            text: "🚪 Ouvrir la porte de sortie",
-            next: "patient_exit"
-        },
-
-        {
-            text: "📞 Lui demander le sixième appel",
-            next: "sixth_call_truth"
-        }
-
-    ]
-
+Et une photo de toi.`,
+choices:[
+{text:"📁 Ouvrir le dossier",next:"blackwood_file",clue:"Dossier Blackwood"},
+{text:"📷 Examiner la photo",next:"photo_file",clue:"Photo de l'hôtel"}
+]
 },
 
+blackwood_file:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ARCHIVES SOUTERRAINES",
+time:"01:17",
+speaker:"NARRATEUR",
+text:`Le dossier contient une phrase :
 
-/* =========================================================
-   TROISIÈME APPEL
-========================================================= */
+« LE SUJET A SURVÉCU AU PREMIER CONTACT. »
 
-third_call: {
+Une autre page indique :
 
-    chapter: "CHAPITRE III",
-    location: "MAINTENANCE",
-    time: "02:09",
-    speaker: "VOIX INCONNUE",
+« BLACKWOOD N'ÉTAIT QU'UN POINT D'ACCÈS. »
 
-    text:
-`Tu décroches.
+Tu comprends.
 
-Une voix grave :
+La maison n'était pas le phénomène.
 
-« Troisième appel. »
+Elle n'était qu'une porte.
 
-— Que voulez-vous ?
+Derrière toi, un dossier tombe au sol.
 
-« Te montrer ce que tu étais avant. »
-
-Le téléphone diffuse un enregistrement.
-
-Une voiture.
-
-La pluie.
-
-Une collision.
-
-Puis un silence.
-
-Tu reconnais la route 47.
-
-Tu reconnais ta voiture.
-
-Et tu comprends enfin :
-
-tu es mort à 23:17.`,
-
-    choices: [
-
-        {
-            text: "📞 Continuer à écouter",
-            next: "death_recording",
-            clue: "Accident de la route 47"
-        },
-
-        {
-            text: "📵 Raccrocher",
-            next: "basement_hall"
-        }
-
-    ]
-
+Il porte ton nom.`,
+choices:[
+{text:"📁 Ouvrir ton dossier",next:"your_file",clue:"Ton dossier"},
+{text:"🚪 Partir",next:"archive_exit"}
+]
 },
 
+photo_file:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ARCHIVES SOUTERRAINES",
+time:"01:19",
+speaker:"NARRATEUR",
+text:`Tu prends la photographie.
 
-/* =========================================================
-   ENREGISTREMENT DE L'ACCIDENT
-========================================================= */
+Elle montre l'hôtel.
 
-death_recording: {
+Puis tu remarques quelque chose.
 
-    chapter: "CHAPITRE III",
-    location: "MAINTENANCE",
-    time: "02:11",
-    speaker: "ENREGISTREMENT",
+Une silhouette se tient derrière la fenêtre de la chambre 17.
 
-    text:
-`L'enregistrement continue.
+Tu retournes la photo.
 
-Une voix dit :
+Une date est inscrite :
 
-« Sujet décédé.
+DEMAIN.
 
-Mémoire récupérée.
+Puis une phrase :
 
-Création de copie.
-
-Cycle numéro 01. »
-
-Puis une autre voix :
-
-« Combien de copies ? »
-
-Réponse :
-
-« Nous ne savons plus. »`,
-
-    choices: [
-
-        {
-            text: "🔎 Chercher le cycle numéro 01",
-            next: "cycle_one",
-            clue: "Cycle numéro 01"
-        },
-
-        {
-            text: "🚪 Quitter",
-            next: "basement_hall"
-        }
-
-    ]
-
+« IL TE REGARDE DEPUIS LE DÉBUT. »`,
+choices:[
+{text:"👁️ Chercher la silhouette",next:"archive_exit"},
+{text:"📁 Continuer les recherches",next:"your_file"}
+]
 },
 
+your_file:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ARCHIVES SOUTERRAINES",
+time:"01:22",
+speaker:"NARRATEUR",
+text:`Tu ouvres le dossier.
 
-/* =========================================================
-   FIN DU CHAPITRE 3
-========================================================= */
+Une photographie de toi.
 
-chapter3_end: {
+Une autre de Blackwood.
 
-    chapter: "CHAPITRE III",
-    location: "NIVEAU -2",
-    time: "02:17",
-    speaker: "NARRATEUR",
+Puis une dernière photographie.
 
-    text:
-`Une alarme retentit.
+Elle montre quelqu'un qui te ressemble parfaitement.
 
-Les portes du sous-sol se verrouillent.
+Sous la photo :
 
-Une voix annonce :
+« AUTRE VERSION — ÉCHEC N°17 »
 
-« TROISIÈME APPEL TERMINÉ. »
+Tu comprends enfin.
 
-Puis :
+Tu n'es pas le premier.
 
-« QUATRIÈME APPEL : PRÉPARATION. »
+Tu n'es même peut-être pas le premier toi.`,
+choices:[
+{text:"📄 Lire la dernière page",next:"last_page",clue:"Échec numéro 17"},
+{text:"📞 Appeler ton autre toi",next:"call_other"}
+]
+},
 
-Une porte métallique s'ouvre.
+last_page:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ARCHIVES SOUTERRAINES",
+time:"01:25",
+speaker:"NARRATEUR",
+text:`La dernière page ne contient qu'une phrase :
+
+« LE SUJET DOIT ATTEINDRE LE DERNIER APPEL. »
+
+En dessous :
+
+« NE LUI FAIS PAS CONFIANCE. »
+
+Tu ne sais plus qui croire.
+
+Un téléphone sonne derrière toi.
+
+Puis une voix prononce ton prénom.`,
+choices:[
+{text:"📞 Répondre",next:"survivor_voice"},
+{text:"🏃 Fuir",next:"archive_exit"}
+]
+},
+
+survivor_voice:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ARCHIVES SOUTERRAINES",
+time:"01:27",
+speaker:"VOIX INCONNUE",
+text:`— Qui êtes-vous ?
+
+La voix répond :
+
+« Quelqu'un qui a survécu. »
+
+— Depuis combien de temps êtes-vous ici ?
+
+Silence.
+
+« Je ne sais plus. »
+
+— Comment sortir ?
+
+La voix murmure :
+
+« Trouve-moi. »
+
+La ligne coupe.`,
+choices:[
+{text:"🔎 Chercher la voix",next:"survivor"},
+{text:"🚪 Remonter",next:"stairs"}
+]
+},
+
+survivor:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"COULOIR SOUTERRAIN",
+time:"01:32",
+speaker:"NARRATEUR",
+text:`Tu suis les indications.
+
+Un couloir étroit.
+
+Puis une porte métallique.
+
+Derrière, quelqu'un frappe.
+
+Trois coups.
+
+Tu ouvres.
+
+Une personne est assise dans une petite pièce.
+
+Elle te regarde.
+
+Elle semble épuisée.
+
+« Pourquoi tu es revenu ? »`,
+choices:[
+{text:"❓ Demander qui elle est",next:"survivor_identity"},
+{text:"🚪 La faire sortir",next:"free_survivor"},
+{text:"🔒 Ne pas lui faire confiance",next:"leave_survivor"}
+]
+},
+
+survivor_identity:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"PIÈCE SOUTERRAINE",
+time:"01:34",
+speaker:"SURVIVANT",
+text:`« Je m'appelle Elias. »
+
+Il baisse les yeux.
+
+« J'ai reçu le même appel que toi. »
+
+— Depuis combien de temps ?
+
+« Onze ans. »
+
+Tu recules.
+
+Il n'a pas vieilli.
+
+« Le Last Call ne laisse pas les gens partir comme avant. »`,
+choices:[
+{text:"🕯️ Lui faire confiance",next:"free_survivor",clue:"Elias"},
+{text:"🚪 Partir seul",next:"leave_survivor"}
+]
+},
+
+free_survivor:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"COULOIR SOUTERRAIN",
+time:"01:38",
+speaker:"NARRATEUR",
+text:`Tu aides Elias à se relever.
+
+Vous avancez ensemble.
+
+Mais au bout du couloir, tous les téléphones sonnent.
+
+Elias s'arrête.
+
+« Ils savent que je suis sorti. »
+
+Les lumières s'allument.
+
+Une silhouette apparaît au bout du couloir.
+
+Elle vous ressemble.`,
+choices:[
+{text:"🏃 Courir",next:"escape_corridor"},
+{text:"👁️ Observer la silhouette",next:"other_appears"}
+]
+},
+
+leave_survivor:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"COULOIR SOUTERRAIN",
+time:"01:40",
+speaker:"NARRATEUR",
+text:`Tu laisses Elias derrière toi.
+
+Tu remontes seul.
+
+Au moment de fermer la porte, il murmure :
+
+« Tu regretteras de ne pas m'avoir cru. »
+
+Le téléphone dans ta poche sonne.
+
+L'écran affiche :
+
+ELIAS.`,
+choices:[
+{text:"📞 Répondre",next:"elias_call"},
+{text:"🔇 Ignorer",next:"stairs"}
+]
+},
+
+elias_call:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ESCALIER",
+time:"01:42",
+speaker:"ELIAS",
+text:`« Écoute-moi.
+
+Ne va pas dans la salle des miroirs.
+
+Ton autre toi t'y attend. »
+
+La ligne coupe.
+
+Une porte s'ouvre devant toi.
 
 Derrière :
 
-une immense salle plongée dans le noir.
-
-Six téléphones sont posés sur une table.
-
-Le premier se met à sonner.`,
-
-    choices: [
-
-        {
-            text: "▶ Continuer",
-            next: "chapter4_start"
-        }
-
-    ]
-
+un miroir immense.`,
+choices:[
+{text:"🪞 Entrer",next:"mirror_room"},
+{text:"🚪 Faire demi-tour",next:"stairs"}
+]
 },
 
+other_appears:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"COULOIR SOUTERRAIN",
+time:"01:43",
+speaker:"NARRATEUR",
+text:`La silhouette avance.
 
-/* =========================================================
-   TRANSITIONS
-========================================================= */
+Même visage.
 
-basement_hall: {
+Même vêtements.
 
-    chapter: "CHAPITRE III",
-    location: "SOUS-SOL",
-    time: "02:12",
-    speaker: "NARRATEUR",
+Même voix.
 
-    text:
-`Tu reviens dans le couloir.
+« Tu aurais dû écouter Elias. »
 
-Les portes derrière toi sont maintenant verrouillées.
+Tu demandes :
 
-Une lumière verte s'allume.
+— Qui es-tu ?
 
-Elle indique :
+Il sourit.
 
-NIVEAU -2.`,
-
-    choices: [
-
-        {
-            text: "⬇️ Descendre",
-            next: "level_minus2"
-        },
-
-        {
-            text: "📁 Retourner aux archives",
-            next: "archives"
-        },
-
-        {
-            text: "▶ Suivre la lumière",
-            next: "chapter3_end"
-        }
-
-    ]
-
+« Celui qui a vécu ce qui va t'arriver. »`,
+choices:[
+{text:"📞 Lui parler",next:"other_talk"},
+{text:"🏃 Fuir",next:"escape_corridor"}
+]
 },
 
-burn_file: {
+other_talk:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"COULOIR SOUTERRAIN",
+time:"01:45",
+speaker:"AUTRE TOI",
+text:`« Le Last Call veut que tu répondes au dernier appel.
 
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:56",
-    speaker: "NARRATEUR",
+Si tu le fais, le cycle continuera.
 
-    text:
-`Tu brûles le dossier.
+Si tu refuses...
 
-Les flammes montent.
+quelqu'un devra prendre ta place. »
 
-Mais les feuilles ne brûlent pas.
+— Qui ?
 
-Une phrase apparaît :
+Il te regarde.
 
-« TU NE PEUX PAS DÉTRUIRE CE QUE TU ES. »`,
+« Moi. »
 
-    choices: [
-        {
-            text: "🚪 Fuir",
-            next: "basement_hall"
-        }
-    ]
-
+Puis il disparaît.`,
+choices:[
+{text:"🪞 Suivre sa trace",next:"mirror_room"},
+{text:"🏃 Fuir l'hôtel",next:"escape_corridor"}
+]
 },
 
-burn_photo: {
+escape_corridor:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"LAST CALL HOTEL",
+time:"01:49",
+speaker:"NARRATEUR",
+text:`Tu remontes les escaliers.
 
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:54",
-    speaker: "NARRATEUR",
-
-    text:
-`La photo prend feu.
-
-Pendant une seconde, tu vois les six personnes assises autour de la table.
-
-Puis l'une d'elles tourne la tête vers toi.
-
-La photo devient noire.`,
-
-    choices: [
-        {
-            text: "🚪 Quitter",
-            next: "basement_hall"
-        }
-    ]
-
-},
-
-keep_basement_photo: {
-
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:54",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu ranges la photo.
-
-Au dos, un nouveau texte apparaît :
-
-« LA SIXIÈME CHAISE EST DÉJÀ OCCUPÉE. »`,
-
-    choices: [
-        {
-            text: "🔎 Chercher la sixième chaise",
-            next: "level_minus2"
-        }
-    ]
-
-},
-
-archive_figure: {
-
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "01:55",
-    speaker: "NARRATEUR",
-
-    text:
-`Tu éclaires le couloir entre les étagères.
-
-Personne.
-
-Mais un dossier est posé au sol.
-
-PATIENT 02.
+La porte principale est juste devant toi.
 
 Tu l'ouvres.
 
-La photo montre ton double.`,
+Mais derrière la porte...
 
-    choices: [
-        {
-            text: "📂 Prendre le dossier",
-            next: "basement_hall",
-            item: "Dossier du patient 02"
-        }
-    ]
+tu retrouves le même couloir.
 
+Tu recommences.
+
+Encore.
+
+Encore.
+
+Le Last Call ne te laisse pas sortir.`,
+choices:[
+{text:"🔄 Continuer",next:"loop_hotel"},
+{text:"🪞 Chercher le miroir",next:"mirror_room"}
+]
 },
 
-unlock_calls: {
+loop_hotel:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"LAST CALL HOTEL",
+time:"01:55",
+speaker:"NARRATEUR",
+text:`Tu marches pendant plusieurs minutes.
 
-    chapter: "CHAPITRE III",
-    location: "MAINTENANCE",
-    time: "02:00",
-    speaker: "NARRATEUR",
+Chaque porte ramène au même endroit.
 
-    text:
-`Tu cherches un moyen de déverrouiller les appels.
+Puis un téléphone sonne.
 
-Un code est inscrit sous le panneau :
+Une voix dit :
 
-17 — 23 — 31 — 06.
+« Il est temps de choisir. »
 
-Tu l'entres.
+Toutes les portes s'ouvrent en même temps.
 
-Le système affiche :
+Une seule porte porte un numéro :
 
-« ACCÈS AU QUATRIÈME APPEL AUTORISÉ. »`,
-
-    choices: [
-        {
-            text: "▶ Continuer",
-            next: "chapter3_end"
-        }
-    ]
-
+17.`,
+choices:[
+{text:"🚪 Entrer dans la chambre 17",next:"mirror_room"},
+{text:"📞 Répondre au téléphone",next:"last_call"}
+]
 },
 
-patient_calls: {
+mirror_room:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"SALLE DES MIROIRS",
+time:"02:00",
+speaker:"NARRATEUR",
+text:`La pièce est remplie de miroirs.
 
-    chapter: "CHAPITRE III",
-    location: "NIVEAU -2",
-    time: "02:06",
-    speaker: "PATIENT 01",
+Dans chacun, tu vois une version différente de toi.
 
-    text:
-`— Les appels ne sont pas là pour communiquer.
+Certaines sont mortes.
 
-— Alors pourquoi ?
+Certaines fuient.
 
-— Pour transférer les souvenirs.
+Certaines te regardent simplement.
 
-Il ferme les yeux.
+Puis tous les reflets se tournent vers toi.
 
-— Au quatrième appel, ils transfèrent l'identité.`,
+Un seul téléphone se trouve au centre.
 
-    choices: [
-        {
-            text: "📞 Demander ce qui arrive au cinquième",
-            next: "sixth_call_truth"
-        },
-        {
-            text: "🚪 Partir",
-            next: "basement_hall"
-        }
-    ]
+Il sonne.
 
+L'écran indique :
+
+DERNIER APPEL.`,
+choices:[
+{text:"📞 Répondre",next:"last_call",clue:"Le dernier appel"},
+{text:"🪞 Briser le miroir",next:"mirror_break"}
+]
 },
 
-sixth_call_truth: {
+mirror_break:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"SALLE DES MIROIRS",
+time:"02:03",
+speaker:"NARRATEUR",
+text:`Tu frappes le miroir.
 
-    chapter: "CHAPITRE III",
-    location: "NIVEAU -2",
-    time: "02:08",
-    speaker: "PATIENT 01",
+Il se brise.
 
-    text:
-`— Le sixième appel ne donne rien.
+Tous les autres miroirs se fissurent en même temps.
 
-— Alors ?
+Mais ton reflet reste debout.
 
-— Il décide qui est réel.
+Il te regarde.
+
+Puis il sourit.
+
+Le téléphone sonne une dernière fois.`,
+choices:[
+{text:"📞 Décrocher",next:"last_call"},
+{text:"🚪 Quitter la salle",next:"chapter3_end"}
+]
+},
+
+last_call:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"SALLE DES MIROIRS",
+time:"02:07",
+speaker:"TA VOIX",
+text:`Tu décroches.
+
+Ta propre voix murmure :
+
+« Tu veux savoir pourquoi tu as survécu à Blackwood ? »
+
+Tu ne réponds pas.
+
+« Parce que tu n'étais pas censé survivre. »
 
 Un silence.
 
-— Mais pour ça, tu dois atteindre le cinquième.`,
+« Maintenant, tu dois découvrir pourquoi. »
 
-    choices: [
-        {
-            text: "▶ Continuer",
-            next: "chapter3_end"
-        }
-    ]
+La communication coupe.
 
+Le téléphone affiche :
+
+CHAPITRE 4 — L'AUTRE.`,
+choices:[
+{text:"➡️ Continuer",next:"chapter4_start"}
+]
 },
 
-patient_exit: {
+stairs:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ESCALIER",
+time:"02:08",
+speaker:"NARRATEUR",
+text:`Tu remontes.
 
-    chapter: "CHAPITRE III",
-    location: "NIVEAU -2",
-    time: "02:08",
-    speaker: "NARRATEUR",
+Derrière toi, les téléphones continuent de sonner.
 
-    text:
-`Derrière le lit se trouve une porte.
+Tu arrives dans le hall.
 
-Tu l'ouvres.
+Mais quelqu'un t'attend à la réception.
 
-Un couloir monte vers la surface.
+Ton visage.
 
-Mais avant de partir, le patient murmure :
+Ton sourire.
 
-« Si tu sors maintenant, il prendra ta place. »`,
+Ta voix.
 
-    choices: [
-        {
-            text: "🚪 Sortir",
-            next: "chapter3_end"
-        },
-        {
-            text: "🔙 Rester",
-            next: "chapter3_end"
-        }
-    ]
-
+« Enfin. »`,
+choices:[
+{text:"👁️ T'approcher",next:"other_talk"},
+{text:"🏃 Fuir",next:"chapter3_end"}
+]
 },
 
-cycle_one: {
+archive_exit:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"ARCHIVES",
+time:"02:10",
+speaker:"NARRATEUR",
+text:`Tu quittes les archives.
 
-    chapter: "CHAPITRE III",
-    location: "ARCHIVES",
-    time: "02:13",
-    speaker: "NARRATEUR",
+Le téléphone de la réception sonne.
 
-    text:
-`Le cycle numéro 01 correspond à une date.
+Tu sais déjà que quelqu'un attend au bout du fil.
 
-14 AOÛT.
+Une voix murmure :
 
-Puis le numéro 02.
+« Tu as trouvé les disparus.
 
-14 AOÛT.
+Maintenant, tu dois trouver l'autre. »
 
-Tous les cycles ont lieu le même jour.
+CHAPITRE 4 — L'AUTRE.`,
+choices:[
+{text:"➡️ Continuer",next:"chapter4_start"}
+]
+},
 
-Comme si l'hôtel ne connaissait qu'une seule journée.
+chapter3_end:{
+chapter:"CHAPITRE 3 — LES DISPARUS",
+location:"LAST CALL HOTEL",
+time:"02:12",
+speaker:"NARRATEUR",
+text:`Tu quittes la salle.
 
-Aujourd'hui.
+Derrière toi, un dernier téléphone sonne.
 
-Et toujours aujourd'hui.`,
+Tu ne te retournes pas.
 
-    choices: [
-        {
-            text: "▶ Continuer",
-            next: "chapter3_end"
-        }
-    ]
+Une voix murmure :
 
+« À bientôt. »
+
+Les lumières s'éteignent.
+
+CHAPITRE 4 — L'AUTRE.`,
+choices:[
+{text:"➡️ Continuer",next:"chapter4_start"}
+]
 }
 
 });
