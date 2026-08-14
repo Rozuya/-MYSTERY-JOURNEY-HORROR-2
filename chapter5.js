@@ -1,8 +1,8 @@
 "use strict";
 
-window.STORY=window.STORY||{};
+window.STORY = window.STORY || {};
 
-Object.assign(window.STORY,{
+Object.assign(window.STORY, {
 
 chapter5_start:{
 chapter:"CHAPITRE 5 — LE DERNIER APPEL",
@@ -23,17 +23,28 @@ Une voix répond.
 
 La tienne.
 
-« Tout ce que tu as vu depuis Blackwood était une seule et même histoire. »`,
+« Tout ce que tu as vu depuis Blackwood était une seule et même histoire. »
+
+Un silence.
+
+Puis :
+
+« Il est temps de choisir comment elle se termine. »`,
 choices:[
 {text:"📞 Demander la vérité",next:"truth"},
-{text:"🔇 Raccrocher",next:"silence"},
-{text:"🔥 Détruire le téléphone",next:"destroy"}
+{text:"🔇 Raccrocher",next:"silence_path"},
+{text:"📱 Répondre à l'appel",next:"answer_path"}
 ]
 },
 
+
+/* =========================================================
+   CHEMIN — LA VÉRITÉ
+========================================================= */
+
 truth:{
 chapter:"CHAPITRE 5 — LE DERNIER APPEL",
-location:"ROUTE 47",
+location:"LAST CALL HOTEL",
 time:"03:20",
 speaker:"TA VOIX",
 text:`« Blackwood n'était pas le début.
@@ -44,68 +55,62 @@ Ce sont des portes.
 
 Et toi...
 
-tu es la personne capable de les ouvrir. »
+tu es la personne capable de les ouvrir.
 
-Un silence.
-
-« Mais quelqu'un doit rester derrière. »`,
+Mais derrière chaque porte se trouve une version différente de ton histoire. »`,
 choices:[
-{text:"❓ Demander qui doit rester",next:"choice_guardian"},
-{text:"🚪 Chercher une sortie",next:"escape"},
-{text:"📞 Continuer l'appel",next:"final_truth"}
+{text:"🩸 Chercher toute la vérité",next:"truth_final"},
+{text:"🏨 Retourner dans l'hôtel",next:"hotel_path"},
+{text:"🪞 Chercher ton autre version",next:"other_path"}
 ]
 },
 
-choice_guardian:{
-chapter:"CHAPITRE 5 — LE DERNIER APPEL",
-location:"LAST CALL HOTEL",
+
+truth_final:{
+chapter:"CHAPITRE 5 — LA VÉRITÉ",
+location:"ARCHIVES",
 time:"03:24",
-speaker:"TA VOIX",
-text:`Tu retournes dans l'hôtel.
-
-Le hall est vide.
-
-Quinze téléphones sont posés devant toi.
-
-Tous affichent ton nom.
-
-Une dernière voix murmure :
-
-« Choisis. »`,
-choices:[
-{text:"🔒 Rester et devenir le gardien",next:"ending_guardian",end:"guardian"},
-{text:"🔥 Détruire les téléphones",next:"ending_destroy",end:"destroy"},
-{text:"🚪 Quitter l'hôtel",next:"ending_escape",end:"escape"}
-]
-},
-
-escape:{
-chapter:"CHAPITRE 5 — LE DERNIER APPEL",
-location:"ROUTE 47",
-time:"03:31",
 speaker:"NARRATEUR",
-text:`Tu démarres la voiture.
+text:`Tu avances dans les archives.
 
-L'hôtel disparaît derrière toi.
+Les dossiers racontent tout.
 
-La route devient normale.
+Blackwood.
 
-Tu continues pendant plusieurs kilomètres.
+Le Last Call.
 
-Puis ton téléphone s'allume.
+Les appels.
 
-APPEL ENTRANT — BLACKWOOD.
+Les survivants.
 
-Tu souris nerveusement.
+Puis tu trouves ton propre dossier.
 
-Tu comprends que le phénomène n'est pas terminé.`,
+Une seule phrase est inscrite sur la dernière page :
+
+« LE SUJET EST LE DERNIER À SAVOIR. »
+
+Tu comprends enfin.
+
+Tu n'étais pas choisi pour arrêter le phénomène.
+
+Tu étais choisi pour devenir sa prochaine victime.
+
+Mais une autre phrase apparaît :
+
+« À MOINS QU'IL NE DÉCOUVRE LA VÉRITÉ. »`,
 choices:[
-{text:"📞 Répondre",next:"ending_watched",end:"watched"},
-{text:"🔇 Éteindre le téléphone",next:"ending_escape",end:"escape"}
+{text:"🩸 Accepter la vérité",next:"ending_truth",end:"truth"},
+{text:"📼 Rechercher l'enregistrement original",next:"ending_cassette",end:"cassette"},
+{text:"🚪 Quitter les archives",next:"ending_after_blackwood",end:"after_blackwood"}
 ]
 },
 
-silence:{
+
+/* =========================================================
+   CHEMIN — RACCROCHER
+========================================================= */
+
+silence_path:{
 chapter:"CHAPITRE 5 — LE DERNIER APPEL",
 location:"ROUTE 47",
 time:"03:28",
@@ -114,306 +119,649 @@ text:`Tu raccroches.
 
 Le téléphone s'éteint.
 
-La route devient silencieuse.
+Pendant quelques secondes, tout semble normal.
 
-Pendant quelques secondes, tu crois être libre.
+Puis les lumières de la route disparaissent une par une.
 
-Puis...
-
-TOC.
-
-TOC.
-
-TOC.
-
-Quelqu'un frappe à la vitre arrière.`,
-choices:[
-{text:"👀 Regarder",next:"ending_watched",end:"watched"},
-{text:"🚗 Continuer",next:"ending_loop",end:"loop"}
-]
-},
-
-destroy:{
-chapter:"CHAPITRE 5 — LE DERNIER APPEL",
-location:"ROUTE 47",
-time:"03:30",
-speaker:"NARRATEUR",
-text:`Tu écrases le téléphone.
-
-L'écran se brise.
-
-Toutes les lumières autour de toi s'éteignent.
-
-Puis les téléphones de l'hôtel cessent de sonner.
-
-Pour la première fois...
-
-plus aucun appel.
-
-Tu crois avoir gagné.
-
-Mais un dernier message apparaît sur l'écran brisé :
-
-« UN APPEL RESTE. »`,
-choices:[
-{text:"📱 Lire le message",next:"ending_memory",end:"memory_end"},
-{text:"🚗 Partir sans regarder",next:"ending_escape",end:"escape"}
-]
-},
-
-final_truth:{
-chapter:"CHAPITRE 5 — LE DERNIER APPEL",
-location:"LAST CALL HOTEL",
-time:"03:35",
-speaker:"TA VOIX",
-text:`« Tu veux vraiment savoir ? »
-
-Les lumières s'allument.
-
-Tu vois des dizaines de portes.
-
-Derrière chacune...
-
-une autre version de toi.
-
-Certaines ont disparu.
-
-Certaines sont encore enfermées.
-
-Et toutes attendent la même chose.
-
-Quelqu'un pour prendre leur place.`,
-choices:[
-{text:"🪞 Chercher ton double",next:"ending_other",end:"mirror_end"},
-{text:"🚪 Refuser et partir",next:"ending_secret",end:"secret_escape"},
-{text:"🔒 Prendre leur place",next:"ending_guardian",end:"guardian"}
-]
-},
-
-ending_guardian:{
-chapter:"FIN",
-location:"LAST CALL HOTEL",
-time:"03:41",
-speaker:"NARRATEUR",
-text:`Tu restes.
-
-Les téléphones se taisent.
-
-Les portes se ferment.
-
-Tu comprends enfin ton rôle.
-
-Chaque fois qu'une personne reçoit un appel...
-
-tu seras là.
-
-À attendre.
-
-À prévenir.
-
-À choisir.
-
-Le Last Call a trouvé son nouveau gardien.`,
-choices:[
-{text:"🎬 Voir la fin",next:"ending_done",end:"guardian"}
-]
-},
-
-ending_destroy:{
-chapter:"FIN",
-location:"LAST CALL HOTEL",
-time:"03:43",
-speaker:"NARRATEUR",
-text:`Tu détruis le dernier téléphone.
-
-Une lumière blanche envahit l'hôtel.
-
-Les voix disparaissent.
-
-Les portes s'ouvrent.
-
-Tu cours dehors.
-
-Derrière toi, le Last Call s'effondre.
-
-Pour la première fois depuis Blackwood...
-
-le silence est réel.`,
-choices:[
-{text:"🎬 Voir la fin",next:"ending_done",end:"destroy"}
-]
-},
-
-ending_escape:{
-chapter:"FIN",
-location:"ROUTE 47",
-time:"04:02",
-speaker:"NARRATEUR",
-text:`Tu quittes définitivement la ville.
-
-Le soleil commence à se lever.
-
-Tu regardes ton téléphone.
+Ton téléphone se rallume.
 
 Aucun réseau.
 
-Aucun appel.
+Aucun message.
 
-Rien.
+Pourtant, une notification apparaît :
 
-Puis une notification apparaît.
-
-« BLACKWOOD — APPEL ENTRANT. »`,
+« TU AS CHOISI LE SILENCE. »`,
 choices:[
-{text:"🎬 Voir la fin",next:"ending_done",end:"escape"}
+{text:"🔇 Ne plus répondre",next:"ending_silence",end:"silence"},
+{text:"🚗 Continuer vers la ville",next:"offline_path"},
+{text:"🏨 Retourner au Last Call",next:"hotel_path"}
 ]
 },
 
-ending_watched:{
-chapter:"FIN",
+
+/* =========================================================
+   CHEMIN — RÉPONDRE
+========================================================= */
+
+answer_path:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
 location:"ROUTE 47",
-time:"04:07",
-speaker:"NARRATEUR",
-text:`Tu regardes dans le rétroviseur.
+time:"03:30",
+speaker:"TA VOIX",
+text:`« Tu as répondu.
 
-Personne.
+C'est tout ce qu'il fallait.
 
-Tu regardes à nouveau.
+Maintenant écoute attentivement.
 
-Une silhouette est assise derrière toi.
+Ne raccroche pas.
 
-Elle sourit.
+Ne regarde pas derrière toi.
 
-Ton téléphone affiche :
+Et surtout...
 
-« ILS TE REGARDENT. »`,
+ne prononce jamais ton propre nom. »`,
 choices:[
-{text:"🎬 Voir la fin",next:"ending_done",end:"watched"}
+{text:"📞 Continuer l'appel",next:"ending_answer",end:"answer"},
+{text:"👀 Regarder derrière toi",next:"ending_nobody",end:"nobody"},
+{text:"🔇 Raccrocher",next:"ending_new_cycle",end:"new_cycle"}
 ]
 },
 
-ending_loop:{
-chapter:"FIN",
-location:"ROUTE 47",
-time:"04:17",
+
+/* =========================================================
+   CHEMIN — L'HÔTEL
+========================================================= */
+
+hotel_path:{
+chapter:"CHAPITRE 5 — LE DERNIER APPEL",
+location:"LAST CALL HOTEL",
+time:"03:34",
 speaker:"NARRATEUR",
-text:`Tu continues.
+text:`Tu retournes dans le Last Call.
 
-Puis tu aperçois une enseigne.
+Les portes sont toutes ouvertes.
 
-LAST CALL HOTEL.
+Le hall est exactement comme lorsque tu es arrivé.
 
-Tu freines.
+Sauf qu'il y a maintenant quinze téléphones sur le comptoir.
+
+Tous sonnent.
+
+Sur le mur, une phrase est apparue :
+
+« UNE SEULE PORTE MÈNE À LA SORTIE. »`,
+choices:[
+{text:"🏨 Rester dans l'hôtel",next:"ending_hotel",end:"hotel"},
+{text:"🚪 Chercher la porte de sortie",next:"offline_path"},
+{text:"📞 Décrocher l'un des téléphones",next:"answer_path"}
+]
+},
+
+
+/* =========================================================
+   CHEMIN — L'AUTRE
+========================================================= */
+
+other_path:{
+chapter:"CHAPITRE 5 — L'AUTRE",
+location:"MIROIR",
+time:"03:38",
+speaker:"NARRATEUR",
+text:`Tu entres dans une pièce entièrement recouverte de miroirs.
+
+Au centre se trouve ton reflet.
+
+Mais il n'imite plus tes mouvements.
+
+Il te regarde.
+
+« Tu voulais comprendre qui j'étais ? »
+
+Il sourit.
+
+« Je suis celui qui a continué après Blackwood. »`,
+choices:[
+{text:"🪞 T'approcher du reflet",next:"ending_other",end:"other"},
+{text:"🪞 Détruire le miroir",next:"ending_mirror",end:"mirror"},
+{text:"🚪 Partir sans le regarder",next:"offline_path"}
+]
+},
+
+
+/* =========================================================
+   CHEMIN — HORS RÉSEAU
+========================================================= */
+
+offline_path:{
+chapter:"CHAPITRE 5 — HORS RÉSEAU",
+location:"ROUTE 47",
+time:"03:42",
+speaker:"NARRATEUR",
+text:`Tu quittes enfin le Last Call.
+
+Tu conduis pendant plusieurs kilomètres.
+
+La ville disparaît derrière toi.
+
+Puis ton téléphone affiche :
+
+AUCUN RÉSEAU.
+
+Tu continues.
+
+Pour la première fois depuis Blackwood, tu crois réellement être libre.
+
+Mais quelque chose apparaît dans ton rétroviseur.`,
+choices:[
+{text:"🚗 Continuer sans regarder",next:"ending_offline",end:"offline"},
+{text:"👀 Regarder le rétroviseur",next:"ending_last_survivor",end:"last_survivor"},
+{text:"📞 Vérifier ton téléphone",next:"ending_tomorrow",end:"tomorrow"}
+]
+},
+
+
+/* =========================================================
+   FIN — LE DERNIER APPEL
+========================================================= */
+
+ending_last_call:{
+chapter:"FIN",
+location:"LAST CALL HOTEL",
+time:"03:47",
+speaker:"NARRATEUR",
+text:`Tu décroches le dernier téléphone.
+
+La voix de l'autre côté est calme.
+
+« Tu voulais savoir pourquoi tous ces endroits existent. »
+
+Tu ne réponds pas.
+
+« Ils existent parce que quelqu'un doit toujours recevoir l'appel. »
 
 Tu comprends.
 
-La route t'a ramené au début.`,
-choices:[
-{text:"🎬 Voir la fin",next:"ending_done",end:"loop"}
-]
+Le dernier appel n'était pas destiné à quelqu'un d'autre.
+
+Il était destiné à toi.
+
+L'écran devient noir.
+
+FIN — LE DERNIER APPEL.`,
+choices:[]
 },
 
-ending_memory:{
+
+/* =========================================================
+   FIN — DÉCROCHE
+========================================================= */
+
+ending_answer:{
 chapter:"FIN",
 location:"ROUTE 47",
-time:"04:20",
+time:"03:49",
+speaker:"TA VOIX",
+text:`Tu gardes le téléphone contre ton oreille.
+
+La voix murmure :
+
+« Maintenant tu sais.
+
+Mais savoir ne signifie pas pouvoir partir. »
+
+La communication coupe.
+
+Ton téléphone affiche un nouveau contact.
+
+TON PROPRE NOM.
+
+Tu comprends que quelqu'un attend déjà ton prochain appel.
+
+FIN — DÉCROCHE.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — SILENCE
+========================================================= */
+
+ending_silence:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"03:51",
 speaker:"NARRATEUR",
-text:`Tu rentres chez toi.
+text:`Tu refuses de répondre.
 
-Tu poses ton téléphone.
+Tu continues à conduire.
 
-Tu t'allonges.
+Les appels cessent.
 
-Puis tu réalises quelque chose.
+Le silence revient.
 
-Tu ne te souviens plus de Blackwood.
+Pourtant, quelque chose reste avec toi.
 
-Ni du Last Call.
+Tu ne sais pas quoi.
 
-Ni de cette nuit.
+Mais tu sais une chose :
+
+tu ne décrocheras plus jamais.
+
+FIN — SILENCE.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — L'HÔTEL
+========================================================= */
+
+ending_hotel:{
+chapter:"FIN",
+location:"LAST CALL HOTEL",
+time:"03:55",
+speaker:"NARRATEUR",
+text:`Tu restes dans le Last Call.
+
+Les portes se ferment une par une.
+
+Les fenêtres disparaissent.
+
+Le hall devient plus petit.
+
+Puis tu comprends.
+
+L'hôtel n'est plus un bâtiment.
+
+Il est devenu ton monde.
+
+Un téléphone sonne derrière le comptoir.
+
+Tu te retournes.
+
+FIN — L'HÔTEL.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — LE NOUVEAU CYCLE
+========================================================= */
+
+ending_new_cycle:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"03:58",
+speaker:"NARRATEUR",
+text:`Tu raccroches.
+
+Le monde devient noir.
+
+Puis tu ouvres les yeux.
+
+Tu es de nouveau devant Blackwood.
+
+La même pluie.
+
+La même route.
+
+La même heure.
 
 Ton téléphone sonne.
 
-Tu ne sais pas pourquoi...
+Tu comprends.
 
-mais tu connais déjà le numéro.`,
-choices:[
-{text:"🎬 Voir la fin",next:"ending_done",end:"memory_end"}
-]
+Tout recommence.
+
+FIN — LE NOUVEAU CYCLE.`,
+choices:[]
 },
+
+
+/* =========================================================
+   FIN — L'AUTRE
+========================================================= */
 
 ending_other:{
 chapter:"FIN",
 location:"MIROIR",
-time:"04:25",
+time:"04:01",
 speaker:"NARRATEUR",
-text:`Ton reflet te regarde.
-
-Il sourit.
+text:`Ton reflet sourit.
 
 Puis il sort du miroir.
 
-Toi, tu restes prisonnier derrière la vitre.
+Tu essaies de bouger.
 
-Le monde extérieur continue normalement.
+Impossible.
 
-Personne ne remarque la différence.
+Ton reflet prend ta place.
 
-Ton reflet vient de prendre ta place.`,
-choices:[
-{text:"🎬 Voir la fin",next:"ending_done",end:"mirror_end"}
-]
+Dehors, personne ne remarque la différence.
+
+Lui continue ta vie.
+
+Toi...
+
+tu restes derrière la vitre.
+
+FIN — L'AUTRE.`,
+choices:[]
 },
 
-ending_secret:{
+
+/* =========================================================
+   FIN — LE REFLET
+========================================================= */
+
+ending_mirror:{
+chapter:"FIN",
+location:"MIROIR",
+time:"04:04",
+speaker:"NARRATEUR",
+text:`Tu frappes le miroir.
+
+Une fissure apparaît.
+
+Puis une deuxième.
+
+Le miroir explose.
+
+Ton reflet disparaît.
+
+Pendant quelques secondes, tu crois avoir gagné.
+
+Puis un morceau de verre au sol bouge.
+
+Ton reflet est toujours là.
+
+Il te regarde depuis l'autre côté.
+
+FIN — LE REFLET.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — HORS RÉSEAU
+========================================================= */
+
+ending_offline:{
 chapter:"FIN",
 location:"ROUTE 47",
-time:"04:30",
+time:"04:09",
 speaker:"NARRATEUR",
-text:`Tu refuses.
+text:`Tu continues de rouler.
 
-Tu quittes l'hôtel.
+La ville disparaît complètement.
 
-Tu ne réponds plus jamais aux appels.
+Plus de réseau.
 
-Tu ne retournes jamais à Blackwood.
+Plus d'appels.
 
-Mais une question reste dans ta tête.
+Plus de Blackwood.
 
-Pourquoi toi ?
+Tu arrives enfin chez toi.
 
-Tu sais que tu n'as découvert qu'une partie de la vérité.`,
-choices:[
-{text:"🎬 Voir la fin",next:"ending_done",end:"secret_escape"}
-]
+Tu poses ton téléphone.
+
+Une dernière notification apparaît :
+
+« HORS RÉSEAU. »
+
+Puis l'écran s'éteint.
+
+FIN — HORS RÉSEAU.`,
+choices:[]
 },
 
-ending_done:{
+
+/* =========================================================
+   FIN — LA CASSETTE
+========================================================= */
+
+ending_cassette:{
 chapter:"FIN",
-location:"ÉCRAN NOIR",
-time:"",
+location:"ARCHIVES",
+time:"04:13",
+speaker:"VOIX ENREGISTRÉE",
+text:`Tu retrouves l'enregistrement original.
+
+La bande commence.
+
+Une voix murmure :
+
+« Blackwood n'était pas le premier.
+
+Et le Last Call ne sera pas le dernier.
+
+Il y aura toujours une porte.
+
+Toujours un appel.
+
+Toujours quelqu'un pour écouter. »
+
+La cassette s'arrête.
+
+Tu comprends que l'histoire ne se termine pas ici.
+
+FIN — LA CASSETTE.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — APRÈS BLACKWOOD
+========================================================= */
+
+ending_after_blackwood:{
+chapter:"FIN",
+location:"ARCHIVES",
+time:"04:17",
 speaker:"NARRATEUR",
-text:`Écran noir.
+text:`Tu regardes tous les dossiers.
 
-Un téléphone sonne.
+Blackwood.
 
-Une fois.
+Le Last Call.
+
+D'autres maisons.
+
+D'autres hôtels.
+
+D'autres survivants.
+
+Tu comprends enfin.
+
+Blackwood n'était qu'un endroit parmi des centaines.
+
+Et quelque part...
+
+un autre téléphone vient de sonner.
+
+FIN — APRÈS BLACKWOOD.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — LE DERNIER SURVIVANT
+========================================================= */
+
+ending_last_survivor:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"04:21",
+speaker:"NARRATEUR",
+text:`Tu regardes dans le rétroviseur.
+
+La silhouette est toujours là.
+
+Tu t'arrêtes.
+
+La porte arrière s'ouvre.
+
+Une personne descend.
+
+Tu la reconnais.
+
+Un survivant de Blackwood.
+
+Il te regarde et murmure :
+
+« Tu n'aurais jamais dû revenir. »
+
+Puis il disparaît dans la nuit.
+
+FIN — LE DERNIER SURVIVANT.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — LA CHAMBRE 17
+========================================================= */
+
+ending_room17:{
+chapter:"FIN",
+location:"CHAMBRE 17",
+time:"04:25",
+speaker:"NARRATEUR",
+text:`Tu ouvres la porte de la chambre 17.
+
+La pièce est vide.
+
+Sur le lit repose une photographie.
+
+C'est toi.
+
+Debout devant la chambre.
+
+Mais la photo a été prise demain.
+
+Au dos, une phrase :
+
+« TU ES DÉJÀ VENU ICI. »
+
+FIN — LA CHAMBRE 17.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — DEMAIN
+========================================================= */
+
+ending_tomorrow:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"04:29",
+speaker:"NARRATEUR",
+text:`Tu regardes ton téléphone.
+
+Une vidéo apparaît.
+
+Tu la lances.
+
+C'est toi.
+
+Tu es assis dans la même voiture.
+
+Tu regardes la caméra.
+
+Puis tu dis :
+
+« Si tu regardes cette vidéo...
+
+c'est que tu n'as pas encore compris. »
+
+La vidéo date de demain.
+
+FIN — DEMAIN.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — PERSONNE NE RÉPOND
+========================================================= */
+
+ending_nobody:{
+chapter:"FIN",
+location:"ROUTE 47",
+time:"04:33",
+speaker:"NARRATEUR",
+text:`Tu regardes derrière toi.
+
+Personne.
+
+Tu regardes ton téléphone.
+
+L'appel est toujours actif.
+
+Mais personne ne parle.
+
+Tu dis :
+
+« Allô ? »
 
 Silence.
 
-Deux fois.
+Puis quelqu'un frappe à la vitre.
 
-Puis une voix murmure :
+TOC.
 
-« Vous avez trouvé le premier. »
+TOC.
 
-Une respiration.
+TOC.
 
-« Maintenant...
+Tu te retournes.
 
-trouvez le deuxième. »
+Personne.
 
-ÉCRAN NOIR.`,
+Ton téléphone affiche :
+
+« PERSONNE NE RÉPOND. »
+
+FIN — PERSONNE NE RÉPOND.`,
+choices:[]
+},
+
+
+/* =========================================================
+   FIN — LA VÉRITÉ
+========================================================= */
+
+ending_truth:{
+chapter:"FIN",
+location:"ARCHIVES",
+time:"04:37",
+speaker:"NARRATEUR",
+text:`Tu comprends enfin.
+
+Le phénomène ne cherche pas à te tuer.
+
+Il cherche quelqu'un capable de prendre ta place.
+
+Blackwood.
+
+Le Last Call.
+
+Les appels.
+
+Tout était destiné à te conduire ici.
+
+Tu refermes ton dossier.
+
+Sur la dernière page apparaît une phrase :
+
+« MAINTENANT, TU SAIS. »
+
+Le téléphone sonne.
+
+FIN — LA VÉRITÉ.`,
 choices:[]
 }
 
