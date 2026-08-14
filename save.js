@@ -2,198 +2,292 @@
 
 window.SaveSystem = (() => {
 
-const SAVE_KEY = "mystery_journey_horror_2_save_v1";
-const ENDINGS_KEY = "mystery_journey_horror_2_endings";
-const VOLUME_KEY = "mystery_journey_horror_2_volume";
+    const SAVE_KEY =
+        "mystery_journey_horror_2_save_v1";
 
+    /*
+       Clé utilisée par l'accueil ET le jeu.
+    */
+    const ENDINGS_KEY =
+        "mystery_journey_horror_2_endings_v1";
 
-function save(data){
+    const VOLUME_KEY =
+        "mystery_journey_horror_2_volume";
 
-try{
 
-localStorage.setItem(
-SAVE_KEY,
-JSON.stringify(data)
-);
+    /* =========================================================
+       SAUVEGARDE
+    ========================================================= */
 
-return true;
+    function save(data){
 
-}catch(error){
+        try{
 
-console.error("Sauvegarde impossible :",error);
-return false;
+            localStorage.setItem(
+                SAVE_KEY,
+                JSON.stringify(data)
+            );
 
-}
+            return true;
 
-}
+        }catch(error){
 
+            console.error(
+                "Sauvegarde impossible :",
+                error
+            );
 
-function load(){
+            return false;
+        }
+    }
 
-try{
 
-const data =
-localStorage.getItem(SAVE_KEY);
+    /* =========================================================
+       CHARGEMENT
+    ========================================================= */
 
-return data
-? JSON.parse(data)
-: null;
+    function load(){
 
-}catch(error){
+        try{
 
-console.error("Chargement impossible :",error);
-return null;
+            const data =
+                localStorage.getItem(
+                    SAVE_KEY
+                );
 
-}
+            return data
+                ? JSON.parse(data)
+                : null;
 
-}
+        }catch(error){
 
+            console.error(
+                "Chargement impossible :",
+                error
+            );
 
-function clear(){
+            return null;
+        }
+    }
 
-try{
 
-localStorage.removeItem(SAVE_KEY);
+    /* =========================================================
+       NOUVELLE PARTIE
+       IMPORTANT :
+       ON SUPPRIME UNIQUEMENT LA SAUVEGARDE.
+       LES FINS RESTENT.
+    ========================================================= */
 
-}catch(error){
+    function clear(){
 
-console.error("Suppression impossible :",error);
+        try{
 
-}
+            localStorage.removeItem(
+                SAVE_KEY
+            );
 
-}
+        }catch(error){
 
+            console.error(
+                "Suppression impossible :",
+                error
+            );
+        }
+    }
 
-function setVolume(value){
 
-try{
+    /* =========================================================
+       VOLUME
+    ========================================================= */
 
-const v=Math.max(
-0,
-Math.min(1,Number(value)||0)
-);
+    function setVolume(value){
 
-localStorage.setItem(
-VOLUME_KEY,
-String(v)
-);
+        try{
 
-}catch(error){
+            const v =
+                Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        Number(value) || 0
+                    )
+                );
 
-console.error("Volume impossible :",error);
+            localStorage.setItem(
+                VOLUME_KEY,
+                String(v)
+            );
 
-}
+        }catch(error){
 
-}
+            console.error(
+                "Volume impossible :",
+                error
+            );
+        }
+    }
 
 
-function volume(){
+    function volume(){
 
-try{
+        try{
 
-const value =
-localStorage.getItem(VOLUME_KEY);
+            const value =
+                localStorage.getItem(
+                    VOLUME_KEY
+                );
 
-if(value===null)return 0.45;
+            if(value === null){
 
-const v=Number(value);
+                return 0.45;
+            }
 
-return Number.isFinite(v)
-?Math.max(0,Math.min(1,v))
-:.45;
+            const v =
+                Number(value);
 
-}catch(error){
+            return Number.isFinite(v)
+                ? Math.max(
+                    0,
+                    Math.min(1,v)
+                )
+                : 0.45;
 
-return .45;
+        }catch(error){
 
-}
+            return 0.45;
+        }
+    }
 
-}
 
+    /* =========================================================
+       FINS
+    ========================================================= */
 
-function getEndings(){
+    function getEndings(){
 
-try{
+        try{
 
-const data =
-localStorage.getItem(ENDINGS_KEY);
+            const data =
+                localStorage.getItem(
+                    ENDINGS_KEY
+                );
 
-const endings =
-data ? JSON.parse(data) : [];
+            const endings =
+                data
+                    ? JSON.parse(data)
+                    : [];
 
-return Array.isArray(endings)
-?endings
-:[];
 
-}catch(error){
+            return Array.isArray(endings)
+                ? endings
+                : [];
 
-return [];
+        }catch(error){
 
-}
+            console.error(
+                "Lecture des fins impossible :",
+                error
+            );
 
-}
+            return [];
+        }
+    }
 
 
-function unlockEnding(id){
+    function unlockEnding(id){
 
-if(!id)return;
+        if(!id){
+            return;
+        }
 
-try{
 
-const endings=getEndings();
+        try{
 
-if(!endings.includes(id)){
+            const endings =
+                getEndings();
 
-endings.push(id);
 
-localStorage.setItem(
-ENDINGS_KEY,
-JSON.stringify(endings)
-);
+            if(
+                !endings.includes(id)
+            ){
 
-}
+                endings.push(id);
 
-}catch(error){
 
-console.error(
-"Impossible de sauvegarder la fin :",
-error
-);
+                localStorage.setItem(
+                    ENDINGS_KEY,
+                    JSON.stringify(
+                        endings
+                    )
+                );
+            }
 
-}
 
-}
+            console.log(
+                "🏆 Fin débloquée :",
+                id
+            );
 
+        }catch(error){
 
-function hasSave(){
+            console.error(
+                "Impossible de sauvegarder la fin :",
+                error
+            );
+        }
+    }
 
-try{
 
-return localStorage.getItem(SAVE_KEY)!==null;
+    /* =========================================================
+       VÉRIFIER UNE FIN
+    ========================================================= */
 
-}catch(error){
+    function hasEnding(id){
 
-return false;
+        return getEndings().includes(id);
+    }
 
-}
 
-}
+    /* =========================================================
+       SAUVEGARDE EXISTANTE
+    ========================================================= */
 
+    function hasSave(){
 
-return{
+        try{
 
-save,
-load,
-clear,
+            return (
+                localStorage.getItem(
+                    SAVE_KEY
+                ) !== null
+            );
 
-setVolume,
-volume,
+        }catch(error){
 
-getEndings,
-unlockEnding,
+            return false;
+        }
+    }
 
-hasSave
 
-};
+    /* =========================================================
+       API PUBLIQUE
+    ========================================================= */
+
+    return {
+
+        save,
+        load,
+        clear,
+
+        setVolume,
+        volume,
+
+        getEndings,
+        unlockEnding,
+        hasEnding,
+
+        hasSave
+
+    };
 
 })();
