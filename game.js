@@ -12,6 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const params = new URLSearchParams(location.search);
 
+    /* =====================================================
+       NOUVELLE PARTIE
+    ===================================================== */
+
     function fresh() {
         return {
             scene: "start",
@@ -25,6 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
+    /* =====================================================
+       ALIAS
+    ===================================================== */
+
     const aliases = {
         chapter1_start: "chapter1_begin",
         chapter2_begin: "chapter2_start",
@@ -35,11 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function resolve(id) {
         if (STORY[id]) return id;
-
         return aliases[id] && STORY[aliases[id]]
             ? aliases[id]
             : id;
     }
+
+    /* =====================================================
+       NOTIFICATION
+    ===================================================== */
 
     function toast(text) {
         const e = $("toast");
@@ -55,12 +66,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2200);
     }
 
+    /* =====================================================
+       NETTOYAGE TEXTE
+    ===================================================== */
+
     function clean(text) {
         return String(text || "")
             .replace(/\r\n/g, "\n")
             .replace(/\n{3,}/g, "\n\n")
             .trim();
     }
+
+    /* =====================================================
+       SAUVEGARDE
+    ===================================================== */
 
     function save(show = false) {
 
@@ -79,6 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return ok;
     }
 
+    /* =====================================================
+       CHARGEMENT
+    ===================================================== */
+
     function load() {
 
         if (!SAVE || typeof SAVE.load !== "function") {
@@ -94,12 +117,8 @@ document.addEventListener("DOMContentLoaded", () => {
         game = {
             ...fresh(),
             ...data,
-            clues: Array.isArray(data.clues)
-                ? data.clues
-                : [],
-            items: Array.isArray(data.items)
-                ? data.items
-                : [],
+            clues: Array.isArray(data.clues) ? data.clues : [],
+            items: Array.isArray(data.items) ? data.items : [],
             decisions: Array.isArray(data.decisions)
                 ? data.decisions
                 : [],
@@ -112,6 +131,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return !!STORY[game.scene];
     }
+
+    /* =====================================================
+       STATISTIQUES
+    ===================================================== */
 
     function stats() {
 
@@ -159,6 +182,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!audio) return;
 
+        /*
+         * Le fichier présent dans ton GitHub est :
+         * The Last Call.mp3
+         *
+         * On force également la source ici pour éviter
+         * une erreur de nom dans game.html.
+         */
+
         const source =
             audio.querySelector("source");
 
@@ -204,12 +235,22 @@ document.addEventListener("DOMContentLoaded", () => {
         function playMusic() {
 
             audio.play().catch(() => {
-                // Autoplay éventuellement bloqué par le navigateur.
+                /*
+                 * Le navigateur peut bloquer
+                 * l'autoplay avant le premier clic.
+                 */
             });
         }
 
+        /*
+         * Tentative immédiate.
+         */
         playMusic();
 
+        /*
+         * Premier toucher/clic :
+         * parfait pour Android/mobile.
+         */
         document.addEventListener(
             "pointerdown",
             playMusic,
@@ -458,7 +499,10 @@ document.addEventListener("DOMContentLoaded", () => {
             choice.clue &&
             !game.clues.includes(choice.clue)
         ) {
+
             game.clues.push(choice.clue);
+
+            /* notification supprimée */
         }
 
         /* OBJET */
@@ -467,7 +511,10 @@ document.addEventListener("DOMContentLoaded", () => {
             choice.item &&
             !game.items.includes(choice.item)
         ) {
+
             game.items.push(choice.item);
+
+            /* notification supprimée */
         }
 
         stats();
