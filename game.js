@@ -13,13 +13,18 @@ let game={
  items:[],
  decisions:[],
  endings:[],
- started:Date.now()
+ started:Date.now(),
+ lastSaved:Date.now()
 };
 
 let typing=false;
 let timer=null;
 
-function fresh(){
+const params=new URLSearchParams(location.search);
+const forceNew=params.get("new")==="1";
+const forceContinue=params.get("continue")==="1";
+
+function freshGame(){
  return{
   scene:"start",
   chapter:"PROLOGUE",
@@ -27,7 +32,8 @@ function fresh(){
   items:[],
   decisions:[],
   endings:[],
-  started:Date.now()
+  started:Date.now(),
+  lastSaved:Date.now()
  };
 }
 
@@ -36,12 +42,13 @@ function toast(text){
  if(!e)return;
  e.textContent=text;
  e.classList.add("show");
- clearTimeout(e._t);
- e._t=setTimeout(()=>e.classList.remove("show"),2200);
+ clearTimeout(e._timer);
+ e._timer=setTimeout(()=>e.classList.remove("show"),2200);
 }
 
-function save(show=true){
+function save(show=false){
  if(!Save)return false;
+ game.lastSaved=Date.now();
  const ok=Save.save(game);
  if(show&&ok)toast("💾 Partie sauvegardée");
  return ok;
@@ -52,11 +59,14 @@ function load(){
  const data=Save.load();
  if(!data)return false;
 
- game=data;
- game.clues=Array.isArray(game.clues)?game.clues:[];
- game.items=Array.isArray(game.items)?game.items:[];
- game.decisions=Array.isArray(game.decisions)?game.decisions:[];
- game.endings=Array.isArray(game.endings)?game.endings:[];
+ game={
+  ...freshGame(),
+  ...data,
+  clues:Array.isArray(data.clues)?data.clues:[],
+  items:Array.isArray(data.items)?data.items:[],
+  decisions:Array.isArray(data.decisions)?data.decisions:[],
+  endings:Array.isArray(data.endings)?data.endings:[]
+ };
 
  return true;
 }
@@ -71,53 +81,43 @@ function updateStats(){
 
  if(p){
   const total=Math.max(Object.keys(scenes).length,1);
-  const value=Math.min(
-   99,
-   Math.round((game.decisions.length/total)*100)
-  );
-  p.textContent=value+"%";
+  const used=new Set(game.decisions.map(x=>x.scene)).size;
+  const percent=Math.min(99,Math.round(used/total*100));
+  p.textContent=percent+"%";
  }
 }
 
-function music(){
+function setupMusic(){
  const audio=$("music");
+ const volume=$("volume");
+ const value=$("volumeValue");
+
  if(!audio)return;
 
- let volume=.45;
+ let v=Save&&Save.volume?Number(Save.volume()):.45;
+ if(!Number.isFinite(v))v=.45;
 
- if(Save&&typeof Save.volume==="function"){
-  volume=Number(Save.volume());
-  if(!Number.isFinite(volume))volume=.45;
- }
+ audio.volume=v;
 
- audio.volume=volume;
-
- const slider=$("volume");
- const value=$("volumeValue");
-
- if(slider)slider.value=Math.round(volume*100);
- if(value)value.textContent=Math.round(volume*100)+"%";
-
- audio.play().catch(()=>{});
-}
-
-function setVolume(){
- const slider=$("volume");
- if(!slider)return;
-
- const v=Math.max(
-  0,
-  Math.min(100,Number(slider.value)||0)
- )/100;
-
- const audio=$("music");
- const value=$("volumeValue");
-
- if(audio)audio.volume=v;
+ if(volume)volume.value=Math.round(v*100);
  if(value)value.textContent=Math.round(v*100)+"%";
 
- if(Save&&typeof Save.setVolume==="function")
-  Save.setVolume(v);
+ function play(){
+  audio.play().catch(()=>{});
+ }
+
+ play();
+
+ document.addEventListener("click",play,{once:true});
+
+ if(volume){
+  volume.addEventListener("input",()=>{
+   const n=Math.max(0,Math.min(100,Number(volume.value)||0))/100;
+   audio.volume=n;
+   if(value)value.textContent=Math.round(n*100)+"%";
+   if(Save&&Save.setVolume)Save.setVolume(n);
+  });
+ }
 }
 
 function typeText(text,done){
@@ -125,14 +125,18 @@ function typeText(text,done){
  typing=true;
 
  const box=$("storyText");
- if(!box)return;
+ if(!box){
+  typing=false;
+  if(done)done();
+  return;
+ }
 
  box.textContent="";
- let n=0;
+ let i=0;
 
  timer=setInterval(()=>{
-  box.textContent+=text.charAt(n++);
-  if(n>=text.length){
+  box.textContent+=text.charAt(i++);
+  if(i>=text.length){
    clearInterval(timer);
    typing=false;
    if(done)done();
@@ -154,30 +158,43 @@ function showScene(id){
  const scene=scenes[id];
 
  if(!scene){
+  console.error("Scène introuvable :",id);
   endGame("unknown");
   return;
  }
 
  game.scene=id;
- if(scene.chapter)game.chapter=scene.chapter;
+
+ if(scene.chapter)
+  game.chapter=scene.chapter;
 
  const chapter=$("chapter");
  const location=$("location");
  const time=$("time");
  const speaker=$("speaker");
+ const choices=$("choices");
 
  if(chapter)chapter.textContent=scene.chapter||"MYSTERY JOURNEY";
  if(location)location.textContent=scene.location||"UNKNOWN";
  if(time)time.textContent=scene.time||"";
  if(speaker)speaker.textContent=scene.speaker||"";
-
- const choices=$("choices");
  if(choices)choices.innerHTML="";
 
  updateStats();
+ save(false);
 
  typeText(scene.text||"",()=>renderChoices(scene));
- save(false);
+}
+
+function conditionOK(condition){
+ if(typeof condition!=="function")return true;
+
+ try{
+  return !!condition(game);
+ }catch(e){
+  console.error("Erreur condition :",e);
+  return false;
+ }
 }
 
 function renderChoices(scene){
@@ -186,31 +203,30 @@ function renderChoices(scene){
 
  box.innerHTML="";
 
- const choices=Array.isArray(scene.choices)
-  ?scene.choices
-  :[];
+ (Array.isArray(scene.choices)?scene.choices:[]).forEach((choice,index)=>{
 
- choices.forEach((choice,index)=>{
+  if(choice.condition&&!conditionOK(choice.condition))
+   return;
 
   const button=document.createElement("button");
   button.className="choice";
   button.type="button";
-  button.textContent=choice.text||"Choisir";
+  button.textContent=choice.text||"Continuer";
 
-  button.onclick=()=>{
+  button.addEventListener("click",()=>{
    if(typing){
     finishTyping(scene);
     return;
    }
 
-   choose(scene,choice,index);
-  };
+   choose(choice,index);
+  });
 
   box.appendChild(button);
  });
 }
 
-function choose(scene,choice,index){
+function choose(choice,index){
 
  game.decisions.push({
   scene:game.scene,
@@ -221,16 +237,20 @@ function choose(scene,choice,index){
  if(typeof choice.effect==="function"){
   try{
    choice.effect(game);
-  }catch(error){
-   console.error("Erreur effet :",error);
+  }catch(e){
+   console.error("Erreur effet :",e);
   }
  }
 
- if(choice.clue&&!game.clues.includes(choice.clue))
+ if(choice.clue&&!game.clues.includes(choice.clue)){
   game.clues.push(choice.clue);
+  toast("🔎 Nouvel indice");
+ }
 
- if(choice.item&&!game.items.includes(choice.item))
+ if(choice.item&&!game.items.includes(choice.item)){
   game.items.push(choice.item);
+  toast("🎒 Objet obtenu");
+ }
 
  updateStats();
  save(false);
@@ -245,104 +265,38 @@ function choose(scene,choice,index){
   return;
  }
 
- renderChoices(scene);
+ save(false);
 }
+
+const endings={
+ good:["🌅","LA VÉRITÉ","Le cycle est terminé. Blackwood disparaît derrière toi."],
+ loop:["🔄","LE CYCLE","La route 47 recommence encore."],
+ destroy:["🔥","LE FEU","Blackwood brûle et les voix disparaissent."],
+ guardian:["🔒","LE GARDIEN","Tu es devenu le nouveau gardien."],
+ escape:["🚗","L'ÉCHAPPÉE","Tu quittes les lieux, mais quelque chose marche toujours derrière toi."],
+ watched:["👁️","ILS TE REGARDENT","Quelqu'un se tient derrière toi, même lorsque tu ne vois personne."],
+ mirror_end:["🪞","LE REFLET","Ton reflet est désormais libre."],
+ memory_end:["🧠","L'OUBLI","Tu as tout oublié, mais l'histoire recommence."],
+ house_end:["🚪","LA PORTE","Tu quittes la maison sans jamais regarder derrière toi."],
+ chapter1_escape:["🏃","TROP TÔT","Tu as quitté Blackwood avant de découvrir toute la vérité."],
+ basement_end:["⬇️","LE SOUS-SOL","Tu es enfermé. Des voix utilisent maintenant ta propre voix."],
+ secret_escape:["🔑","LE SECRET","Tu refuses d'ouvrir la dernière porte et pars."],
+ upper_end:["👤","LA SILHOUETTE","La silhouette est déjà derrière toi."],
+ survivor_end:["🕯️","LE SURVIVANT","Tu marches jusqu'à l'aube, mais ton ombre n'est pas seule."]
+};
 
 function endGame(id){
 
- if(id&&!game.endings.includes(id))
-  game.endings.push(id);
+ if(id&&id!=="unknown"){
+
+  if(!game.endings.includes(id))
+   game.endings.push(id);
+
+  if(Save&&Save.unlockEnding)
+   Save.unlockEnding(id);
+ }
 
  save(false);
-
- const data={
-  good:{
-   title:"LA VÉRITÉ",
-   icon:"🌅",
-   text:"Tu as compris le fonctionnement de Blackwood. Pour la première fois depuis des décennies, le cycle est brisé."
-  },
-  loop:{
-   title:"LE CYCLE",
-   icon:"🔄",
-   text:"Tu pensais être sorti. Pourtant, la route devant toi mène encore à la maison."
-  },
-  destroy:{
-   title:"LE FEU",
-   icon:"🔥",
-   text:"Les archives brûlent. Les voix se taisent. Blackwood disparaît dans les flammes."
-  },
-  guardian:{
-   title:"LE GARDIEN",
-   icon:"🔒",
-   text:"Tu as pris la place du gardien. La maison est désormais silencieuse."
-  },
-  escape:{
-   title:"L'ÉCHAPPÉE",
-   icon:"🚗",
-   text:"Tu quittes Blackwood avant de comprendre toute la vérité. Puis ton téléphone sonne."
-  },
-  watched:{
-   title:"ILS TE REGARDENT",
-   icon:"👁️",
-   text:"Tu comprends trop tard que tu n'as jamais vraiment quitté Blackwood."
-  },
-  mirror_end:{
-   title:"LE REFLET",
-   icon:"🪞",
-   text:"Ton reflet ne t'appartient plus."
-  },
-  memory_end:{
-   title:"L'OUBLI",
-   icon:"🧠",
-   text:"Tu acceptes d'oublier. Mais quelque chose continue de te suivre."
-  },
-  house_end:{
-   title:"LA PORTE",
-   icon:"🚪",
-   text:"Tu quittes la maison. Derrière toi, la porte se referme doucement."
-  },
-  chapter1_escape:{
-   title:"TROP TÔT",
-   icon:"🏃",
-   text:"Tu quittes Blackwood avant de découvrir ce qu'elle cache."
-  },
-  basement_end:{
-   title:"LE SOUS-SOL",
-   icon:"⬇️",
-   text:"Les portes se ferment autour de toi."
-  },
-  secret_escape:{
-   title:"LE SECRET",
-   icon:"🔑",
-   text:"Tu refuses d'ouvrir la porte. Peut-être était-ce la meilleure décision."
-  },
-  upper_end:{
-   title:"LA SILHOUETTE",
-   icon:"👤",
-   text:"Lorsque tu descends l'escalier, elle est déjà derrière toi."
-  },
-  survivor_end:{
-   title:"LE SURVIVANT",
-   icon:"🕯️",
-   text:"Tu laisses l'inconnu derrière toi."
-  },
-  house_escape:{
-   title:"LA FUITE",
-   icon:"🏚️",
-   text:"Tu trouves une sortie. Blackwood reste derrière toi."
-  },
-  prologue_escape:{
-   title:"LA FUITE",
-   icon:"🚗",
-   text:"Tu quittes la route 47. Tu ne sauras jamais ce qui se trouvait dans la maison."
-  }
- };
-
- const info=data[id]||{
-  title:"FIN",
-  icon:"❓",
-  text:"L'histoire se termine ici."
- };
 
  const gameBox=$("game");
  const ending=$("ending");
@@ -350,19 +304,25 @@ function endGame(id){
  if(gameBox)gameBox.classList.add("hidden");
  if(ending)ending.classList.remove("hidden");
 
+ const data=endings[id]||[
+  "❓",
+  "FIN",
+  "L'histoire se termine ici."
+ ];
+
  const icon=$("endingIcon");
  const title=$("endingTitle");
  const text=$("endingText");
 
- if(icon)icon.textContent=info.icon;
- if(title)title.textContent=info.title;
- if(text)text.textContent=info.text;
+ if(icon)icon.textContent=data[0];
+ if(title)title.textContent=data[1];
+ if(text)text.textContent=data[2];
 }
 
-function restart(){
+function newGame(){
  if(Save)Save.clear();
 
- game=fresh();
+ game=freshGame();
 
  const ending=$("ending");
  const gameBox=$("game");
@@ -373,8 +333,8 @@ function restart(){
  showScene("start");
 }
 
-function again(){
- game=fresh();
+function replay(){
+ game=freshGame();
 
  const ending=$("ending");
  const gameBox=$("game");
@@ -385,43 +345,37 @@ function again(){
  showScene("start");
 }
 
-const volume=$("volume");
 const saveBtn=$("saveBtn");
 const restartBtn=$("restartBtn");
 const againBtn=$("againBtn");
 const menuBtn=$("menuBtn");
 
-if(volume)
- volume.addEventListener("input",setVolume);
-
 if(saveBtn)
  saveBtn.addEventListener("click",()=>save(true));
 
 if(restartBtn)
- restartBtn.addEventListener("click",restart);
+ restartBtn.addEventListener("click",newGame);
 
 if(againBtn)
- againBtn.addEventListener("click",again);
+ againBtn.addEventListener("click",replay);
 
 if(menuBtn)
  menuBtn.addEventListener("click",()=>{
   save(false);
-  window.location.href="index.html";
- });
+  location.href="index.html";
+});
 
-document.addEventListener("click",()=>{
- const audio=$("music");
- if(audio&&audio.paused)
-  audio.play().catch(()=>{});
-},{once:true});
+setupMusic();
 
-music();
-
-if(load()){
+if(forceNew){
+ newGame();
+}else if(forceContinue){
+ if(load())showScene(game.scene);
+ else newGame();
+}else if(load()){
  toast("📂 Partie chargée");
- showScene(game.scene||"start");
+ showScene(game.scene);
 }else{
- game=fresh();
  showScene("start");
 }
 
