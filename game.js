@@ -45,7 +45,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     function resolve(id){
-        if(STORY[id]) return id;
+
+        if(STORY[id]){
+            return id;
+        }
 
         if(
             aliases[id] &&
@@ -64,17 +67,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toast(text){
 
-        const e = $("toast");
+        let e = $("toast");
 
-        if(!e) return;
+        /*
+           Si la notification existe déjà dans le HTML,
+           on l'utilise.
+
+           Sinon on la crée automatiquement.
+        */
+
+        if(!e){
+
+            e = document.createElement("div");
+
+            e.id = "toast";
+
+            e.setAttribute(
+                "aria-live",
+                "polite"
+            );
+
+            document.body.appendChild(e);
+        }
+
+
+        /*
+           Force la notification à être une
+           fenêtre flottante et non un texte
+           ajouté en bas du contenu.
+        */
+
+        e.style.position = "fixed";
+        e.style.left = "50%";
+        e.style.bottom = "24px";
+        e.style.top = "auto";
+        e.style.transform =
+            "translateX(-50%)";
+
+        e.style.zIndex = "99999";
+        e.style.pointerEvents = "none";
 
         e.textContent = text;
+
+        e.classList.remove("show");
+
+        /*
+           Force le navigateur à recalculer
+           l'animation avant de remettre show.
+        */
+
+        void e.offsetWidth;
+
         e.classList.add("show");
 
         clearTimeout(e._toast);
 
         e._toast = setTimeout(() => {
+
             e.classList.remove("show");
+
         },2200);
     }
 
@@ -97,7 +148,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const ok = SAVE.save(game);
 
         if(show && ok){
-            toast("💾 Partie sauvegardée");
+
+            toast(
+                "💾 Partie sauvegardée"
+            );
         }
 
         return ok;
@@ -147,7 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     : []
         };
 
-        game.scene = resolve(game.scene);
+        game.scene =
+            resolve(game.scene);
 
         return !!STORY[game.scene];
     }
@@ -159,17 +214,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function stats(){
 
-        const clue = $("clueCount");
-        const item = $("itemCount");
-        const progress = $("progress");
+        const clue =
+            $("clueCount");
+
+        const item =
+            $("itemCount");
+
+        const progress =
+            $("progress");
+
 
         if(clue){
-            clue.textContent = game.clues.length;
+
+            clue.textContent =
+                game.clues.length;
         }
 
+
         if(item){
-            item.textContent = game.items.length;
+
+            item.textContent =
+                game.items.length;
         }
+
 
         if(progress){
 
@@ -187,7 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 Math.min(
                     99,
                     Math.round(
-                        visited / total * 100
+                        visited /
+                        total *
+                        100
                     )
                 ) + "%";
         }
@@ -196,76 +265,146 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* =========================================================
        MUSIQUE
+       The Last Call.mp3
     ========================================================= */
 
     function music(){
 
-        const audio = $("music");
-        const slider = $("volume");
-        const value = $("volumeValue");
+        const audio =
+            $("music");
 
-        if(!audio) return;
+        const slider =
+            $("volume");
+
+        const value =
+            $("volumeValue");
+
+
+        if(!audio){
+            return;
+        }
+
 
         audio.loop = true;
 
+
+        /*
+           On force la musique du jeu à être
+           exactement la même que celle de l'accueil.
+        */
+
+        const musicFile =
+            "The Last Call.mp3";
+
+
+        /*
+           Si le HTML possède déjà une source différente,
+           on la remplace.
+        */
+
+        if(
+            !audio.src ||
+            !audio.src.includes(
+                "The Last Call.mp3"
+            )
+        ){
+
+            audio.src =
+                musicFile;
+
+            audio.load();
+        }
+
+
         let volume = 0.45;
+
 
         if(
             SAVE &&
             typeof SAVE.volume === "function"
         ){
-            volume = Number(SAVE.volume());
 
-            if(!Number.isFinite(volume)){
+            volume =
+                Number(
+                    SAVE.volume()
+                );
+
+            if(
+                !Number.isFinite(volume)
+            ){
                 volume = 0.45;
             }
         }
 
+
         audio.volume =
             Math.max(
                 0,
-                Math.min(1,volume)
+                Math.min(
+                    1,
+                    volume
+                )
             );
 
+
         if(slider){
+
             slider.value =
                 Math.round(
-                    audio.volume * 100
+                    audio.volume *
+                    100
                 );
         }
 
+
         if(value){
+
             value.textContent =
                 Math.round(
-                    audio.volume * 100
+                    audio.volume *
+                    100
                 ) + "%";
         }
 
 
         function startMusic(){
 
-            if(audio.paused){
+            if(!audio.paused){
+                return;
+            }
 
-                const promise =
-                    audio.play();
 
-                if(
-                    promise &&
-                    typeof promise.catch === "function"
-                ){
-                    promise.catch(() => {});
-                }
+            const promise =
+                audio.play();
+
+
+            if(
+                promise &&
+                typeof promise.catch ===
+                "function"
+            ){
+
+                promise.catch(
+                    () => {}
+                );
             }
         }
 
 
         /*
-           Tentative immédiate.
-           Si le navigateur bloque l'autoplay,
-           la première interaction lancera la musique.
+           Première tentative.
         */
 
         startMusic();
+
+
+        /*
+           Les navigateurs mobiles peuvent
+           bloquer l'autoplay sur une nouvelle page.
+
+           La première interaction du joueur
+           relancera donc la musique.
+        */
 
         document.addEventListener(
             "pointerdown",
@@ -273,6 +412,25 @@ document.addEventListener("DOMContentLoaded", () => {
             {
                 once:true,
                 passive:true
+            }
+        );
+
+
+        document.addEventListener(
+            "touchstart",
+            startMusic,
+            {
+                once:true,
+                passive:true
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            startMusic,
+            {
+                once:true
             }
         );
 
@@ -288,23 +446,35 @@ document.addEventListener("DOMContentLoaded", () => {
                             0,
                             Math.min(
                                 100,
-                                Number(slider.value) || 0
+                                Number(
+                                    slider.value
+                                ) || 0
                             )
                         ) / 100;
 
-                    audio.volume = n;
+
+                    audio.volume =
+                        n;
+
 
                     if(value){
+
                         value.textContent =
-                            Math.round(n * 100) + "%";
+                            Math.round(
+                                n * 100
+                            ) + "%";
                     }
+
 
                     if(
                         SAVE &&
-                        typeof SAVE.setVolume === "function"
+                        typeof SAVE.setVolume ===
+                        "function"
                     ){
+
                         SAVE.setVolume(n);
                     }
+
 
                     startMusic();
                 }
@@ -317,11 +487,16 @@ document.addEventListener("DOMContentLoaded", () => {
        TEXTE
     ========================================================= */
 
-    function showText(text,done){
+    function showText(
+        text,
+        done
+    ){
 
         clearInterval(timer);
 
-        const box = $("storyText");
+        const box =
+            $("storyText");
+
 
         if(!box){
 
@@ -332,40 +507,58 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+
         typing = true;
 
         box.textContent = "";
 
-        /*
-           Nettoyage des lignes vides excessives.
-           Cela évite les énormes espaces entre les phrases.
-        */
 
-        text = String(text || "")
-            .replace(/\r\n/g,"\n")
-            .replace(/\n{3,}/g,"\n\n")
-            .trim();
+        text =
+            String(text || "")
+                .replace(
+                    /\r\n/g,
+                    "\n"
+                )
+                .replace(
+                    /\n{3,}/g,
+                    "\n\n"
+                )
+                .trim();
+
 
         let i = 0;
 
-        timer = setInterval(() => {
 
-            box.textContent +=
-                text.charAt(i++);
+        timer =
+            setInterval(
+                () => {
 
-            if(i >= text.length){
+                    box.textContent +=
+                        text.charAt(i++);
 
-                clearInterval(timer);
 
-                timer = null;
-                typing = false;
+                    if(
+                        i >=
+                        text.length
+                    ){
 
-                if(done){
-                    done();
-                }
-            }
+                        clearInterval(
+                            timer
+                        );
 
-        },18);
+                        timer = null;
+
+                        typing = false;
+
+
+                        if(done){
+                            done();
+                        }
+                    }
+
+                },
+                18
+            );
     }
 
 
@@ -374,17 +567,31 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(timer);
 
         timer = null;
+
         typing = false;
 
-        const box = $("storyText");
+
+        const box =
+            $("storyText");
+
 
         if(box){
+
             box.textContent =
-                String(scene.text || "")
-                    .replace(/\r\n/g,"\n")
-                    .replace(/\n{3,}/g,"\n\n")
-                    .trim();
+                String(
+                    scene.text || ""
+                )
+                .replace(
+                    /\r\n/g,
+                    "\n"
+                )
+                .replace(
+                    /\n{3,}/g,
+                    "\n\n"
+                )
+                .trim();
         }
+
 
         renderChoices(scene);
     }
@@ -396,9 +603,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function scene(id){
 
-        id = resolve(id);
+        id =
+            resolve(id);
 
-        const data = STORY[id];
+
+        const data =
+            STORY[id];
+
 
         if(!data){
 
@@ -407,56 +618,88 @@ document.addEventListener("DOMContentLoaded", () => {
                 id
             );
 
+
             toast(
-                "⚠️ Erreur de scène : " + id
+                "⚠️ Erreur de scène : " +
+                id
             );
+
 
             return;
         }
 
-        game.scene = id;
+
+        game.scene =
+            id;
+
 
         if(data.chapter){
-            game.chapter = data.chapter;
+
+            game.chapter =
+                data.chapter;
         }
 
-        const chapter = $("chapter");
-        const location = $("location");
-        const time = $("time");
-        const speaker = $("speaker");
-        const choices = $("choices");
+
+        const chapter =
+            $("chapter");
+
+        const location =
+            $("location");
+
+        const time =
+            $("time");
+
+        const speaker =
+            $("speaker");
+
+        const choices =
+            $("choices");
+
 
         if(chapter){
+
             chapter.textContent =
                 data.chapter ||
                 "MYSTERY JOURNEY";
         }
 
+
         if(location){
+
             location.textContent =
                 data.location || "";
         }
 
+
         if(time){
+
             time.textContent =
                 data.time || "";
         }
 
+
         if(speaker){
+
             speaker.textContent =
                 data.speaker || "";
         }
 
+
         if(choices){
+
             choices.innerHTML = "";
         }
 
+
         stats();
+
         save();
+
 
         showText(
             data.text || "",
-            () => renderChoices(data)
+            () =>
+                renderChoices(data)
         );
     }
 
@@ -467,16 +710,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderChoices(data){
 
-        const box = $("choices");
+        const box =
+            $("choices");
 
-        if(!box) return;
+
+        if(!box){
+            return;
+        }
+
 
         box.innerHTML = "";
 
+
         const choices =
-            Array.isArray(data.choices)
-                ? data.choices
-                : [];
+            Array.isArray(
+                data.choices
+            )
+            ? data.choices
+            : [];
+
 
         choices.forEach(
             (choice,index) => {
@@ -486,22 +738,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     "function" &&
                     !choice.condition(game)
                 ){
+
                     return;
                 }
+
 
                 const button =
                     document.createElement(
                         "button"
                     );
 
-                button.type = "button";
+
+                button.type =
+                    "button";
+
 
                 button.className =
                     "choice";
 
+
                 button.textContent =
                     choice.text ||
                     "Continuer";
+
 
                 button.addEventListener(
                     "click",
@@ -514,6 +773,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             return;
                         }
 
+
                         choose(
                             choice,
                             index
@@ -521,7 +781,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 );
 
-                box.appendChild(button);
+
+                box.appendChild(
+                    button
+                );
             }
         );
     }
@@ -531,14 +794,27 @@ document.addEventListener("DOMContentLoaded", () => {
        EFFECTUER UN CHOIX
     ========================================================= */
 
-    function choose(choice,index){
+    function choose(
+        choice,
+        index
+    ){
 
         game.decisions.push({
-            scene:game.scene,
-            choice:index,
-            time:Date.now()
+
+            scene:
+                game.scene,
+
+            choice:
+                index,
+
+            time:
+                Date.now()
         });
 
+
+        /* =====================================================
+           EFFET
+        ===================================================== */
 
         if(
             typeof choice.effect ===
@@ -559,16 +835,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        /* =========================
+        /* =====================================================
            INDICE
-           Le compteur augmente,
-           mais aucun message
-           "Nouvel indice" n'est affiché.
-        ========================= */
+           Le compteur augmente.
+           Aucun texte n'est ajouté à storyText.
+        ===================================================== */
 
         if(
             choice.clue &&
-            !game.clues.includes(choice.clue)
+            !game.clues.includes(
+                choice.clue
+            )
         ){
 
             game.clues.push(
@@ -577,38 +854,67 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        /* =========================
+        /* =====================================================
            OBJET
-        ========================= */
+           IMPORTANT :
+
+           L'objet est seulement ajouté à
+           l'inventaire puis affiché dans
+           la notification toast.
+
+           Il n'est PAS ajouté à storyText.
+        ===================================================== */
 
         if(
             choice.item &&
-            !game.items.includes(choice.item)
+            !game.items.includes(
+                choice.item
+            )
         ){
 
             game.items.push(
                 choice.item
             );
 
-            toast("🎒 Objet obtenu");
+
+            /*
+               Notification flottante.
+            */
+
+            toast(
+                "🎒 Objet obtenu"
+            );
         }
 
 
         stats();
+
         save();
 
 
+        /* =====================================================
+           FIN
+        ===================================================== */
+
         if(choice.end){
 
-            end(choice.end);
+            end(
+                choice.end
+            );
 
             return;
         }
 
 
+        /* =====================================================
+           SCÈNE SUIVANTE
+        ===================================================== */
+
         if(choice.next){
 
-            scene(choice.next);
+            scene(
+                choice.next
+            );
 
             return;
         }
@@ -621,12 +927,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function end(id){
 
-        if(!id) return;
+        if(!id){
+            return;
+        }
 
 
         if(
             !game.endings.includes(id)
         ){
+
             game.endings.push(id);
         }
 
@@ -636,6 +945,7 @@ document.addEventListener("DOMContentLoaded", () => {
             typeof SAVE.unlockEnding ===
             "function"
         ){
+
             SAVE.unlockEnding(id);
         }
 
@@ -643,16 +953,23 @@ document.addEventListener("DOMContentLoaded", () => {
         save();
 
 
-        const gameBox = $("game");
-        const ending = $("ending");
+        const gameBox =
+            $("game");
+
+        const ending =
+            $("ending");
+
 
         if(gameBox){
+
             gameBox.classList.add(
                 "hidden"
             );
         }
 
+
         if(ending){
+
             ending.classList.remove(
                 "hidden"
             );
@@ -752,11 +1069,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         if(icon){
+
             icon.textContent =
                 data[0];
         }
 
+
         if(title){
+
             title.textContent =
                 data[1];
         }
@@ -773,213 +1093,4 @@ document.addEventListener("DOMContentLoaded", () => {
                     "La route 47 recommence. Le cycle n'est pas terminé.",
 
                 destroy:
-                    "Blackwood brûle et les voix disparaissent.",
-
-                guardian:
-                    "Tu es devenu le nouveau gardien.",
-
-                escape:
-                    "Tu quittes les lieux, mais quelque chose marche toujours derrière toi.",
-
-                watched:
-                    "Quelqu'un te regarde, même lorsque tu ne vois personne.",
-
-                mirror_end:
-                    "Ton reflet est maintenant libre.",
-
-                memory_end:
-                    "Tu as tout oublié. Une nouvelle histoire commence.",
-
-                house_end:
-                    "Tu quittes la maison sans jamais regarder derrière toi.",
-
-                chapter1_escape:
-                    "Tu as quitté Blackwood trop tôt.",
-
-                basement_end:
-                    "Tu es enfermé. Des dizaines de voix utilisent maintenant ta voix.",
-
-                secret_escape:
-                    "Tu refuses d'ouvrir la dernière porte.",
-
-                upper_end:
-                    "La silhouette est déjà derrière toi.",
-
-                survivor_end:
-                    "Tu marches jusqu'à l'aube, mais ton ombre n'est pas seule."
-            };
-
-
-            text.textContent =
-                descriptions[id] ||
-                "L'histoire se termine ici.";
-        }
-    }
-
-
-    /* =========================================================
-       NOUVELLE PARTIE
-    ========================================================= */
-
-    function newGame(){
-
-        if(
-            SAVE &&
-            typeof SAVE.clear ===
-            "function"
-        ){
-            SAVE.clear();
-        }
-
-        game = fresh();
-
-
-        const ending =
-            $("ending");
-
-        const gameBox =
-            $("game");
-
-
-        if(ending){
-            ending.classList.add(
-                "hidden"
-            );
-        }
-
-        if(gameBox){
-            gameBox.classList.remove(
-                "hidden"
-            );
-        }
-
-
-        scene("start");
-    }
-
-
-    /* =========================================================
-       REJOUER
-    ========================================================= */
-
-    function replay(){
-
-        game = fresh();
-
-
-        const ending =
-            $("ending");
-
-        const gameBox =
-            $("game");
-
-
-        if(ending){
-            ending.classList.add(
-                "hidden"
-            );
-        }
-
-        if(gameBox){
-            gameBox.classList.remove(
-                "hidden"
-            );
-        }
-
-
-        scene("start");
-    }
-
-
-    /* =========================================================
-       BOUTONS
-    ========================================================= */
-
-    const saveBtn =
-        $("saveBtn");
-
-    const restartBtn =
-        $("restartBtn");
-
-    const againBtn =
-        $("againBtn");
-
-    const menuBtn =
-        $("menuBtn");
-
-
-    if(saveBtn){
-
-        saveBtn.addEventListener(
-            "click",
-            () => save(true)
-        );
-    }
-
-
-    if(restartBtn){
-
-        restartBtn.addEventListener(
-            "click",
-            newGame
-        );
-    }
-
-
-    if(againBtn){
-
-        againBtn.addEventListener(
-            "click",
-            replay
-        );
-    }
-
-
-    if(menuBtn){
-
-        menuBtn.addEventListener(
-            "click",
-            () => {
-
-                save();
-
-                location.href =
-                    "index.html";
-            }
-        );
-    }
-
-
-    /* =========================================================
-       DÉMARRAGE
-    ========================================================= */
-
-    music();
-
-
-    if(params.get("new") === "1"){
-
-        newGame();
-
-    }else if(
-        params.get("continue") === "1"
-    ){
-
-        if(load()){
-            scene(game.scene);
-        }else{
-            newGame();
-        }
-
-    }else if(load()){
-
-        toast("📂 Partie chargée");
-
-        scene(game.scene);
-
-    }else{
-
-        scene("start");
-    }
-
-});
+                    "Blackwood brûle
